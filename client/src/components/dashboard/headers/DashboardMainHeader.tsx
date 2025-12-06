@@ -27,7 +27,7 @@ export function DashboardMainHeader() {
   );
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-md px-6 sticky top-0 z-50">
+    <header className="flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-md px-2 sticky top-0 z-50">
       {/* Left section - Team Switcher */}
       <div className="flex items-center gap-4">
         <DropdownMenu>
