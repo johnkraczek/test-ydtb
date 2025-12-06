@@ -37,7 +37,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
@@ -202,7 +202,7 @@ export default function ContactsPage() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-slate-500 dark:text-slate-500">
-                        {format(contact.lastActive, 'h:mm a')}
+                        {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
                       </span>
                     </TableCell>
                     <TableCell>
