@@ -46,10 +46,6 @@ export function DashboardMainHeader() {
       {/* Right section - Quick Actions and Avatar */}
       <div className="flex items-center gap-3">
         {/* Quick Actions */}
-        <Button className="hidden md:flex gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 rounded-lg h-9" size="sm">
-          <Plus className="h-4 w-4" />
-          <span className="font-medium">New Project</span>
-        </Button>
         
         <div className="h-8 w-px bg-slate-200 mx-1" />
 
