@@ -19,39 +19,62 @@ import {
 } from "@/components/ui/select";
 import { 
   MoreHorizontal, 
-  Mail, 
-  Phone, 
-  MapPin, 
   Search,
   Filter,
   Download,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar,
+  Tag
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { format } from "date-fns";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
-  return Array.from({ length: count }).map((_, i) => ({
-    id: `contact-${i + 1}`,
-    name: [
+  const tags = ["Customer", "Lead", "VIP", "Partner", "Vendor", "New", "Inactive"];
+  
+  return Array.from({ length: count }).map((_, i) => {
+    const hasImage = Math.random() > 0.6; // 40% chance of having an image
+    const name = [
       "Alice Johnson", "Bob Smith", "Charlie Brown", "Diana Prince", 
       "Evan Wright", "Fiona Green", "George King", "Hannah White",
       "Ian Black", "Julia Roberts", "Kevin Lee", "Laura Croft",
       "Mike Tyson", "Nina Simone", "Oscar Wilde", "Paula Abdul",
       "Quincy Jones", "Rachel Green", "Steve Jobs", "Tina Turner"
-    ][i % 20] + (Math.floor(i / 20) > 0 ? ` ${Math.floor(i / 20) + 1}` : ""),
-    email: `user${i + 1}@example.com`,
-    phone: `+1 (555) 000-${(1000 + i).toString().slice(1)}`,
-    company: ["Acme Corp", "Globex", "Soylent Corp", "Initech", "Umbrella Corp"][i % 5],
-    role: ["Manager", "Developer", "Designer", "Director", "Sales"][i % 5],
-    status: ["Active", "Inactive", "Pending"][i % 3],
-    location: ["New York", "London", "Tokyo", "San Francisco", "Berlin"][i % 5],
-    lastActive: `${Math.floor(Math.random() * 24)} hours ago`
-  }));
+    ][i % 20] + (Math.floor(i / 20) > 0 ? ` ${Math.floor(i / 20) + 1}` : "");
+    
+    // Generate initials
+    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+    // Random date within last 2 years
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - Math.floor(Math.random() * 730));
+
+    // Random last active
+    const lastActiveDate = new Date();
+    lastActiveDate.setHours(lastActiveDate.getHours() - Math.floor(Math.random() * 100));
+
+    // Random tags (1-3 tags)
+    const numTags = Math.floor(Math.random() * 3) + 1;
+    const contactTags = Array.from({ length: numTags }).map(() => tags[Math.floor(Math.random() * tags.length)]);
+    const uniqueTags = Array.from(new Set(contactTags));
+
+    return {
+      id: `contact-${i + 1}`,
+      name,
+      initials,
+      email: `user${i + 1}@example.com`,
+      phone: `+1 (555) 000-${(1000 + i).toString().slice(1)}`,
+      image: hasImage ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}` : undefined,
+      created: createdDate,
+      lastActive: lastActiveDate,
+      tags: uniqueTags
+    };
+  });
 };
 
 const allContacts = generateContacts(100);
@@ -65,8 +88,7 @@ export default function ContactsPage() {
   // Filter contacts
   const filteredContacts = allContacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.company.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Pagination
@@ -133,10 +155,11 @@ export default function ContactsPage() {
                   />
                 </TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Contact Info</TableHead>
-                <TableHead className="hidden md:table-cell">Company & Role</TableHead>
-                <TableHead className="hidden lg:table-cell">Status</TableHead>
-                <TableHead className="hidden xl:table-cell">Location</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Last Activity</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -152,50 +175,41 @@ export default function ContactsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700">
-                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.name}`} />
-                          <AvatarFallback>{contact.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
+                          {contact.image && <AvatarImage src={contact.image} />}
+                          <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 md:hidden">{contact.email}</div>
-                        </div>
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                          <Mail className="h-3.5 w-3.5 text-slate-400" />
-                          <span>{contact.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                          <Phone className="h-3 w-3 text-slate-400" />
-                          <span>{contact.phone}</span>
-                        </div>
-                      </div>
+                      <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">{contact.phone}</span>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div>
-                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">{contact.company}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">{contact.role}</div>
-                      </div>
+                    <TableCell>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">{contact.email}</span>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      <Badge 
-                        variant="secondary" 
-                        className={`
-                          ${contact.status === 'Active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : ''}
-                          ${contact.status === 'Inactive' ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700' : ''}
-                          ${contact.status === 'Pending' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20' : ''}
-                        `}
-                      >
-                        {contact.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden xl:table-cell">
+                    <TableCell>
                       <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                        {contact.location}
+                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                        <span>{format(contact.created, 'MMM d, yyyy')}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-500 dark:text-slate-500">
+                        {format(contact.lastActive, 'h:mm a')}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1.5">
+                        {contact.tags.map(tag => (
+                          <Badge 
+                            key={tag} 
+                            variant="secondary" 
+                            className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -207,7 +221,7 @@ export default function ContactsPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-slate-500">
+                  <TableCell colSpan={8} className="h-24 text-center text-slate-500">
                     No contacts found.
                   </TableCell>
                 </TableRow>
