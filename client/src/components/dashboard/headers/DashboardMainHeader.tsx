@@ -1,5 +1,5 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -252,7 +252,7 @@ export function DashboardMainHeader() {
                   settingsTab === 'general' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 )}
               >
-                <LayoutGrid className="h-4 w-4" />
+                <List className="h-4 w-4" />
                 General
               </button>
               <button 
@@ -262,7 +262,7 @@ export function DashboardMainHeader() {
                   settingsTab === 'sources' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 )}
               >
-                <LayoutGrid className="h-4 w-4" />
+                <AppWindow className="h-4 w-4" />
                 Sources
               </button>
               <button 
@@ -272,7 +272,7 @@ export function DashboardMainHeader() {
                   settingsTab === 'commands' ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 )}
               >
-                <span className="flex items-center justify-center h-4 w-4 font-mono text-[10px] border border-current rounded bg-transparent">⌘</span>
+                <CommandIcon className="h-4 w-4" />
                 Commands
               </button>
             </div>
@@ -282,7 +282,7 @@ export function DashboardMainHeader() {
               <div className="h-14 border-b flex items-center justify-between px-6">
                 <h2 className="font-semibold text-slate-900">
                   {settingsTab === 'general' && 'General Settings'}
-                  {settingsTab === 'sources' && 'Search Sources'}
+                  {settingsTab === 'sources' && 'Sources'}
                   {settingsTab === 'commands' && 'Commands'}
                 </h2>
                 <Button 
@@ -297,6 +297,37 @@ export function DashboardMainHeader() {
               </div>
 
               <div className="flex-1 p-6 overflow-y-auto">
+                {settingsTab === 'sources' && (
+                  <div className="flex flex-col h-full items-center justify-center text-center">
+                    <div className="relative mb-6">
+                      <div className="h-16 w-16 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
+                        <div className="flex flex-col gap-1.5 opacity-50">
+                          <div className="w-8 h-1 bg-slate-300 rounded-full" />
+                          <div className="w-6 h-1 bg-slate-300 rounded-full" />
+                          <div className="w-8 h-1 bg-slate-300 rounded-full" />
+                        </div>
+                      </div>
+                      <div className="absolute -right-2 -bottom-2 h-8 w-8 bg-white rounded-full shadow-sm border border-slate-100 flex items-center justify-center">
+                        <Search className="h-4 w-4 text-indigo-600" />
+                      </div>
+                      <div className="absolute -left-2 -top-2">
+                        <Slack className="h-4 w-4 text-slate-400 rotate-12" />
+                      </div>
+                      <div className="absolute right-6 -top-4">
+                        <Box className="h-3 w-3 text-slate-300" />
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-sm font-medium text-slate-900 mb-2">Search your Apps</h3>
+                    <p className="text-xs text-slate-500 max-w-[360px] mb-6 leading-relaxed">
+                      Visit our App Center to connect apps you're using, enable Connected Search for them and we will use those apps as sources for your search.
+                    </p>
+                    <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 h-9 px-4 text-xs font-medium">
+                      Connect app
+                    </Button>
+                  </div>
+                )}
+
                 {settingsTab === 'commands' && (
                   <div className="flex flex-col h-full">
                     <div className="flex-1 flex flex-col items-center justify-center text-center mb-8">
