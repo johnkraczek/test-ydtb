@@ -53,7 +53,7 @@ export default function DashboardPage() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
           {/* Main Chart */}
-          <Card className="col-span-4 border-slate-200/60 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <Card className="col-span-4 border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader>
               <CardTitle className="text-lg font-display font-semibold">Overview</CardTitle>
               <CardDescription>Monthly revenue performance</CardDescription>
@@ -64,18 +64,18 @@ export default function DashboardPage() {
                   <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                     <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                        itemStyle={{ color: '#1e293b' }}
+                        contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
                     />
-                    <Area type="monotone" dataKey="value" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                    <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -83,7 +83,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recent Activity */}
-          <Card className="col-span-3 border-slate-200/60 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <Card className="col-span-3 border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader>
               <CardTitle className="text-lg font-display font-semibold">Recent Sales</CardTitle>
               <CardDescription>You made 265 sales this month.</CardDescription>
@@ -113,15 +113,15 @@ export default function DashboardPage() {
 
 function StatsCard({ title, value, change, icon: Icon, trend }: any) {
     return (
-        <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">{title}</CardTitle>
+                <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</CardTitle>
                 <Icon className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold font-display text-slate-900">{value}</div>
-                <p className="text-xs text-slate-500 mt-1">
-                    <span className={trend === 'up' ? 'text-emerald-600 font-medium' : 'text-rose-600 font-medium'}>{change}</span>
+                <div className="text-2xl font-bold font-display text-slate-900 dark:text-slate-100">{value}</div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <span className={trend === 'up' ? 'text-emerald-600 dark:text-emerald-500 font-medium' : 'text-rose-600 dark:text-rose-500 font-medium'}>{change}</span>
                 </p>
             </CardContent>
         </Card>
@@ -131,24 +131,24 @@ function StatsCard({ title, value, change, icon: Icon, trend }: any) {
 function RecentSaleItem({ name, email, amount, initials }: any) {
     return (
         <div className="flex items-center">
-            <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold mr-4">
+            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold mr-4">
                 {initials}
             </div>
             <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none text-slate-900">{name}</p>
-                <p className="text-xs text-slate-500">{email}</p>
+                <p className="text-sm font-medium leading-none text-slate-900 dark:text-slate-100">{name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{email}</p>
             </div>
-            <div className="ml-auto font-medium text-slate-900">{amount}</div>
+            <div className="ml-auto font-medium text-slate-900 dark:text-slate-100">{amount}</div>
         </div>
     )
 }
 
 function ProjectCard({ title, status, progress }: any) {
     return (
-        <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+        <Card className="border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-display font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{title}</CardTitle>
+                    <CardTitle className="text-base font-display font-semibold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{title}</CardTitle>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -156,8 +156,8 @@ function ProjectCard({ title, status, progress }: any) {
                 <CardDescription>{status}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden mt-2">
-                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${progress}%` }} />
+                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${progress}%` }} />
                 </div>
                 <div className="mt-2 text-xs text-slate-500 text-right">{progress}% Complete</div>
             </CardContent>
