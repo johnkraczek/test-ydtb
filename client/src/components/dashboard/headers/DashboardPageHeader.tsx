@@ -20,12 +20,6 @@ export function DashboardPageHeader({
     <div className={`flex items-center justify-between ${isBorderVisible ? "border-b" : ""} bg-white/50 backdrop-blur-sm px-8 py-4 transition-all duration-300`}>
       <div className="flex items-center gap-4">
         <DashboardBreadcrumb />
-        {title && (
-          <>
-            <div className="h-4 w-px bg-slate-200" />
-            <h1 className="font-display font-semibold text-sm tracking-tight text-slate-900">{title}</h1>
-          </>
-        )}
       </div>
       <div className="flex items-center gap-3">
         {actions || (
