@@ -1,5 +1,5 @@
 
-import { Bell, Plus, Search, Settings, User, Command } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,23 +8,98 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export function DashboardMainHeader() {
+  const [workspaces] = useState([
+    { id: "1", name: "Acme Corp", plan: "Free Plan", initials: "AC", active: true },
+    { id: "2", name: "Stark Industries", plan: "Pro Plan", initials: "SI", active: false },
+    { id: "3", name: "Wayne Enterprises", plan: "Enterprise", initials: "WE", active: false },
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredWorkspaces = workspaces.filter(ws => 
+    ws.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-md px-6 sticky top-0 z-50">
       {/* Left section - Team Switcher */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-sm text-white shadow-md shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
-            AC
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm text-slate-800 leading-none">Acme Corp</span>
-            <span className="text-slate-500 text-xs mt-1">Free Plan</span>
-          </div>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 group cursor-pointer hover:bg-slate-100/50 p-1 -ml-1 pr-3 rounded-lg transition-colors">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-sm text-white shadow-md shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
+                AC
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="font-semibold text-sm text-slate-800 leading-none group-hover:text-indigo-600 transition-colors">Acme Corp</span>
+                <span className="text-slate-500 text-xs mt-1">Free Plan</span>
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[300px] p-0" sideOffset={8}>
+            {/* Back to Agency View */}
+            <div className="p-2 border-b border-slate-100">
+              <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-slate-500 hover:text-slate-900 h-9 font-medium">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Agency View
+              </Button>
+            </div>
+
+            {/* Search */}
+            <div className="p-3 pb-2">
+              <div className="relative">
+                <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                <Input 
+                  className="w-full pl-8 h-9 text-sm bg-slate-50 border-slate-200" 
+                  placeholder="Find workspace..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Workspaces List */}
+            <div className="p-2 max-h-[240px] overflow-y-auto">
+              <DropdownMenuLabel className="text-xs text-slate-500 font-medium px-2 py-1.5">
+                Your Workspaces
+              </DropdownMenuLabel>
+              {filteredWorkspaces.length > 0 ? (
+                filteredWorkspaces.map((ws) => (
+                  <DropdownMenuItem key={ws.id} className="flex items-center gap-3 p-2 cursor-pointer rounded-md">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-md font-bold text-xs text-white ${ws.active ? 'bg-indigo-600 shadow-sm shadow-indigo-200' : 'bg-slate-600'}`}>
+                      {ws.initials}
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <span className={`font-medium text-sm ${ws.active ? 'text-slate-900' : 'text-slate-600'}`}>{ws.name}</span>
+                      <span className="text-xs text-slate-400">{ws.plan}</span>
+                    </div>
+                    {ws.active && <Check className="h-4 w-4 text-indigo-600" />}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-400">
+                  No workspaces found
+                </div>
+              )}
+            </div>
+
+            <DropdownMenuSeparator />
+
+            {/* Create Workspace */}
+            <div className="p-2">
+              <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200" size="sm">
+                <Plus className="h-4 w-4" />
+                Create Workspace
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Center section - Search */}
