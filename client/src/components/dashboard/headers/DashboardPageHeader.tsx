@@ -17,27 +17,25 @@ export function DashboardPageHeader({
   isBorderVisible = true,
 }: DashboardPageHeaderProps) {
   return (
-    <div className={`flex items-end justify-between ${isBorderVisible ? "border-b" : ""} bg-white/50 backdrop-blur-sm px-8 py-6 transition-all duration-300`}>
-      <div className="flex flex-col gap-4">
+    <div className={`flex items-center justify-between ${isBorderVisible ? "border-b" : ""} bg-white/50 backdrop-blur-sm px-8 py-4 transition-all duration-300`}>
+      <div className="flex items-center gap-4">
         <DashboardBreadcrumb />
-        <div>
-          {title && (
-            <h1 className="font-display font-bold text-3xl tracking-tight text-slate-900">{title}</h1>
-          )}
-          {description && (
-            <p className="mt-2 text-slate-500 text-base max-w-2xl leading-relaxed">{description}</p>
-          )}
-        </div>
+        {title && (
+          <>
+            <div className="h-4 w-px bg-slate-200" />
+            <h1 className="font-display font-semibold text-sm tracking-tight text-slate-900">{title}</h1>
+          </>
+        )}
       </div>
-      <div className="flex items-center gap-3 mb-1">
+      <div className="flex items-center gap-3">
         {actions || (
           <>
-             <Button variant="outline" size="sm" className="h-9 gap-2 bg-white">
-              <Share2 className="h-4 w-4" />
+             <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs">
+              <Share2 className="h-3.5 w-3.5" />
               Share
             </Button>
-            <Button variant="outline" size="sm" className="h-9 gap-2 bg-white">
-              <Download className="h-4 w-4" />
+            <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs">
+              <Download className="h-3.5 w-3.5" />
               Export
             </Button>
           </>
