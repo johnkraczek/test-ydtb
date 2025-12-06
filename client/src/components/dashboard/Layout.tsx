@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
 
         {/* Collapsible Tool Sidebar + Main Content */}
-        <div className="flex flex-1 overflow-hidden gap-2 pr-2 pb-2 pt-0">
+        <div className="flex flex-1 overflow-hidden gap-2 p-2 pl-0">
           
             <ToolSidebar
               isOpen={isToolSidebarOpen}
@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             />
 
             {/* Main Content Area */}
-            <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm mt-2 transition-all duration-300`}>
+            <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300`}>
               {/* Page Header */}
               <DashboardPageHeader
                 description="Here's what's happening with your projects today."

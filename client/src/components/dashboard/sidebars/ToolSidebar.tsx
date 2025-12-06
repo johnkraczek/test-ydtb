@@ -44,7 +44,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
 
   return (
     <div
-      className={`bg-white/80 backdrop-blur-xl h-full ml-2 my-2 rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`bg-white/80 backdrop-blur-xl h-full rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isOpen ? "w-64 opacity-100 translate-x-0" : "w-0 opacity-0 -translate-x-4 overflow-hidden border-0 ml-0 p-0"
       }`}
     >
