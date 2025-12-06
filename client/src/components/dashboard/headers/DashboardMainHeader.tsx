@@ -1,5 +1,5 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2 } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +11,18 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import { Command as CommandPrimitive } from "cmdk";
 
 export function DashboardMainHeader() {
   const [workspaces] = useState([
@@ -49,6 +59,18 @@ export function DashboardMainHeader() {
   ]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const filteredWorkspaces = workspaces.filter(ws => 
     ws.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -58,6 +80,155 @@ export function DashboardMainHeader() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-md px-2 sticky top-0 z-50">
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          <CommandPrimitive.Input
+            className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="Search, run a command, or ask a question..."
+          />
+          <Button variant="outline" size="sm" className="h-7 gap-1 text-xs font-medium text-indigo-600 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700">
+            Ask AI
+            <Sparkles className="h-3 w-3" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-1 p-2 border-b bg-slate-50/50 overflow-x-auto no-scrollbar">
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs font-medium bg-white shadow-sm border border-slate-200 text-slate-900">
+            All
+          </Button>
+          <div className="w-px h-4 bg-slate-200 mx-1" />
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+            <Mail className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+            <Box className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+            <Github className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+            <Slack className="h-3.5 w-3.5" />
+          </Button>
+          <div className="w-px h-4 bg-slate-200 mx-1" />
+          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+            <CheckCircle2 className="h-3 w-3" />
+            Tasks
+          </Button>
+          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+            <FileText className="h-3 w-3" />
+            Docs
+          </Button>
+          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+            <Hash className="h-3 w-3" />
+            Channels
+          </Button>
+        </div>
+
+        <CommandList className="max-h-[400px]">
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Suggestions">
+            <CommandItem className="py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-slate-500" />
+                </div>
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900 truncate">Connect GHL to Clinic Sense via forms</span>
+                    <span className="text-xs text-slate-400 shrink-0">1mo ago</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <span>in Tasks</span>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
+            <CommandItem className="py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <LayoutGrid className="h-4 w-4 text-slate-500" />
+                </div>
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900 truncate">Phone Process for how to answer a call</span>
+                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                    <span>in Tasks</span>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
+            <CommandItem className="py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                </div>
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900 truncate">Export Contacts to upload to High Level</span>
+                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                    <span>in Tasks</span>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
+            <CommandItem className="py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                </div>
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900 truncate">Obtain Files from Haley, Graphic Designer</span>
+                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                    <span>in Tasks</span>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Rise AI">
+            <CommandItem className="py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <LayoutGrid className="h-4 w-4 text-slate-500" />
+                </div>
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900 truncate">Botanza</span>
+                    <span className="text-xs text-slate-400 shrink-0">3mo ago</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <span>in Rise AI</span>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+        
+        <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-t text-[10px] text-slate-500">
+          <div className="flex items-center gap-2">
+            <span>Type <kbd className="font-mono bg-white border rounded px-1">/</kbd> to view available commands</span>
+            <span>hit <kbd className="font-mono bg-white border rounded px-1">tab</kbd> on a selected item to see additional actions</span>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-slate-900">
+            <Settings className="h-3 w-3" />
+            <span>Settings</span>
+          </div>
+        </div>
+      </CommandDialog>
+
       {/* Left section - Team Switcher */}
       <div className="flex items-center gap-4">
         <DropdownMenu>
@@ -138,12 +309,14 @@ export function DashboardMainHeader() {
 
       {/* Center section - Search */}
       <div className="mx-8 max-w-md flex-1">
-        <div className="relative group">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-          <Input 
-            className="w-full pl-10 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500 transition-all rounded-lg" 
-            placeholder="Search resources..." 
-          />
+        <div 
+          className="relative group cursor-pointer"
+          onClick={() => setOpen(true)}
+        >
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+          <div className="w-full pl-10 h-10 flex items-center bg-slate-50 border border-slate-200 hover:border-indigo-300 text-sm text-slate-500 rounded-lg transition-all">
+            Search resources...
+          </div>
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
               <span className="text-xs">⌘</span>K
