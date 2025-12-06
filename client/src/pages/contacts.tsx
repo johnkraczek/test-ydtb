@@ -80,6 +80,20 @@ const generateContacts = (count: number) => {
     const contactTags = Array.from({ length: numTags }).map(() => tags[Math.floor(Math.random() * tags.length)]);
     const uniqueTags = Array.from(new Set(contactTags));
 
+    // Random Date of Birth (20-60 years ago)
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - Math.floor(Math.random() * 40 + 20));
+    dob.setMonth(Math.floor(Math.random() * 12));
+    dob.setDate(Math.floor(Math.random() * 28 + 1));
+
+    // Random Contact Source
+    const sources = ["Website", "Referral", "LinkedIn", "Conference", "Cold Call", "Advertisement"];
+    const source = sources[Math.floor(Math.random() * sources.length)];
+
+    // Random Contact Type
+    const types = ["Individual", "Company", "Non-Profit", "Government"];
+    const type = types[Math.floor(Math.random() * types.length)];
+
     return {
       id: `contact-${i + 1}`,
       name,
@@ -89,7 +103,15 @@ const generateContacts = (count: number) => {
       image: hasImage ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}` : undefined,
       created: createdDate,
       lastActive: lastActiveDate,
-      tags: uniqueTags
+      tags: uniqueTags,
+      dob,
+      source,
+      type,
+      dndEmail: Math.random() > 0.9,
+      dndSms: Math.random() > 0.9,
+      dndCall: Math.random() > 0.9,
+      inboundCalls: Math.floor(Math.random() * 50),
+      inboundSms: Math.floor(Math.random() * 100),
     };
   });
 };
@@ -112,6 +134,14 @@ export default function ContactsPage() {
     created: true,
     lastActive: true,
     tags: true,
+    dob: false,
+    source: false,
+    type: false,
+    dndEmail: false,
+    dndSms: false,
+    dndCall: false,
+    inboundCalls: false,
+    inboundSms: false,
   });
   const [columnSearch, setColumnSearch] = useState("");
 
@@ -122,6 +152,14 @@ export default function ContactsPage() {
     { id: "created", label: "Created" },
     { id: "lastActive", label: "Last Activity" },
     { id: "tags", label: "Tags" },
+    { id: "dob", label: "Date of Birth" },
+    { id: "source", label: "Contact Source" },
+    { id: "type", label: "Contact Type" },
+    { id: "dndEmail", label: "DND Email" },
+    { id: "dndSms", label: "DND SMS" },
+    { id: "dndCall", label: "DND Calls" },
+    { id: "inboundCalls", label: "Inbound Calls" },
+    { id: "inboundSms", label: "Inbound SMS" },
   ];
 
   const filteredColumns = columns.filter(col => 
@@ -150,7 +188,7 @@ export default function ContactsPage() {
       let bValue: any = b[sortColumn as keyof typeof b];
 
       // Handle dates specifically
-      if (sortColumn === 'created' || sortColumn === 'lastActive') {
+      if (['created', 'lastActive', 'dob'].includes(sortColumn)) {
         aValue = new Date(aValue).getTime();
         bValue = new Date(bValue).getTime();
       } else if (typeof aValue === 'string') {
@@ -287,6 +325,14 @@ export default function ContactsPage() {
                 {visibleColumns.email && <SortableHeader column="email" label="Email" />}
                 {visibleColumns.created && <SortableHeader column="created" label="Created" />}
                 {visibleColumns.lastActive && <SortableHeader column="lastActive" label="Last Activity" />}
+                {visibleColumns.dob && <SortableHeader column="dob" label="Date of Birth" />}
+                {visibleColumns.source && <SortableHeader column="source" label="Source" />}
+                {visibleColumns.type && <SortableHeader column="type" label="Type" />}
+                {visibleColumns.dndEmail && <SortableHeader column="dndEmail" label="DND Email" />}
+                {visibleColumns.dndSms && <SortableHeader column="dndSms" label="DND SMS" />}
+                {visibleColumns.dndCall && <SortableHeader column="dndCall" label="DND Calls" />}
+                {visibleColumns.inboundCalls && <SortableHeader column="inboundCalls" label="Inbound Calls" />}
+                {visibleColumns.inboundSms && <SortableHeader column="inboundSms" label="Inbound SMS" />}
                 {visibleColumns.tags && <TableHead>Tags</TableHead>}
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -334,6 +380,62 @@ export default function ContactsPage() {
                       <TableCell>
                         <span className="text-sm text-slate-500 dark:text-slate-500">
                           {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.dob && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {format(contact.dob, 'MMM d, yyyy')}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.source && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {contact.source}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.type && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {contact.type}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.dndEmail && (
+                      <TableCell>
+                        <span className={`text-sm ${contact.dndEmail ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                          {contact.dndEmail ? 'Yes' : 'No'}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.dndSms && (
+                      <TableCell>
+                        <span className={`text-sm ${contact.dndSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                          {contact.dndSms ? 'Yes' : 'No'}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.dndCall && (
+                      <TableCell>
+                        <span className={`text-sm ${contact.dndCall ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                          {contact.dndCall ? 'Yes' : 'No'}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.inboundCalls && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {contact.inboundCalls}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.inboundSms && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {contact.inboundSms}
                         </span>
                       </TableCell>
                     )}
