@@ -30,12 +30,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useState } from "react";
 import { format } from "date-fns";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
-  const tags = ["Customer", "Lead", "VIP", "Partner", "Vendor", "New", "Inactive"];
+  const tags = ["Customer", "Lead", "VIP", "Partner", "Vendor", "New", "Inactive", "Referral", "Enterprise", "Small Business"];
   
   return Array.from({ length: count }).map((_, i) => {
     const hasImage = Math.random() > 0.6; // 40% chance of having an image
@@ -58,8 +64,8 @@ const generateContacts = (count: number) => {
     const lastActiveDate = new Date();
     lastActiveDate.setHours(lastActiveDate.getHours() - Math.floor(Math.random() * 100));
 
-    // Random tags (1-3 tags)
-    const numTags = Math.floor(Math.random() * 3) + 1;
+    // Random tags (1-5 tags)
+    const numTags = Math.floor(Math.random() * 5) + 1;
     const contactTags = Array.from({ length: numTags }).map(() => tags[Math.floor(Math.random() * tags.length)]);
     const uniqueTags = Array.from(new Set(contactTags));
 
@@ -200,16 +206,37 @@ export default function ContactsPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1.5">
-                        {contact.tags.map(tag => (
+                      <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+                        {contact.tags.slice(0, 2).map(tag => (
                           <Badge 
                             key={tag} 
                             variant="secondary" 
-                            className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                            className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap"
                           >
                             {tag}
                           </Badge>
                         ))}
+                        {contact.tags.length > 2 && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge 
+                                  variant="secondary" 
+                                  className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-help"
+                                >
+                                  +{contact.tags.length - 2}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="flex flex-col gap-1">
+                                  {contact.tags.slice(2).map(tag => (
+                                    <span key={tag} className="text-xs">{tag}</span>
+                                  ))}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
