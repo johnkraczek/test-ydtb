@@ -95,7 +95,7 @@ export function ToolIconsSidebar({
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full py-2 pl-2">
-        <div className="flex w-12 flex-col items-center gap-2 border border-slate-200/60 bg-white/80 backdrop-blur-xl rounded-md shadow-sm py-3 z-20">
+        <div className="flex w-12 flex-col items-center gap-2 border border-slate-200/60 bg-white/80 backdrop-blur-xl rounded-md shadow-sm py-1.5 z-20">
           {/* Expand/Collapse Button */}
           {!isToolSidebarOpen && onToggleSidebar && (
             <div className="mb-2">
