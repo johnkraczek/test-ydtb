@@ -21,7 +21,7 @@ import { ThemeColorProvider } from "@/hooks/use-theme-color";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem>
         <ThemeColorProvider defaultThemeColor="zinc" storageKey="vite-ui-theme-color">
           <TooltipProvider>
             <Toaster />
