@@ -27,7 +27,8 @@ import {
   Calendar,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Plus
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -253,6 +254,13 @@ export default function ContactsPage() {
                       No columns found
                     </div>
                   )}
+                </div>
+                <DropdownMenuSeparator />
+                <div className="p-2">
+                  <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 px-2 text-xs font-normal text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <Plus className="h-3.5 w-3.5" />
+                    Add custom fields
+                  </Button>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
