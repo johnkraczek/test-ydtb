@@ -1,7 +1,8 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,7 +62,17 @@ export function DashboardMainHeader() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<'command' | 'settings'>('command');
-  const [settingsTab, setSettingsTab] = useState<'general' | 'sources' | 'commands'>('commands');
+  const [settingsTab, setSettingsTab] = useState<'general' | 'sources' | 'commands'>('general');
+  const [searchSettings, setSearchSettings] = useState([
+    { id: 'contacts', label: 'Contacts', icon: User, enabled: true, description: 'Search through your contacts and team members' },
+    { id: 'tasks', label: 'Tasks', icon: CheckCircle2, enabled: true, description: 'Find tasks, subtasks and projects' },
+    { id: 'media', label: 'Media', icon: ImageIcon, enabled: true, description: 'Images, videos and other media files' },
+    { id: 'docs', label: 'Documents', icon: FileText, enabled: true, description: 'Text documents, PDFs and spreadsheets' },
+    { id: 'calendar', label: 'Calendar', icon: Calendar, enabled: false, description: 'Events, meetings and reminders' },
+    { id: 'messages', label: 'Messages', icon: MessageSquare, enabled: true, description: 'Chat messages and direct messages' },
+    { id: 'channels', label: 'Channels', icon: Hash, enabled: true, description: 'Public and private channels' },
+    { id: 'repos', label: 'Repositories', icon: Github, enabled: false, description: 'Code repositories and branches' },
+  ]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -297,6 +308,40 @@ export function DashboardMainHeader() {
               </div>
 
               <div className="flex-1 p-6 overflow-y-auto">
+                {settingsTab === 'general' && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-slate-900 mb-1">Search Scope</h3>
+                      <p className="text-xs text-slate-500 mb-4">
+                        Customize what content appears in your search results.
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      {searchSettings.map((setting) => (
+                        <div key={setting.id} className="flex items-start justify-between group">
+                          <div className="flex items-start gap-3">
+                            <div className="mt-0.5 h-8 w-8 rounded-md bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
+                              <setting.icon className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-slate-900 mb-0.5">{setting.label}</div>
+                              <div className="text-xs text-slate-500">{setting.description}</div>
+                            </div>
+                          </div>
+                          <Switch 
+                            checked={setting.enabled}
+                            onCheckedChange={(checked) => {
+                              setSearchSettings(prev => prev.map(s => 
+                                s.id === setting.id ? { ...s, enabled: checked } : s
+                              ));
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {settingsTab === 'sources' && (
                   <div className="flex flex-col h-full items-center justify-center text-center">
                     <div className="relative mb-6">
