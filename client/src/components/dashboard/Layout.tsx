@@ -1,14 +1,38 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { DashboardFooter } from "./DashboardFooter";
 import { DashboardMainHeader } from "./headers/DashboardMainHeader";
 import { DashboardPageHeader } from "./headers/DashboardPageHeader";
 import { ToolIconsSidebar } from "./sidebars/ToolIconsSidebar";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [activeTool, setActiveTool] = useState("home");
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  activeTool?: string;
+}
+
+export default function DashboardLayout({ children, activeTool: initialActiveTool = "home" }: DashboardLayoutProps) {
+  const [activeTool, setActiveTool] = useState(initialActiveTool);
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
+  const [location, setLocation] = useLocation();
+
+  // Sync internal state with prop if it changes
+  useEffect(() => {
+    setActiveTool(initialActiveTool);
+  }, [initialActiveTool]);
+
+  const handleToolSelect = (toolId: string) => {
+    setActiveTool(toolId);
+    
+    // Simple routing based on tool ID
+    if (toolId === "home") {
+      setLocation("/");
+    } else if (toolId === "users") {
+      setLocation("/contacts");
+    }
+    // Add other routes as needed
+  };
 
   return (
     <div className="flex h-screen flex-col bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
@@ -25,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Tool Icons Sidebar - Fixed left */}
         <ToolIconsSidebar
           activeTool={activeTool}
-          onToolSelect={setActiveTool}
+          onToolSelect={handleToolSelect}
           isToolSidebarOpen={isToolSidebarOpen}
           onToggleSidebar={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
         />
@@ -43,8 +67,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300`}>
               {/* Page Header */}
               <DashboardPageHeader
-                description="Here's what's happening with your projects today."
-                title="Dashboard"
+                description={activeTool === "users" ? "Manage your team and contacts." : "Here's what's happening with your projects today."}
+                title={activeTool === "users" ? "Contacts" : "Dashboard"}
                 isBorderVisible={true}
               />
 

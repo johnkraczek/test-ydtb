@@ -47,7 +47,7 @@ const mainTools = [
   {
     id: "users",
     icon: Users,
-    label: "Users",
+    label: "Contacts",
     active: false,
   },
   {

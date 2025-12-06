@@ -35,6 +35,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <DocumentsSidebarContent />;
       case "analytics":
         return <AnalyticsSidebarContent />;
+      case "users":
+        return <ContactsSidebarContent />;
       case "settings":
         return <SettingsSidebarContent />;
       default:
@@ -79,7 +81,9 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         <div className="p-3 border-t border-slate-100 dark:border-slate-800">
             <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
                 <Plus className="h-4 w-4" />
-                <span className="font-medium">Create New</span>
+                <span className="font-medium">
+                  {toolId === "users" ? "Create New Contact" : "Create New"}
+                </span>
             </Button>
         </div>
       </div>
@@ -169,6 +173,24 @@ function AnalyticsSidebarContent() {
         <SidebarItem icon={FileText} label="Weekly Summary" />
         <SidebarItem icon={FileText} label="Monthly Growth" />
         <SidebarItem icon={FileText} label="User Retention" />
+      </SidebarSection>
+    </div>
+  );
+}
+
+function ContactsSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Contacts">
+        <SidebarItem icon={User} label="All Contacts" active />
+        <SidebarItem icon={Star} label="Favorites" badge="5" />
+        <SidebarItem icon={Clock} label="Recently Added" />
+      </SidebarSection>
+      
+      <SidebarSection title="Groups">
+        <SidebarItem icon={Folder} label="Customers" />
+        <SidebarItem icon={Folder} label="Partners" />
+        <SidebarItem icon={Folder} label="Vendors" />
       </SidebarSection>
     </div>
   );
