@@ -1,7 +1,7 @@
 
 export function DashboardFooter() {
   return (
-    <footer className="border-t bg-white/50 backdrop-blur-sm px-8 py-4 mt-auto">
+    <footer className="border-t bg-white/50 backdrop-blur-sm px-8 py-2 mt-auto">
       <div className="flex items-center justify-between">
         <div className="text-slate-400 text-xs">
           © 2024 Acme Corp. All rights reserved.
