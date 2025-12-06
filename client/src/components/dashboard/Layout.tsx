@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
 
         {/* Collapsible Tool Sidebar + Main Content */}
-        <div className="flex flex-1 overflow-hidden gap-2 p-2">
+        <div className={`flex flex-1 overflow-hidden p-2 ${isToolSidebarOpen ? "gap-2" : ""}`}>
           
             <ToolSidebar
               isOpen={isToolSidebarOpen}
