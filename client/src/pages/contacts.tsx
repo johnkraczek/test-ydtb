@@ -279,9 +279,11 @@ export default function ContactsPage() {
                     <DropdownMenuCheckboxItem
                       key={col.id}
                       checked={visibleColumns[col.id]}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) => {
+                        if (col.id === 'name') return;
                         setVisibleColumns(prev => ({ ...prev, [col.id]: checked }))
-                      }
+                      }}
+                      disabled={col.id === 'name'}
                       className="text-xs"
                     >
                       {col.label}
