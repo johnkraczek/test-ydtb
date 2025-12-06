@@ -25,7 +25,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Tag
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -90,12 +92,44 @@ export default function ContactsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
 
   // Filter contacts
   const filteredContacts = allContacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contact.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Sort contacts
+  if (sortColumn) {
+    filteredContacts.sort((a, b) => {
+      let aValue: any = a[sortColumn as keyof typeof a];
+      let bValue: any = b[sortColumn as keyof typeof b];
+
+      // Handle dates specifically
+      if (sortColumn === 'created' || sortColumn === 'lastActive') {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      } else if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 
   // Pagination
   const totalPages = Math.ceil(filteredContacts.length / parseInt(pageSize));
@@ -117,6 +151,21 @@ export default function ContactsPage() {
     } else {
       setSelectedContacts([...selectedContacts, id]);
     }
+  };
+
+  const SortableHeader = ({ column, label, className = "" }: { column: string, label: string, className?: string }) => {
+    return (
+      <TableHead className={`cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none ${className}`} onClick={() => handleSort(column)}>
+        <div className="flex items-center gap-1">
+          {label}
+          {sortColumn === column ? (
+            sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />
+          ) : (
+            <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 opacity-50" />
+          )}
+        </div>
+      </TableHead>
+    );
   };
 
   return (
@@ -160,11 +209,11 @@ export default function ContactsPage() {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Activity</TableHead>
+                <SortableHeader column="name" label="Name" />
+                <SortableHeader column="phone" label="Phone" />
+                <SortableHeader column="email" label="Email" />
+                <SortableHeader column="created" label="Created" />
+                <SortableHeader column="lastActive" label="Last Activity" />
                 <TableHead>Tags</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
