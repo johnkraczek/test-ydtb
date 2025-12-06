@@ -283,6 +283,7 @@ export default function ContactsPage() {
                         if (col.id === 'name') return;
                         setVisibleColumns(prev => ({ ...prev, [col.id]: checked }))
                       }}
+                      onSelect={(e) => e.preventDefault()}
                       disabled={col.id === 'name'}
                       className="text-xs"
                     >
