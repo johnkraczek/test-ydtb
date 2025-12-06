@@ -1,5 +1,5 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,14 +32,18 @@ export function DashboardMainHeader() {
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-3 group cursor-pointer hover:bg-slate-100/50 p-1 -ml-1 pr-3 rounded-lg transition-colors">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-sm text-white shadow-md shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
+            <div className="flex items-center gap-3 group cursor-pointer hover:bg-slate-50 border border-slate-200/60 p-1.5 pr-3 rounded-xl transition-all shadow-sm hover:shadow-md">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-sm text-white shadow-sm shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
                 AC
               </div>
-              <div className="flex flex-col text-left">
+              <div className="flex flex-col text-left mr-2">
                 <span className="font-semibold text-sm text-slate-800 leading-none group-hover:text-indigo-600 transition-colors">Acme Corp</span>
-                <span className="text-slate-500 text-xs mt-1">Free Plan</span>
+                <div className="flex items-center gap-1 mt-1">
+                  <Zap className="h-3 w-3 text-amber-500 fill-amber-500" />
+                  <span className="text-slate-500 text-xs">Free Plan</span>
+                </div>
               </div>
+              <ChevronDown className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-[300px] p-0" sideOffset={8}>
