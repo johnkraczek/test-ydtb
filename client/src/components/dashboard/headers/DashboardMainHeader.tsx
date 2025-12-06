@@ -141,7 +141,7 @@ export function DashboardMainHeader() {
               </Button>
             </div>
 
-            <CommandList className="max-h-[400px]">
+            <CommandList className="max-h-[500px]">
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Suggestions">
                 <CommandItem className="py-3">
@@ -248,7 +248,7 @@ export function DashboardMainHeader() {
             </div>
           </>
         ) : (
-          <div className="flex h-[500px] w-full bg-white rounded-lg overflow-hidden">
+          <div className="flex h-[625px] w-full bg-white rounded-lg overflow-hidden">
             {/* Sidebar */}
             <div className="w-48 border-r bg-slate-50 p-2 flex flex-col gap-1">
               <div className="px-3 py-2 mb-2 flex items-center gap-2 font-semibold text-sm text-slate-900">
