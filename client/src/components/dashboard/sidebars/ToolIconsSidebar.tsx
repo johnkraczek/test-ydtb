@@ -95,14 +95,14 @@ export function ToolIconsSidebar({
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full py-2 pl-2">
-        <div className="flex w-12 flex-col items-center gap-2 border border-slate-200/60 bg-white/80 backdrop-blur-xl rounded-md shadow-sm py-1.5 z-20">
+        <div className="flex w-12 flex-col items-center gap-2 border border-slate-200/60 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-md shadow-sm py-1.5 z-20">
           {/* Expand/Collapse Button */}
           {!isToolSidebarOpen && onToggleSidebar && (
             <div className="mb-2">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className="h-8 w-8 p-0 rounded-sm hover:bg-indigo-50 text-slate-500 hover:text-indigo-600 transition-all"
+                    className="h-8 w-8 p-0 rounded-sm hover:bg-primary/10 text-slate-500 hover:text-primary transition-all"
                     onClick={onToggleSidebar}
                     variant="ghost"
                   >
@@ -128,8 +128,8 @@ export function ToolIconsSidebar({
                   <Button
                     className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
                       isActive 
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 hover:bg-indigo-700" 
-                        : "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90" 
+                        : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                     }`}
                     onClick={() => onToolSelect?.(tool.id)}
                     variant="ghost"
@@ -160,8 +160,8 @@ export function ToolIconsSidebar({
                   <Button
                     className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
                       isActive 
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" 
-                        : "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                        : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                     }`}
                     onClick={() => onToolSelect?.(tool.id)}
                     variant="ghost"
