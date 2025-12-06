@@ -32,8 +32,8 @@ export function DashboardMainHeader() {
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-3 group cursor-pointer hover:bg-slate-50 border border-slate-200/60 p-1.5 pr-3 rounded-xl transition-all shadow-sm hover:shadow-md">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-sm text-white shadow-sm shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
+            <div className="flex items-center gap-3 group cursor-pointer hover:bg-slate-50 border border-slate-200/60 p-1.5 pr-3 rounded-md transition-all shadow-sm hover:shadow-md">
+              <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-indigo-600 font-bold text-sm text-white shadow-sm shadow-indigo-200 group-hover:shadow-indigo-300 transition-all">
                 AC
               </div>
               <div className="flex flex-col text-left mr-2">
