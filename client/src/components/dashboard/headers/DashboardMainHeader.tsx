@@ -53,10 +53,6 @@ export function DashboardMainHeader() {
           <Bell className="h-5 w-5" />
           <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
         </Button>
-        
-        <Button size="icon" variant="ghost" className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg">
-          <Settings className="h-5 w-5" />
-        </Button>
 
         {/* Avatar Dropdown */}
         <DropdownMenu>
