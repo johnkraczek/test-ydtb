@@ -110,8 +110,8 @@ const generateContacts = (count: number) => {
       dndEmail: Math.random() > 0.9,
       dndSms: Math.random() > 0.9,
       dndCall: Math.random() > 0.9,
-      inboundCalls: Math.floor(Math.random() * 50),
-      inboundSms: Math.floor(Math.random() * 100),
+      dndInboundCalls: Math.random() > 0.9,
+      dndInboundSms: Math.random() > 0.9,
     };
   });
 };
@@ -140,8 +140,8 @@ export default function ContactsPage() {
     dndEmail: false,
     dndSms: false,
     dndCall: false,
-    inboundCalls: false,
-    inboundSms: false,
+    dndInboundCalls: false,
+    dndInboundSms: false,
   });
   const [columnSearch, setColumnSearch] = useState("");
 
@@ -158,8 +158,8 @@ export default function ContactsPage() {
     { id: "dndEmail", label: "DND Email" },
     { id: "dndSms", label: "DND SMS" },
     { id: "dndCall", label: "DND Calls" },
-    { id: "inboundCalls", label: "Inbound Calls" },
-    { id: "inboundSms", label: "Inbound SMS" },
+    { id: "dndInboundCalls", label: "DND Inbound Calls" },
+    { id: "dndInboundSms", label: "DND Inbound SMS" },
   ];
 
   const filteredColumns = columns.filter(col => 
@@ -334,8 +334,8 @@ export default function ContactsPage() {
                 {visibleColumns.dndEmail && <SortableHeader column="dndEmail" label="DND Email" />}
                 {visibleColumns.dndSms && <SortableHeader column="dndSms" label="DND SMS" />}
                 {visibleColumns.dndCall && <SortableHeader column="dndCall" label="DND Calls" />}
-                {visibleColumns.inboundCalls && <SortableHeader column="inboundCalls" label="Inbound Calls" />}
-                {visibleColumns.inboundSms && <SortableHeader column="inboundSms" label="Inbound SMS" />}
+                {visibleColumns.dndInboundCalls && <SortableHeader column="dndInboundCalls" label="DND Inbound Calls" />}
+                {visibleColumns.dndInboundSms && <SortableHeader column="dndInboundSms" label="DND Inbound SMS" />}
                 {visibleColumns.tags && <TableHead>Tags</TableHead>}
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -428,17 +428,17 @@ export default function ContactsPage() {
                         </span>
                       </TableCell>
                     )}
-                    {visibleColumns.inboundCalls && (
+                    {visibleColumns.dndInboundCalls && (
                       <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {contact.inboundCalls}
+                        <span className={`text-sm ${contact.dndInboundCalls ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                          {contact.dndInboundCalls ? 'Yes' : 'No'}
                         </span>
                       </TableCell>
                     )}
-                    {visibleColumns.inboundSms && (
+                    {visibleColumns.dndInboundSms && (
                       <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {contact.inboundSms}
+                        <span className={`text-sm ${contact.dndInboundSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                          {contact.dndInboundSms ? 'Yes' : 'No'}
                         </span>
                       </TableCell>
                     )}
