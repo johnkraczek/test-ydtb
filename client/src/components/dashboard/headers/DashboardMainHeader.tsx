@@ -1,8 +1,9 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon, Palette } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,7 +63,8 @@ export function DashboardMainHeader() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<'command' | 'settings'>('command');
-  const [settingsTab, setSettingsTab] = useState<'general' | 'sources' | 'commands'>('general');
+  const [settingsTab, setSettingsTab] = useState<'general' | 'sources' | 'commands' | 'theme'>('general');
+  const { themeColor, setThemeColor } = useThemeColor();
   const [searchSettings, setSearchSettings] = useState([
     { id: 'contacts', label: 'Contacts', icon: User, enabled: true, description: 'Search through your contacts and team members' },
     { id: 'tasks', label: 'Tasks', icon: CheckCircle2, enabled: true, description: 'Find tasks, subtasks and projects' },
@@ -286,6 +288,16 @@ export function DashboardMainHeader() {
                 <CommandIcon className="h-4 w-4" />
                 Commands
               </button>
+              <button 
+                onClick={() => setSettingsTab('theme')}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors text-left",
+                  settingsTab === 'theme' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                )}
+              >
+                <Palette className="h-4 w-4" />
+                Theme
+              </button>
             </div>
 
             {/* Content */}
@@ -295,6 +307,7 @@ export function DashboardMainHeader() {
                   {settingsTab === 'general' && 'General Settings'}
                   {settingsTab === 'sources' && 'Sources'}
                   {settingsTab === 'commands' && 'Commands'}
+                  {settingsTab === 'theme' && 'Theme'}
                 </h2>
                 <Button 
                   variant="ghost" 
@@ -429,6 +442,53 @@ export function DashboardMainHeader() {
                           <p className="text-xs text-slate-500">Fully custom, shareable commands that are just JSON endpoints on t...</p>
                         </div>
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {settingsTab === 'theme' && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-slate-900 mb-1">Theme Preference</h3>
+                      <p className="text-xs text-slate-500 mb-4">
+                        Select a color theme for your workspace.
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { name: "zinc", color: "bg-zinc-900" },
+                        { name: "slate", color: "bg-slate-900" },
+                        { name: "stone", color: "bg-stone-900" },
+                        { name: "gray", color: "bg-gray-500" },
+                        { name: "neutral", color: "bg-neutral-900" },
+                        { name: "red", color: "bg-red-500" },
+                        { name: "rose", color: "bg-rose-500" },
+                        { name: "orange", color: "bg-orange-500" },
+                        { name: "green", color: "bg-green-500" },
+                        { name: "blue", color: "bg-blue-500" },
+                        { name: "yellow", color: "bg-yellow-500" },
+                        { name: "violet", color: "bg-violet-500" },
+                      ].map((theme) => (
+                        <button
+                          key={theme.name}
+                          onClick={() => setThemeColor(theme.name as any)}
+                          className={cn(
+                            "group relative flex items-center gap-2 rounded-lg border p-2 text-left text-xs font-medium hover:bg-slate-50 transition-all",
+                            themeColor === theme.name ? "border-primary ring-1 ring-primary" : "border-slate-200"
+                          )}
+                        >
+                          <div className={cn("h-6 w-6 rounded-full shrink-0", theme.color)} />
+                          <span className="capitalize text-slate-700">{theme.name}</span>
+                          {themeColor === theme.name && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                              <div className="h-4 w-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                                <Check className="h-2.5 w-2.5" />
+                              </div>
+                            </div>
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}

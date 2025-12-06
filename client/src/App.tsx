@@ -15,13 +15,20 @@ function Router() {
   );
 }
 
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeColorProvider } from "@/hooks/use-theme-color";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <ThemeColorProvider defaultThemeColor="zinc" storageKey="vite-ui-theme-color">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ThemeColorProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
