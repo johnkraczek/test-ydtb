@@ -60,12 +60,15 @@ export function DashboardMainHeader() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<'command' | 'settings'>('command');
+  const [settingsTab, setSettingsTab] = useState<'general' | 'sources' | 'commands'>('commands');
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
+        if (!open) setView('command'); // Reset to command view when opening
       }
     };
     document.addEventListener("keydown", down);
@@ -81,152 +84,282 @@ export function DashboardMainHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-md px-2 sticky top-0 z-50">
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-          <CommandPrimitive.Input
-            className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            placeholder="Search, run a command, or ask a question..."
-          />
-          <Button variant="outline" size="sm" className="h-7 gap-1 text-xs font-medium text-indigo-600 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700">
-            Ask AI
-            <Sparkles className="h-3 w-3" />
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-1 p-2 border-b bg-slate-50/50 overflow-x-auto no-scrollbar">
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs font-medium bg-white shadow-sm border border-slate-200 text-slate-900">
-            All
-          </Button>
-          <div className="w-px h-4 bg-slate-200 mx-1" />
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
-            <Mail className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
-            <Box className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
-            <Github className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
-            <Slack className="h-3.5 w-3.5" />
-          </Button>
-          <div className="w-px h-4 bg-slate-200 mx-1" />
-          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
-            <CheckCircle2 className="h-3 w-3" />
-            Tasks
-          </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
-            <FileText className="h-3 w-3" />
-            Docs
-          </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
-            <Hash className="h-3 w-3" />
-            Channels
-          </Button>
-        </div>
+        {view === 'command' ? (
+          <>
+            <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <CommandPrimitive.Input
+                className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Search, run a command, or ask a question..."
+              />
+              <Button variant="outline" size="sm" className="h-7 gap-1 text-xs font-medium text-indigo-600 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700">
+                Ask AI
+                <Sparkles className="h-3 w-3" />
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-1 p-2 border-b bg-slate-50/50 overflow-x-auto no-scrollbar">
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs font-medium bg-white shadow-sm border border-slate-200 text-slate-900">
+                All
+              </Button>
+              <div className="w-px h-4 bg-slate-200 mx-1" />
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+                <Mail className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+                <Box className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+                <Github className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50">
+                <Slack className="h-3.5 w-3.5" />
+              </Button>
+              <div className="w-px h-4 bg-slate-200 mx-1" />
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+                <CheckCircle2 className="h-3 w-3" />
+                Tasks
+              </Button>
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+                <FileText className="h-3 w-3" />
+                Docs
+              </Button>
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs font-medium text-slate-600 hover:bg-slate-200/50 border border-transparent hover:border-slate-200">
+                <Hash className="h-3 w-3" />
+                Channels
+              </Button>
+            </div>
 
-        <CommandList className="max-h-[400px]">
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem className="py-3">
-              <div className="flex items-center gap-3 w-full">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-slate-500" />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-900 truncate">Connect GHL to Clinic Sense via forms</span>
-                    <span className="text-xs text-slate-400 shrink-0">1mo ago</span>
+            <CommandList className="max-h-[400px]">
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup heading="Suggestions">
+                <CommandItem className="py-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900 truncate">Connect GHL to Clinic Sense via forms</span>
+                        <span className="text-xs text-slate-400 shrink-0">1mo ago</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span>in Tasks</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span>in Tasks</span>
+                </CommandItem>
+                <CommandItem className="py-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <LayoutGrid className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900 truncate">Phone Process for how to answer a call</span>
+                        <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                        <span>in Tasks</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </CommandItem>
+                <CommandItem className="py-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900 truncate">Export Contacts to upload to High Level</span>
+                        <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                        <span>in Tasks</span>
+                      </div>
+                    </div>
+                  </div>
+                </CommandItem>
+                <CommandItem className="py-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900 truncate">Obtain Files from Haley, Graphic Designer</span>
+                        <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
+                        <span>in Tasks</span>
+                      </div>
+                    </div>
+                  </div>
+                </CommandItem>
+              </CommandGroup>
+              <CommandSeparator />
+              <CommandGroup heading="Rise AI">
+                <CommandItem className="py-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <LayoutGrid className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-900 truncate">Botanza</span>
+                        <span className="text-xs text-slate-400 shrink-0">3mo ago</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span>in Rise AI</span>
+                      </div>
+                    </div>
+                  </div>
+                </CommandItem>
+              </CommandGroup>
+            </CommandList>
+            
+            <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-t text-[10px] text-slate-500">
+              <div className="flex items-center gap-2">
+                <span>Type <kbd className="font-mono bg-white border rounded px-1">/</kbd> to view available commands</span>
+                <span>hit <kbd className="font-mono bg-white border rounded px-1">tab</kbd> on a selected item to see additional actions</span>
               </div>
-            </CommandItem>
-            <CommandItem className="py-3">
-              <div className="flex items-center gap-3 w-full">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                  <LayoutGrid className="h-4 w-4 text-slate-500" />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-900 truncate">Phone Process for how to answer a call</span>
-                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
-                    <span>in Tasks</span>
-                  </div>
-                </div>
+              <div 
+                className="flex items-center gap-1 cursor-pointer hover:text-slate-900"
+                onClick={() => setView('settings')}
+              >
+                <Settings className="h-3 w-3" />
+                <span>Settings</span>
               </div>
-            </CommandItem>
-            <CommandItem className="py-3">
-              <div className="flex items-center gap-3 w-full">
-                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-900 truncate">Export Contacts to upload to High Level</span>
-                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
-                    <span>in Tasks</span>
-                  </div>
-                </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex h-[500px] w-full bg-white rounded-lg overflow-hidden">
+            {/* Sidebar */}
+            <div className="w-48 border-r bg-slate-50 p-2 flex flex-col gap-1">
+              <div className="px-3 py-2 mb-2 flex items-center gap-2 font-semibold text-sm text-slate-900">
+                <Settings className="h-4 w-4" />
+                Search settings
               </div>
-            </CommandItem>
-            <CommandItem className="py-3">
-              <div className="flex items-center gap-3 w-full">
-                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-900 truncate">Obtain Files from Haley, Graphic Designer</span>
-                    <span className="text-xs text-slate-400 shrink-0">2mo ago</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">E</span>
-                    <span>in Tasks</span>
-                  </div>
-                </div>
+              
+              <button 
+                onClick={() => setSettingsTab('general')}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors text-left",
+                  settingsTab === 'general' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                General
+              </button>
+              <button 
+                onClick={() => setSettingsTab('sources')}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors text-left",
+                  settingsTab === 'sources' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Sources
+              </button>
+              <button 
+                onClick={() => setSettingsTab('commands')}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors text-left",
+                  settingsTab === 'commands' ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                )}
+              >
+                <span className="flex items-center justify-center h-4 w-4 font-mono text-[10px] border border-current rounded bg-transparent">⌘</span>
+                Commands
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 flex flex-col h-full">
+              <div className="h-14 border-b flex items-center justify-between px-6">
+                <h2 className="font-semibold text-slate-900">
+                  {settingsTab === 'general' && 'General Settings'}
+                  {settingsTab === 'sources' && 'Search Sources'}
+                  {settingsTab === 'commands' && 'Commands'}
+                </h2>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-slate-400 hover:text-slate-600"
+                  onClick={() => setView('command')}
+                >
+                  <span className="sr-only">Close settings</span>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
               </div>
-            </CommandItem>
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Rise AI">
-            <CommandItem className="py-3">
-              <div className="flex items-center gap-3 w-full">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                  <LayoutGrid className="h-4 w-4 text-slate-500" />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-900 truncate">Botanza</span>
-                    <span className="text-xs text-slate-400 shrink-0">3mo ago</span>
+
+              <div className="flex-1 p-6 overflow-y-auto">
+                {settingsTab === 'commands' && (
+                  <div className="flex flex-col h-full">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center mb-8">
+                      <div className="h-12 w-12 bg-slate-100 rounded-xl flex items-center justify-center mb-4 text-slate-400">
+                        <span className="font-mono text-xl">⌘</span>
+                        <Search className="h-3 w-3 absolute translate-x-3 translate-y-3 bg-white rounded-full p-0.5" />
+                      </div>
+                      <h3 className="text-sm font-medium text-slate-900 mb-1">No custom commands</h3>
+                      <p className="text-xs text-slate-500 max-w-[240px] mb-4">
+                        Create, customize and share your custom commands here.
+                      </p>
+                      <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 h-9 px-4 text-xs font-medium">
+                        Add command
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-medium text-slate-500 mb-3">Quickly create a new command:</h4>
+                      
+                      <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition-all group text-left bg-white">
+                        <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-white flex items-center justify-center text-slate-500 group-hover:text-indigo-600 transition-colors border border-slate-200/50">
+                          <div className="rotate-45">
+                            <Plus className="h-4 w-4" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-sm font-medium text-slate-900">Link</span>
+                          </div>
+                          <p className="text-xs text-slate-500">Create a shortcut for the fastest way to open any webpage or URL.</p>
+                        </div>
+                      </button>
+
+                      <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition-all group text-left bg-white">
+                        <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-white flex items-center justify-center text-slate-500 group-hover:text-indigo-600 transition-colors border border-slate-200/50">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-sm font-medium text-slate-900">Clipboard</span>
+                          </div>
+                          <p className="text-xs text-slate-500">Add a text snippet that you can instantly copy and paste from the...</p>
+                        </div>
+                      </button>
+
+                      <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 transition-all group text-left bg-white">
+                        <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-white flex items-center justify-center text-slate-500 group-hover:text-indigo-600 transition-colors border border-slate-200/50">
+                          <Box className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-sm font-medium text-slate-900">Cloud</span>
+                          </div>
+                          <p className="text-xs text-slate-500">Fully custom, shareable commands that are just JSON endpoints on t...</p>
+                        </div>
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span>in Rise AI</span>
-                  </div>
-                </div>
+                )}
               </div>
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-        
-        <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-t text-[10px] text-slate-500">
-          <div className="flex items-center gap-2">
-            <span>Type <kbd className="font-mono bg-white border rounded px-1">/</kbd> to view available commands</span>
-            <span>hit <kbd className="font-mono bg-white border rounded px-1">tab</kbd> on a selected item to see additional actions</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1 cursor-pointer hover:text-slate-900">
-            <Settings className="h-3 w-3" />
-            <span>Settings</span>
-          </div>
-        </div>
+        )}
       </CommandDialog>
 
       {/* Left section - Team Switcher */}
