@@ -38,6 +38,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -94,6 +102,30 @@ export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  // Column visibility state
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
+    name: true,
+    phone: true,
+    email: true,
+    created: true,
+    lastActive: true,
+    tags: true,
+  });
+  const [columnSearch, setColumnSearch] = useState("");
+
+  const columns = [
+    { id: "name", label: "Name" },
+    { id: "phone", label: "Phone" },
+    { id: "email", label: "Email" },
+    { id: "created", label: "Created" },
+    { id: "lastActive", label: "Last Activity" },
+    { id: "tags", label: "Tags" },
+  ];
+
+  const filteredColumns = columns.filter(col => 
+    col.label.toLowerCase().includes(columnSearch.toLowerCase())
+  );
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -187,10 +219,43 @@ export default function ContactsPage() {
           </div>
           
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="gap-2 border-slate-200 dark:border-slate-800">
-              <Filter className="h-4 w-4" />
-              Filter
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9 border-slate-200 dark:border-slate-800">
+                  <Filter className="h-4 w-4 text-slate-500" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <div className="p-2">
+                  <Input 
+                    placeholder="Search columns..." 
+                    className="h-8 text-xs" 
+                    value={columnSearch}
+                    onChange={(e) => setColumnSearch(e.target.value)}
+                  />
+                </div>
+                <DropdownMenuSeparator />
+                <div className="max-h-[200px] overflow-y-auto">
+                  {filteredColumns.map((col) => (
+                    <DropdownMenuCheckboxItem
+                      key={col.id}
+                      checked={visibleColumns[col.id]}
+                      onCheckedChange={(checked) => 
+                        setVisibleColumns(prev => ({ ...prev, [col.id]: checked }))
+                      }
+                      className="text-xs"
+                    >
+                      {col.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                  {filteredColumns.length === 0 && (
+                    <div className="p-2 text-xs text-slate-500 text-center">
+                      No columns found
+                    </div>
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" className="gap-2 border-slate-200 dark:border-slate-800">
               <Download className="h-4 w-4" />
               Export
@@ -209,12 +274,12 @@ export default function ContactsPage() {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                <SortableHeader column="name" label="Name" />
-                <SortableHeader column="phone" label="Phone" />
-                <SortableHeader column="email" label="Email" />
-                <SortableHeader column="created" label="Created" />
-                <SortableHeader column="lastActive" label="Last Activity" />
-                <TableHead>Tags</TableHead>
+                {visibleColumns.name && <SortableHeader column="name" label="Name" />}
+                {visibleColumns.phone && <SortableHeader column="phone" label="Phone" />}
+                {visibleColumns.email && <SortableHeader column="email" label="Email" />}
+                {visibleColumns.created && <SortableHeader column="created" label="Created" />}
+                {visibleColumns.lastActive && <SortableHeader column="lastActive" label="Last Activity" />}
+                {visibleColumns.tags && <TableHead>Tags</TableHead>}
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -228,66 +293,78 @@ export default function ContactsPage() {
                         onCheckedChange={() => toggleSelectContact(contact.id)}
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
-                          {contact.image && <AvatarImage src={contact.image} />}
-                          <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">{contact.phone}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-slate-600 dark:text-slate-400">{contact.email}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{format(contact.created, 'MMM d, yyyy')}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-slate-500 dark:text-slate-500">
-                        {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1.5 max-w-[200px]">
-                        {contact.tags.slice(0, 2).map(tag => (
-                          <Badge 
-                            key={tag} 
-                            variant="secondary" 
-                            className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                        {contact.tags.length > 2 && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Badge 
-                                  variant="secondary" 
-                                  className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-help"
-                                >
-                                  +{contact.tags.length - 2}
-                                </Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <div className="flex flex-col gap-1">
-                                  {contact.tags.slice(2).map(tag => (
-                                    <span key={tag} className="text-xs">{tag}</span>
-                                  ))}
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
-                      </div>
-                    </TableCell>
+                    {visibleColumns.name && (
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
+                            {contact.image && <AvatarImage src={contact.image} />}
+                            <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
+                        </div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.phone && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">{contact.phone}</span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.email && (
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{contact.email}</span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.created && (
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                          <span>{format(contact.created, 'MMM d, yyyy')}</span>
+                        </div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.lastActive && (
+                      <TableCell>
+                        <span className="text-sm text-slate-500 dark:text-slate-500">
+                          {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.tags && (
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+                          {contact.tags.slice(0, 2).map(tag => (
+                            <Badge 
+                              key={tag} 
+                              variant="secondary" 
+                              className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                          {contact.tags.length > 2 && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-help"
+                                  >
+                                    +{contact.tags.length - 2}
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="flex flex-col gap-1">
+                                    {contact.tags.slice(2).map(tag => (
+                                      <span key={tag} className="text-xs">{tag}</span>
+                                    ))}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
                         <MoreHorizontal className="h-4 w-4" />
