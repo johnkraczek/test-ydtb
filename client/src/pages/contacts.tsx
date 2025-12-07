@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
+import { useLocation } from "wouter";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
@@ -125,6 +126,7 @@ export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [, setLocation] = useLocation();
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
@@ -343,7 +345,17 @@ export default function ContactsPage() {
             <TableBody>
               {currentContacts.length > 0 ? (
                 currentContacts.map((contact) => (
-                  <TableRow key={contact.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <TableRow 
+                    key={contact.id} 
+                    className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                    onClick={(e) => {
+                      // Prevent navigation if clicking checkbox or action button
+                      if ((e.target as HTMLElement).closest('[role="checkbox"]') || (e.target as HTMLElement).closest('button')) {
+                        return;
+                      }
+                      setLocation(`/contacts/${contact.id}`);
+                    }}
+                  >
                     <TableCell className="pl-4">
                       <Checkbox 
                         checked={selectedContacts.includes(contact.id)}
