@@ -33,7 +33,8 @@ import {
   Ticket,
   UserPlus,
   Eye,
-  MousePointerClick
+  MousePointerClick,
+  ArrowRight,
 } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useState } from "react";
@@ -78,7 +79,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-function SortableTaskItem({ task, onClick }: { task: any, onClick: () => void }) {
+function SortableTaskItem({ task, onClick, onMoveNext }: { task: any, onClick: () => void, onMoveNext?: () => void }) {
   const {
     attributes,
     listeners,
@@ -97,14 +98,30 @@ function SortableTaskItem({ task, onClick }: { task: any, onClick: () => void })
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card 
-        className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+        className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 group"
         onClick={onClick}
       >
         <CardContent className="p-3 space-y-3">
-          <div className="space-y-1">
-            <span className="text-sm font-medium leading-tight block">{task.title}</span>
-            {task.description && (
-              <p className="text-xs text-slate-500 line-clamp-2">{task.description}</p>
+          <div className="flex justify-between items-start gap-2">
+            <div className="space-y-1 flex-1">
+              <span className="text-sm font-medium leading-tight block">{task.title}</span>
+              {task.description && (
+                <p className="text-xs text-slate-500 line-clamp-2">{task.description}</p>
+              )}
+            </div>
+            {onMoveNext && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 -mt-1 -mr-1 text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveNext();
+                }}
+                title="Move to next column"
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
             )}
           </div>
           
@@ -130,12 +147,18 @@ function SortableTaskItem({ task, onClick }: { task: any, onClick: () => void })
   );
 }
 
-function KanbanColumn({ column, tasks, onClickTask }: { column: any, tasks: any[], onClickTask: (task: any) => void }) {
+function KanbanColumn({ column, tasks, onClickTask, onMoveTask }: { column: any, tasks: any[], onClickTask: (task: any) => void, onMoveTask: (taskId: string, nextStatus: string) => void }) {
   const { setNodeRef } = useDroppable({
     id: column.id,
   });
 
   const columnTasks = tasks.filter(t => t.status === column.id);
+
+  const getNextStatus = (currentStatus: string) => {
+    if (currentStatus === 'todo') return 'in-progress';
+    if (currentStatus === 'in-progress') return 'done';
+    return null;
+  };
 
   return (
     <div 
@@ -154,9 +177,17 @@ function KanbanColumn({ column, tasks, onClickTask }: { column: any, tasks: any[
            items={columnTasks.map(t => t.id)} 
            strategy={verticalListSortingStrategy}
          >
-           {columnTasks.map(task => (
-             <SortableTaskItem key={task.id} task={task} onClick={() => onClickTask(task)} />
-           ))}
+           {columnTasks.map(task => {
+             const nextStatus = getNextStatus(task.status);
+             return (
+               <SortableTaskItem 
+                 key={task.id} 
+                 task={task} 
+                 onClick={() => onClickTask(task)} 
+                 onMoveNext={nextStatus ? () => onMoveTask(task.id, nextStatus) : undefined}
+               />
+             );
+           })}
          </SortableContext>
          {columnTasks.length === 0 && (
             <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-lg flex items-center justify-center text-slate-400 text-xs">
@@ -527,6 +558,16 @@ export default function ContactDetailPage() {
 
   const activeTask = activeId ? tasks.find(t => t.id === activeId) : null;
 
+  const handleMoveTask = (taskId: string, nextStatus: string) => {
+    setTasks(tasks.map(t => {
+      if (t.id === taskId) {
+        const completed = nextStatus === "done";
+        return { ...t, status: nextStatus, completed };
+      }
+      return t;
+    }));
+  };
+
   return (
     <DashboardLayout activeTool="users">
       <div className="space-y-6">
@@ -859,6 +900,7 @@ export default function ContactDetailPage() {
                               setSelectedTask(task);
                               setIsTaskDialogOpen(true);
                             }} 
+                            onMoveTask={handleMoveTask}
                           />
                         ))}
                       </div>
