@@ -631,10 +631,10 @@ export default function ContactDetailPage() {
             {/* Main Chat/Activity Stream */}
             <div>
               <Card className="h-[500px] border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-                <CardHeader className="flex-none">
+                <CardHeader className="flex-none border-b">
                   <CardTitle className="text-base">Activity Stream</CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-y-auto min-h-0">
+                <CardContent className="flex-1 overflow-y-auto min-h-0 pt-6">
                   {/* Activity List */}
                   <div className="space-y-6 pr-2">
                     {activities.map((activity) => { 
