@@ -738,6 +738,19 @@ export default function ContactDetailPage() {
                       
                       <div className="space-y-4">
                         <TabsContent value="email" className="mt-0 space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground ml-1">From</Label>
+                            <Select defaultValue="info@restaurant.com">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select email" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="info@restaurant.com">info@restaurant.com</SelectItem>
+                                <SelectItem value="support@restaurant.com">support@restaurant.com</SelectItem>
+                                <SelectItem value="manager@restaurant.com">manager@restaurant.com</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                           <Input 
                             placeholder="Subject line..." 
                             value={messageSubject}
