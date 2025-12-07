@@ -78,8 +78,8 @@ export function MediaProvider({ children }: { children: ReactNode }) {
     while (current) {
       path.unshift(current);
       if (current.parentId) {
-        const pid = current.parentId;
-        current = items.find(i => i.id === pid);
+        const parentId = current.parentId;
+        current = items.find(i => i.id === parentId);
       } else {
         current = undefined;
       }

@@ -23,7 +23,6 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useMedia, FileSystemItem } from "@/context/media-context";
 import { Card } from "@/components/ui/card";
-import { useDroppable } from '@dnd-kit/core';
 
 interface ToolSidebarProps {
   isOpen: boolean;
@@ -117,46 +116,28 @@ function MediaSidebarContent() {
   const { items, currentPath, navigateToFolder, setCurrentPath, setSelectedItems } = useMedia();
   const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
 
-  const DroppableSidebarItem = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: item.id,
-      data: item
-    });
-
-    return (
-      <div 
-        ref={setNodeRef}
-        className={`rounded-md transition-colors ${isOver ? 'bg-primary/20 ring-2 ring-primary ring-inset' : ''}`}
-      >
-        {children}
-      </div>
-    );
-  };
-
   const FileTreeItem = ({ item, level = 0 }: { item: FileSystemItem, level?: number }) => {
     const hasChildren = items.some(i => i.parentId === item.id);
     const isExpanded = currentPath.some(p => p.id === item.id) || (currentPath.length > 0 && currentPath[0].id === item.id && level === 0);
     
     return (
       <div className="select-none">
-        <DroppableSidebarItem item={item}>
-          <div 
-            className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
-              currentFolderId === item.id 
-                ? 'bg-primary/10 text-primary font-medium' 
-                : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-            }`}
-            style={{ paddingLeft: `${level * 12 + 8}px` }}
-            onClick={() => navigateToFolder(item)}
-          >
-            {item.type === 'folder' ? (
-              <Folder className={`h-4 w-4 ${currentFolderId === item.id ? 'fill-primary/20' : 'text-slate-400'}`} />
-            ) : (
-              <File className="h-4 w-4 text-slate-400" />
-            )}
-            <span className="text-sm truncate">{item.name}</span>
-          </div>
-        </DroppableSidebarItem>
+        <div 
+          className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+            currentFolderId === item.id 
+              ? 'bg-primary/10 text-primary font-medium' 
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+          }`}
+          style={{ paddingLeft: `${level * 12 + 8}px` }}
+          onClick={() => navigateToFolder(item)}
+        >
+          {item.type === 'folder' ? (
+            <Folder className={`h-4 w-4 ${currentFolderId === item.id ? 'fill-primary/20' : 'text-slate-400'}`} />
+          ) : (
+            <File className="h-4 w-4 text-slate-400" />
+          )}
+          <span className="text-sm truncate">{item.name}</span>
+        </div>
         
         {hasChildren && isExpanded && (
           <div>
