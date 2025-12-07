@@ -480,164 +480,314 @@ export default function ContactDetailPage() {
       </div>
 
 
-      <div className="grid gap-6 md:grid-cols-2 h-[calc(100vh-200px)]">
-        {/* Main Chat/Activity Stream */}
-        <div className="h-full">
-          <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-             <CardHeader className="flex-none">
-               <CardTitle className="text-base">Activity Stream</CardTitle>
-             </CardHeader>
-             <CardContent className="flex-1 overflow-y-auto min-h-0">
-               {/* Activity List */}
-               <div className="space-y-6 pr-2">
-                 {activities.slice().reverse().map((activity) => { 
-                    const isRestaurant = activity.source === 'restaurant';
-                    
-                    return (
-                      <div key={activity.id} className={cn(
-                        "flex w-full gap-3",
-                        isRestaurant ? "justify-start" : "justify-end"
-                      )}>
-                        {/* Avatar for Restaurant (Left) */}
-                        {isRestaurant && (
-                          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 mt-1 shadow-sm">
-                            {activity.type === 'email' ? (
-                              <Mail className="h-4 w-4" />
-                            ) : activity.type === 'sms' ? (
-                              <MessageSquare className="h-4 w-4" />
-                            ) : activity.type === 'offer' ? (
-                              <Gift className="h-4 w-4" />
-                            ) : activity.type === 'tag' ? (
-                              <Tag className="h-4 w-4" />
-                            ) : activity.type === 'update' ? (
-                              <PenLine className="h-4 w-4" />
-                            ) : activity.type === 'note' ? (
-                              <StickyNote className="h-4 w-4" />
-                            ) : (
-                              <Store className="h-4 w-4" />
-                            )}
-                          </div>
-                        )}
+      <Tabs defaultValue="details" className="w-full">
+        <TabsList className="mb-4 w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+          <TabsTrigger 
+            value="details" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+          >
+            Contact Details
+          </TabsTrigger>
+          <TabsTrigger 
+            value="messaging" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+          >
+            Messaging
+          </TabsTrigger>
+          <TabsTrigger 
+            value="notes" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+          >
+            Notes
+          </TabsTrigger>
+        </TabsList>
 
-                        {/* Message Bubble */}
-                        <div className={cn(
-                          "max-w-[80%] rounded-2xl p-4 shadow-sm border",
-                          isRestaurant 
-                            ? "bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 rounded-tl-none" 
-                            : "bg-primary text-white border-primary/20 rounded-tr-none"
-                        )}>
-                          <div className="flex items-center justify-between gap-4 mb-1">
-                            <span className={cn("text-xs font-bold uppercase tracking-wider opacity-80", isRestaurant ? "text-primary" : "text-white")}>
-                              {activity.title}
-                            </span>
-                            <time className={cn("text-[10px] opacity-60", isRestaurant ? "text-zinc-500 dark:text-zinc-400" : "text-white")}>
-                              {activity.date}
-                            </time>
-                          </div>
-                          
-                          <p className="text-sm leading-relaxed">
-                            {activity.description}
-                          </p>
-
-                          {activity.meta && (
-                            <div className={cn(
-                              "mt-3 text-xs font-mono py-1.5 px-2 rounded inline-flex items-center gap-1.5",
-                              isRestaurant 
-                                ? "bg-white dark:bg-black/20 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400" 
-                                : "bg-black/20 text-white/90"
-                            )}>
-                              <DollarSign className="h-3 w-3" />
-                              {activity.meta}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Avatar for Customer (Right) */}
-                        {!isRestaurant && (
-                          <div className="h-8 w-8 rounded-full bg-white dark:bg-slate-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0 mt-1 shadow-sm">
-                            {activity.type === 'redemption' ? (
-                              <Ticket className="h-4 w-4" />
-                            ) : activity.type === 'loyalty' ? (
-                              <MapPin className="h-4 w-4" />
-                            ) : activity.type === 'activation' ? (
-                              <CreditCard className="h-4 w-4" />
-                            ) : activity.type === 'review' ? (
-                              <Star className="h-4 w-4" />
-                            ) : (
-                              <User className="h-4 w-4" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                 })}
-               </div>
-             </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="h-full space-y-6 overflow-y-auto">
-           {/* Composer Card */}
-           <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
-             <CardHeader>
-               <CardTitle className="text-base">Send a Message</CardTitle>
-             </CardHeader>
-             <CardContent>
-               <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="email">Email</TabsTrigger>
-                    <TabsTrigger value="sms">SMS</TabsTrigger>
-                  </TabsList>
-                  
-                  <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                    <TabsContent value="email" className="mt-0 space-y-3">
-                      <Input 
-                        placeholder="Subject line..." 
-                        value={messageSubject}
-                        onChange={(e) => setMessageSubject(e.target.value)}
-                        className="border-0 border-b border-zinc-100 dark:border-zinc-800 rounded-none px-0 focus-visible:ring-0 font-medium bg-transparent"
-                      />
-                      <Textarea 
-                        placeholder={`Hi ${customer.firstName}, ...`}
-                        className="min-h-[150px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
-                        value={messageBody}
-                        onChange={(e) => setMessageBody(e.target.value)}
-                      />
-                    </TabsContent>
-                    
-                    <TabsContent value="sms" className="mt-0 space-y-3">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <MessageSquare className="h-3 w-3" />
-                        <span>SMS to {customer.phone}</span>
-                      </div>
-                      <Textarea 
-                        placeholder="Type your SMS message here..." 
-                        maxLength={160}
-                        value={messageBody}
-                        onChange={(e) => setMessageBody(e.target.value)}
-                        className="min-h-[120px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
-                      />
-                    </TabsContent>
-
-                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-zinc-50 dark:border-zinc-800">
-                      <div className="text-xs text-muted-foreground">
-                        {messageType === 'sms' && `${messageBody.length}/160 chars`}
-                      </div>
-                      <Button 
-                        onClick={handleSendMessage} 
-                        disabled={!messageBody}
-                        size="sm"
-                        className="rounded-full px-6"
-                      >
-                        Send <Send className="ml-2 h-3 w-3" />
-                      </Button>
+        <TabsContent value="details" className="mt-6 space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(customer.customData).map(([key, value]) => (
+                    <div key={key}>
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider block">{key}</span>
+                      <span className="text-sm font-medium">{value}</span>
                     </div>
+                  ))}
+                  <div className="pt-2">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider block">Join Date</span>
+                    <span className="text-sm font-medium">{customer.joinDate}</span>
                   </div>
-                </Tabs>
-             </CardContent>
-           </Card>
+                </CardContent>
+              </Card>
 
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-base">Tags</CardTitle>
+                  <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 w-80" align="end">
+                      <Command>
+                        <CommandInput placeholder="Search tags..." value={tagSearch} onValueChange={setTagSearch} />
+                        <CommandList>
+                          <CommandEmpty>No tag found.</CommandEmpty>
+                          <CommandGroup heading="Available Tags">
+                            {allTags.filter(t => !customer.tags.includes(t)).map(tag => (
+                              <CommandItem 
+                                key={tag}
+                                onSelect={() => handleAddTag(tag)}
+                              >
+                                <Tag className="mr-2 h-3 w-3" />
+                                {tag}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {customer.tags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="group pr-1">
+                        {tag}
+                        <button 
+                          onClick={() => handleRemoveTag(tag)}
+                          className="ml-1 h-3 w-3 rounded-full hover:bg-slate-200 inline-flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-2 w-2" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-base">Active Offers</CardTitle>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 w-80" align="end">
+                      <Command>
+                        <CommandInput placeholder="Search offers..." />
+                        <CommandList>
+                          <CommandEmpty>No offers found.</CommandEmpty>
+                          <CommandGroup heading="Available Offers">
+                            {availableOffers.map(offer => (
+                              <CommandItem 
+                                key={offer.id}
+                                onSelect={() => handleAddOffer(offer)}
+                                className="flex flex-col items-start gap-1 p-2"
+                              >
+                                <span className="font-medium">{offer.title}</span>
+                                <span className="text-xs text-muted-foreground">{offer.description}</span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {activeOffers.map(offer => (
+                    <div key={offer.id} className="flex items-center justify-between p-2 rounded-lg border bg-slate-50 dark:bg-slate-900/50">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center",
+                          offer.status === 'active' ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-500"
+                        )}>
+                          <Gift className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{offer.title}</p>
+                          <p className="text-xs text-muted-foreground">{offer.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="messaging" className="mt-6 h-[calc(100vh-250px)]">
+          <div className="grid gap-6 md:grid-cols-2 h-full">
+            {/* Main Chat/Activity Stream */}
+            <div className="h-full">
+              <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+                <CardHeader className="flex-none">
+                  <CardTitle className="text-base">Activity Stream</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-y-auto min-h-0">
+                  {/* Activity List */}
+                  <div className="space-y-6 pr-2">
+                    {activities.slice().reverse().map((activity) => { 
+                        const isRestaurant = activity.source === 'restaurant';
+                        
+                        return (
+                          <div key={activity.id} className={cn(
+                            "flex w-full gap-3",
+                            isRestaurant ? "justify-start" : "justify-end"
+                          )}>
+                            {/* Avatar for Restaurant (Left) */}
+                            {isRestaurant && (
+                              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 mt-1 shadow-sm">
+                                {activity.type === 'email' ? (
+                                  <Mail className="h-4 w-4" />
+                                ) : activity.type === 'sms' ? (
+                                  <MessageSquare className="h-4 w-4" />
+                                ) : activity.type === 'offer' ? (
+                                  <Gift className="h-4 w-4" />
+                                ) : activity.type === 'tag' ? (
+                                  <Tag className="h-4 w-4" />
+                                ) : activity.type === 'update' ? (
+                                  <PenLine className="h-4 w-4" />
+                                ) : activity.type === 'note' ? (
+                                  <StickyNote className="h-4 w-4" />
+                                ) : (
+                                  <Store className="h-4 w-4" />
+                                )}
+                              </div>
+                            )}
+
+                            {/* Message Bubble */}
+                            <div className={cn(
+                              "max-w-[80%] rounded-2xl p-4 shadow-sm border",
+                              isRestaurant 
+                                ? "bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 rounded-tl-none" 
+                                : "bg-primary text-white border-primary/20 rounded-tr-none"
+                            )}>
+                              <div className="flex items-center justify-between gap-4 mb-1">
+                                <span className={cn("text-xs font-bold uppercase tracking-wider opacity-80", isRestaurant ? "text-primary" : "text-white")}>
+                                  {activity.title}
+                                </span>
+                                <time className={cn("text-[10px] opacity-60", isRestaurant ? "text-zinc-500 dark:text-zinc-400" : "text-white")}>
+                                  {activity.date}
+                                </time>
+                              </div>
+                              
+                              <p className="text-sm leading-relaxed">
+                                {activity.description}
+                              </p>
+
+                              {activity.meta && (
+                                <div className={cn(
+                                  "mt-3 text-xs font-mono py-1.5 px-2 rounded inline-flex items-center gap-1.5",
+                                  isRestaurant 
+                                    ? "bg-white dark:bg-black/20 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400" 
+                                    : "bg-black/20 text-white/90"
+                                )}>
+                                  <DollarSign className="h-3 w-3" />
+                                  {activity.meta}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Avatar for Customer (Right) */}
+                            {!isRestaurant && (
+                              <div className="h-8 w-8 rounded-full bg-white dark:bg-slate-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0 mt-1 shadow-sm">
+                                {activity.type === 'redemption' ? (
+                                  <Ticket className="h-4 w-4" />
+                                ) : activity.type === 'loyalty' ? (
+                                  <MapPin className="h-4 w-4" />
+                                ) : activity.type === 'activation' ? (
+                                  <CreditCard className="h-4 w-4" />
+                                ) : activity.type === 'review' ? (
+                                  <Star className="h-4 w-4" />
+                                ) : (
+                                  <User className="h-4 w-4" />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Sidebar - Composer */}
+            <div className="h-full">
+              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-base">Send a Message</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full h-full flex flex-col">
+                      <TabsList className="grid w-full grid-cols-2 mb-4 shrink-0">
+                        <TabsTrigger value="email">Email</TabsTrigger>
+                        <TabsTrigger value="sms">SMS</TabsTrigger>
+                      </TabsList>
+                      
+                      <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all flex-1 flex flex-col">
+                        <TabsContent value="email" className="mt-0 space-y-3 flex-1 flex flex-col">
+                          <Input 
+                            placeholder="Subject line..." 
+                            value={messageSubject}
+                            onChange={(e) => setMessageSubject(e.target.value)}
+                            className="border-0 border-b border-zinc-100 dark:border-zinc-800 rounded-none px-0 focus-visible:ring-0 font-medium bg-transparent shrink-0"
+                          />
+                          <Textarea 
+                            placeholder={`Hi ${customer.firstName}, ...`}
+                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent flex-1 min-h-[100px]"
+                            value={messageBody}
+                            onChange={(e) => setMessageBody(e.target.value)}
+                          />
+                        </TabsContent>
+                        
+                        <TabsContent value="sms" className="mt-0 space-y-3 flex-1 flex flex-col">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 shrink-0">
+                            <MessageSquare className="h-3 w-3" />
+                            <span>SMS to {customer.phone}</span>
+                          </div>
+                          <Textarea 
+                            placeholder="Type your SMS message here..." 
+                            maxLength={160}
+                            value={messageBody}
+                            onChange={(e) => setMessageBody(e.target.value)}
+                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent flex-1 min-h-[100px]"
+                          />
+                        </TabsContent>
+
+                        <div className="flex justify-between items-center pt-2 mt-2 border-t border-zinc-50 dark:border-zinc-800 shrink-0">
+                          <div className="text-xs text-muted-foreground">
+                            {messageType === 'sms' && `${messageBody.length}/160 chars`}
+                          </div>
+                          <Button 
+                            onClick={handleSendMessage} 
+                            disabled={!messageBody}
+                            size="sm"
+                            className="rounded-full px-6"
+                          >
+                            Send <Send className="ml-2 h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="notes" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Customer Notes</CardTitle>
@@ -649,124 +799,8 @@ export default function ContactDetailPage() {
               <Button variant="outline" size="sm" className="w-full">Add Note</Button>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-base">Active Offers</CardTitle>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-80" align="end">
-                  <Command>
-                    <CommandInput placeholder="Search offers..." />
-                    <CommandList>
-                      <CommandEmpty>No offers found.</CommandEmpty>
-                      <CommandGroup heading="Available Offers">
-                        {availableOffers.map(offer => (
-                          <CommandItem 
-                            key={offer.id}
-                            onSelect={() => handleAddOffer(offer)}
-                            className="flex flex-col items-start gap-1 p-2"
-                          >
-                            <span className="font-medium">{offer.title}</span>
-                            <span className="text-xs text-muted-foreground">{offer.description}</span>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {activeOffers.map(offer => (
-                <div key={offer.id} className="flex items-center justify-between p-2 rounded-lg border bg-slate-50 dark:bg-slate-900/50">
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "h-8 w-8 rounded-full flex items-center justify-center",
-                      offer.status === 'active' ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-500"
-                    )}>
-                      <Gift className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{offer.title}</p>
-                      <p className="text-xs text-muted-foreground">{offer.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-base">Tags</CardTitle>
-              <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-80" align="end">
-                  <Command>
-                    <CommandInput placeholder="Search tags..." value={tagSearch} onValueChange={setTagSearch} />
-                    <CommandList>
-                      <CommandEmpty>No tag found.</CommandEmpty>
-                      <CommandGroup heading="Available Tags">
-                        {allTags.filter(t => !customer.tags.includes(t)).map(tag => (
-                          <CommandItem 
-                            key={tag}
-                            onSelect={() => handleAddTag(tag)}
-                          >
-                            <Tag className="mr-2 h-3 w-3" />
-                            {tag}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {customer.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="group pr-1">
-                    {tag}
-                    <button 
-                      onClick={() => handleRemoveTag(tag)}
-                      className="ml-1 h-3 w-3 rounded-full hover:bg-slate-200 inline-flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-2 w-2" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {Object.entries(customer.customData).map(([key, value]) => (
-                <div key={key}>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider block">{key}</span>
-                  <span className="text-sm font-medium">{value}</span>
-                </div>
-              ))}
-              <div className="pt-2">
-                <span className="text-xs text-muted-foreground uppercase tracking-wider block">Join Date</span>
-                <span className="text-sm font-medium">{customer.joinDate}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
       </div>
     </DashboardLayout>
   );
