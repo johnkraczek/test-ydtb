@@ -95,7 +95,7 @@ export default function MediaPage() {
     setDraggedItem(null);
   };
 
-  const DraggableItem = ({ item, children, ...props }: { item: FileSystemItem, children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
+  const DraggableItem = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
       id: item.id,
       data: item
@@ -106,8 +106,7 @@ export default function MediaPage() {
         ref={setNodeRef} 
         {...listeners} 
         {...attributes} 
-        {...props}
-        className={`${isDragging ? 'opacity-50' : ''} ${props.className || ''}`}
+        className={`${isDragging ? 'opacity-50' : ''}`}
       >
         {children}
       </div>
