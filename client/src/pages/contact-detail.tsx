@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   ChevronLeft,
@@ -25,7 +26,8 @@ import {
   PhoneIncoming,
   MessageCircle,
   History,
-  CheckSquare
+  CheckSquare,
+  Plus
 } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { format } from "date-fns";
