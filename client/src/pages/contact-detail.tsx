@@ -120,24 +120,22 @@ function CustomerFormContent({ formData, setFormData }: { formData: any, setForm
 
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-muted-foreground">Status & Tier</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select 
-              value={formData.status} 
-              onValueChange={(val) => setFormData({...formData, status: val})}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="VIP">VIP</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="Lead">Lead</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select 
+            value={formData.status} 
+            onValueChange={(val) => setFormData({...formData, status: val})}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="VIP">VIP</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+              <SelectItem value="Lead">Lead</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
