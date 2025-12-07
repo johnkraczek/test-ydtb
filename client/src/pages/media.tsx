@@ -35,6 +35,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
   ContextMenuShortcut,
+  ContextMenuCheckboxItem,
 } from "@/components/ui/context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -51,7 +52,9 @@ export default function MediaPage() {
     viewMode, 
     setViewMode, 
     navigateToFolder, 
-    navigateUp 
+    navigateUp,
+    favoriteItems,
+    toggleFavorite
   } = useMedia();
 
   const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
@@ -221,6 +224,12 @@ export default function MediaPage() {
                 <ContextMenuItem inset>
                     <Info className="mr-2 h-4 w-4" /> Get Info
                 </ContextMenuItem>
+                {item.type === 'folder' && (
+                    <ContextMenuItem inset onClick={() => toggleFavorite(item.id)}>
+                        <Star className={`mr-2 h-4 w-4 ${favoriteItems.includes(item.id) ? "fill-yellow-500 text-yellow-500" : ""}`} /> 
+                        {favoriteItems.includes(item.id) ? "Remove from Favorites" : "Pin to Favorites"}
+                    </ContextMenuItem>
+                )}
                 <ContextMenuSeparator />
                 <ContextMenuItem inset>
                     <Copy className="mr-2 h-4 w-4" /> Copy

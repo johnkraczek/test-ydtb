@@ -21,6 +21,8 @@ interface MediaContextType {
   setCurrentPath: React.Dispatch<React.SetStateAction<FileSystemItem[]>>;
   selectedItems: string[];
   setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
+  favoriteItems: string[];
+  toggleFavorite: (itemId: string) => void;
   viewMode: 'grid' | 'list' | 'columns';
   setViewMode: React.Dispatch<React.SetStateAction<'grid' | 'list' | 'columns'>>;
   navigateToFolder: (folder: FileSystemItem) => void;
@@ -69,7 +71,16 @@ export function MediaProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<FileSystemItem[]>(initialFiles);
   const [currentPath, setCurrentPath] = useState<FileSystemItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'columns'>('grid');
+
+  const toggleFavorite = (itemId: string) => {
+    setFavoriteItems(prev => 
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
 
   const navigateToFolder = (folder: FileSystemItem) => {
     const path: FileSystemItem[] = [];
@@ -103,6 +114,8 @@ export function MediaProvider({ children }: { children: ReactNode }) {
       setCurrentPath,
       selectedItems,
       setSelectedItems,
+      favoriteItems,
+      toggleFavorite,
       viewMode,
       setViewMode,
       navigateToFolder,
