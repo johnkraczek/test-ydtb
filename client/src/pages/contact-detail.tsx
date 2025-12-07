@@ -619,21 +619,6 @@ export default function ContactDetailPage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-2">
-          <Button className="gap-2 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90">
-            <Phone className="h-4 w-4" />
-            Call
-          </Button>
-          <Button variant="outline" className="gap-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <Mail className="h-4 w-4" />
-            Email
-          </Button>
-          <Button variant="outline" className="gap-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <MessageSquare className="h-4 w-4" />
-            SMS
-          </Button>
-        </div>
 
         <div className="space-y-6">
           {/* Main Content */}
