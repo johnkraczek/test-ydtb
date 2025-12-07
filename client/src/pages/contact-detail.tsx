@@ -40,6 +40,14 @@ import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -242,6 +250,24 @@ export default function ContactDetailPage() {
 
   const toggleTask = (id: string) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const [newTask, setNewTask] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
+
+  const handleAddTask = () => {
+    if (!newTask.trim()) return;
+    setTasks([
+      {
+        id: Math.random().toString(),
+        title: newTask,
+        dueDate: "Due in 3 days",
+        completed: false
+      },
+      ...tasks
+    ]);
+    setNewTask("");
+    setAssignedTo("");
   };
 
   const filteredTasks = showCompletedTasks ? tasks : tasks.filter(t => !t.completed);
@@ -488,10 +514,6 @@ export default function ContactDetailPage() {
                               Show completed
                             </Label>
                           </div>
-                          <Button size="sm" variant="outline" className="h-8 gap-2">
-                            <Plus className="h-3.5 w-3.5" />
-                            Add Task
-                          </Button>
                         </div>
                       </div>
                     </CardHeader>
@@ -521,6 +543,52 @@ export default function ContactDetailPage() {
                             No {showCompletedTasks ? '' : 'pending'} tasks found
                           </div>
                         )}
+                        
+                        <Separator className="my-4" />
+                        
+                        <div className="space-y-4 pt-2">
+                          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">Add New Task</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="assignee" className="text-xs">Assign To</Label>
+                              <Select value={assignedTo} onValueChange={setAssignedTo}>
+                                <SelectTrigger id="assignee" className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                                  <SelectValue placeholder="Select team member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="me">Me</SelectItem>
+                                  <SelectItem value="john">John Doe</SelectItem>
+                                  <SelectItem value="jane">Jane Smith</SelectItem>
+                                  <SelectItem value="sarah">Sarah Connor</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="dueDate" className="text-xs">Due Date</Label>
+                              <Button variant="outline" className="w-full justify-start text-left font-normal bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500">
+                                <Calendar className="mr-2 h-4 w-4" />
+                                <span>Pick a date</span>
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="taskDescription" className="text-xs">Task Description</Label>
+                            <Textarea 
+                              id="taskDescription" 
+                              placeholder="What needs to be done?" 
+                              className="min-h-[80px] bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                              value={newTask}
+                              onChange={(e) => setNewTask(e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-end pt-2">
+                            <Button size="sm" onClick={handleAddTask} disabled={!newTask.trim()}>
+                              Add Task
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
