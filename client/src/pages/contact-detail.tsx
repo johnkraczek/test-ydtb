@@ -724,20 +724,20 @@ export default function ContactDetailPage() {
             </div>
 
             {/* Right Sidebar - Composer */}
-            <div className="h-full">
-              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
+            <div className="">
+              <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-base">Send a Message</CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1">
-                  <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full h-full flex flex-col">
+                <CardContent>
+                  <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full">
                       <TabsList className="grid w-full grid-cols-2 mb-4 shrink-0">
                         <TabsTrigger value="email">Email</TabsTrigger>
                         <TabsTrigger value="sms">SMS</TabsTrigger>
                       </TabsList>
                       
-                      <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all flex-1 flex flex-col">
-                        <TabsContent value="email" className="mt-0 space-y-3 flex-1 flex flex-col">
+                      <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                        <TabsContent value="email" className="mt-0 space-y-3">
                           <Input 
                             placeholder="Subject line..." 
                             value={messageSubject}
@@ -746,13 +746,13 @@ export default function ContactDetailPage() {
                           />
                           <Textarea 
                             placeholder={`Hi ${customer.firstName}, ...`}
-                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent flex-1 min-h-[100px]"
+                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent min-h-[150px]"
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
                           />
                         </TabsContent>
                         
-                        <TabsContent value="sms" className="mt-0 space-y-3 flex-1 flex flex-col">
+                        <TabsContent value="sms" className="mt-0 space-y-3">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 shrink-0">
                             <MessageSquare className="h-3 w-3" />
                             <span>SMS to {customer.phone}</span>
@@ -762,7 +762,7 @@ export default function ContactDetailPage() {
                             maxLength={160}
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
-                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent flex-1 min-h-[100px]"
+                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent min-h-[150px]"
                           />
                         </TabsContent>
 
