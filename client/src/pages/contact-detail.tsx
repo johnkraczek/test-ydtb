@@ -637,7 +637,7 @@ export default function ContactDetailPage() {
                 <CardContent className="flex-1 overflow-y-auto min-h-0">
                   {/* Activity List */}
                   <div className="space-y-6 pr-2">
-                    {activities.slice().reverse().map((activity) => { 
+                    {activities.map((activity) => { 
                         const isRestaurant = activity.source === 'restaurant';
                         
                         return (
