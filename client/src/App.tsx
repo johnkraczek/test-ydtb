@@ -23,16 +23,19 @@ function Router() {
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorProvider } from "@/hooks/use-theme-color";
+import { MediaProvider } from "@/context/media-context";
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem>
         <ThemeColorProvider defaultThemeColor="zinc" storageKey="vite-ui-theme-color">
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <MediaProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </MediaProvider>
         </ThemeColorProvider>
       </ThemeProvider>
     </QueryClientProvider>

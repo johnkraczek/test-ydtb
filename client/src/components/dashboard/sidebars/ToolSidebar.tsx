@@ -13,12 +13,16 @@ import {
   LayoutGrid,
   PieChart,
   CreditCard,
-  FileText
+  FileText,
+  File,
+  Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useMedia, FileSystemItem } from "@/context/media-context";
+import { Card } from "@/components/ui/card";
 
 interface ToolSidebarProps {
   isOpen: boolean;
@@ -37,6 +41,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <AnalyticsSidebarContent />;
       case "users":
         return <ContactsSidebarContent />;
+      case "media":
+        return <MediaSidebarContent />;
       case "settings":
         return <SettingsSidebarContent />;
       default:
@@ -82,11 +88,94 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
             <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
                 <Plus className="h-4 w-4" />
                 <span className="font-medium">
-                  {toolId === "users" ? "Create New Contact" : "Create New"}
+                  {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
                 </span>
             </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function MediaSidebarContent() {
+  const { items, currentPath, navigateToFolder, setCurrentPath, setSelectedItems } = useMedia();
+  const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
+
+  const FileTreeItem = ({ item, level = 0 }: { item: FileSystemItem, level?: number }) => {
+    const hasChildren = items.some(i => i.parentId === item.id);
+    const isExpanded = currentPath.some(p => p.id === item.id) || (currentPath.length > 0 && currentPath[0].id === item.id && level === 0);
+    
+    return (
+      <div className="select-none">
+        <div 
+          className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+            currentFolderId === item.id 
+              ? 'bg-primary/10 text-primary font-medium' 
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+          }`}
+          style={{ paddingLeft: `${level * 12 + 8}px` }}
+          onClick={() => navigateToFolder(item)}
+        >
+          {item.type === 'folder' ? (
+            <Folder className={`h-4 w-4 ${currentFolderId === item.id ? 'fill-primary/20' : 'text-slate-400'}`} />
+          ) : (
+            <File className="h-4 w-4 text-slate-400" />
+          )}
+          <span className="text-sm truncate">{item.name}</span>
+        </div>
+        
+        {hasChildren && isExpanded && (
+          <div>
+            {items
+              .filter(i => i.parentId === item.id && i.type === 'folder')
+              .map(child => (
+                <FileTreeItem key={child.id} item={child} level={level + 1} />
+              ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+        <div className="space-y-1">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2">Folders</div>
+            {/* Root - All Files */}
+            <div 
+                className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                    currentPath.length === 0 
+                    ? 'bg-primary/10 text-primary font-medium' 
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                }`}
+                onClick={() => {
+                    setCurrentPath([]);
+                    setSelectedItems([]);
+                }}
+            >
+                <Home className="h-4 w-4" />
+                <span className="text-sm">All Files</span>
+            </div>
+            
+            {/* Tree Structure */}
+            {items.filter(i => i.parentId === null).map(item => (
+                <FileTreeItem key={item.id} item={item} />
+            ))}
+        </div>
+
+        <Card className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-none shadow-lg mt-4">
+            <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium opacity-80">Storage</span>
+                <span className="text-xs font-bold">75%</span>
+            </div>
+            <div className="h-1.5 bg-black/20 rounded-full overflow-hidden mb-3">
+                <div className="h-full bg-white w-[75%]" />
+            </div>
+            <p className="text-xs opacity-80 mb-4">7.5 GB of 10 GB used</p>
+            <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-white/20 hover:bg-white/30 border-none text-white">
+                Upgrade Plan
+            </Button>
+        </Card>
     </div>
   );
 }
