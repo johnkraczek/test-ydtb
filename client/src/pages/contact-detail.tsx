@@ -668,18 +668,6 @@ export default function ContactDetailPage() {
               
               <div className="mt-6">
                 <TabsContent value="overview" className="space-y-6">
-                  {/* About Card */}
-                  <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold">About</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                        {contact.about}
-                      </p>
-                    </CardContent>
-                  </Card>
-
                   {/* Details Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
