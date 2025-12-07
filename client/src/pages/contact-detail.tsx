@@ -513,42 +513,6 @@ export default function ContactDetailPage() {
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Spend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">${metrics.spend.toFixed(2)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Visits</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.visits}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Ticket</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">${metrics.avg.toFixed(2)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Loyalty Points</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{customer.points}</div>
-            <p className="text-xs text-muted-foreground">Tier: {customer.tier}</p>
-          </CardContent>
-        </Card>
-      </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         {/* Main Chat/Activity Stream */}
