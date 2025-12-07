@@ -626,11 +626,11 @@ export default function ContactDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="messaging" className="mt-6 h-[calc(100vh-220px)]">
-          <div className="grid gap-6 md:grid-cols-2 h-full pb-2">
+        <TabsContent value="messaging" className="mt-6 flex-1 min-h-0 flex flex-col">
+          <div className="grid gap-6 md:grid-cols-2 flex-1 min-h-0 pb-2">
             {/* Main Chat/Activity Stream */}
-            <div className="h-full">
-              <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+            <div className="flex flex-col h-full min-h-0">
+              <Card className="flex-1 border-slate-200 dark:border-slate-800 shadow-sm flex flex-col min-h-0">
                 <CardHeader className="flex-none border-b">
                   <CardTitle className="text-base">Activity Stream</CardTitle>
                 </CardHeader>
