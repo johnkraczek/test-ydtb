@@ -242,6 +242,47 @@ export default function MediaPage() {
     );
   };
 
+  const FilePreview = ({ selectedItem }: { selectedItem: FileSystemItem | undefined }) => {
+    if (!selectedItem) return (
+      <div className="text-slate-400 flex flex-col items-center gap-3">
+        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
+          <Columns className="h-8 w-8 opacity-50" />
+        </div>
+        <p>Select an item to view details</p>
+      </div>
+    );
+
+    return (
+      <div className="space-y-6 w-full max-w-sm animate-in fade-in zoom-in-95 duration-200">
+        <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-center relative group">
+          {selectedItem.url ? (
+            <img src={selectedItem.url} className="w-full h-full object-cover" />
+          ) : (
+            <div className="p-12">
+              {selectedItem.type === 'folder' ? (
+                <Folder className="h-24 w-24 text-blue-500/50" />
+              ) : (
+                <FileText className="h-24 w-24 text-slate-300" />
+              )}
+            </div>
+          )}
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{selectedItem.name}</h3>
+          <div className="flex items-center justify-center gap-4 text-sm text-slate-500">
+            <span>{selectedItem.size || 'Folder'}</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300" />
+            <span>{selectedItem.modified}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 pt-4">
+          <Button variant="outline" className="w-full">Open</Button>
+          <Button className="w-full">Download</Button>
+        </div>
+      </div>
+    );
+  };
+
   // Render content based on view mode
   const renderContent = () => {
     if (viewMode === 'list') {
@@ -368,39 +409,7 @@ export default function MediaPage() {
           {/* Preview Column */}
            <div className="min-w-[300px] flex-1 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-center text-center border-l border-slate-200 dark:border-slate-800">
               {selectedItems.length > 0 ? (
-                  (() => {
-                      const selectedItem = items.find(i => i.id === selectedItems[0]);
-                      if (!selectedItem) return null;
-                      return (
-                          <div className="space-y-6 w-full max-w-sm animate-in fade-in zoom-in-95 duration-200">
-                              <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-center relative group">
-                                  {selectedItem.url ? (
-                                      <img src={selectedItem.url} className="w-full h-full object-cover" />
-                                  ) : (
-                                      <div className="p-12">
-                                          {selectedItem.type === 'folder' ? (
-                                              <Folder className="h-24 w-24 text-blue-500/50" />
-                                          ) : (
-                                              <FileText className="h-24 w-24 text-slate-300" />
-                                          )}
-                                      </div>
-                                  )}
-                              </div>
-                              <div className="space-y-2">
-                                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{selectedItem.name}</h3>
-                                  <div className="flex items-center justify-center gap-4 text-sm text-slate-500">
-                                      <span>{selectedItem.size || 'Folder'}</span>
-                                      <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                      <span>{selectedItem.modified}</span>
-                                  </div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-3 pt-4">
-                                  <Button variant="outline" className="w-full">Open</Button>
-                                  <Button className="w-full">Download</Button>
-                              </div>
-                          </div>
-                      );
-                  })()
+                  <FilePreview selectedItem={items.find(i => i.id === selectedItems[0])} />
               ) : (
                   <div className="text-slate-400 flex flex-col items-center gap-3">
                       <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
@@ -589,6 +598,15 @@ export default function MediaPage() {
                {renderContent()}
             </div>
           </div>
+          
+          {/* Global Preview Sidebar for Grid/List */}
+          {(viewMode !== 'columns' && selectedItems.length > 0) && (
+             <div className="w-[300px] flex-shrink-0 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-start text-center border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
+                  <div className="sticky top-0 w-full flex flex-col items-center">
+                     <FilePreview selectedItem={items.find(i => i.id === selectedItems[0])} />
+                  </div>
+             </div>
+          )}
         </div>
       </DashboardLayout>
       <DragOverlay>
