@@ -48,6 +48,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -230,23 +238,31 @@ export default function ContactDetailPage() {
     {
       id: "1",
       title: "Follow up on proposal",
+      description: "Check if they reviewed the latest pricing tier we sent last week.",
       dueDate: "Due tomorrow at 5:00 PM",
-      completed: false
+      completed: false,
+      assignee: "Me"
     },
     {
       id: "2",
       title: "Send onboarding docs",
+      description: "Send the standard welcome packet and API documentation.",
       dueDate: "Completed yesterday",
-      completed: true
+      completed: true,
+      assignee: "Jane Smith"
     },
     {
       id: "3",
       title: "Schedule product demo",
+      description: "Coordinate with the sales engineering team to find a slot.",
       dueDate: "Due in 2 days",
-      completed: false
+      completed: false,
+      assignee: "Me"
     }
   ]);
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
 
   const toggleTask = (id: string) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
@@ -261,8 +277,10 @@ export default function ContactDetailPage() {
       {
         id: Math.random().toString(),
         title: newTask,
+        description: "",
         dueDate: "Due in 3 days",
-        completed: false
+        completed: false,
+        assignee: assignedTo || "Me"
       },
       ...tasks
     ]);
@@ -521,16 +539,37 @@ export default function ContactDetailPage() {
                       <div className="space-y-4">
                         {filteredTasks.length > 0 ? (
                           filteredTasks.map(task => (
-                            <div key={task.id} className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80">
-                              <Checkbox 
-                                id={`task-${task.id}`} 
-                                checked={task.completed}
-                                onCheckedChange={() => toggleTask(task.id)}
-                              />
+                            <div 
+                              key={task.id} 
+                              className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80 cursor-pointer"
+                              onClick={() => {
+                                setSelectedTask(task);
+                                setIsTaskDialogOpen(true);
+                              }}
+                            >
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <Checkbox 
+                                  id={`task-${task.id}`} 
+                                  checked={task.completed}
+                                  onCheckedChange={() => toggleTask(task.id)}
+                                />
+                              </div>
                               <div className="space-y-1 w-full">
                                 <Label 
                                   htmlFor={`task-${task.id}`} 
                                   className={`text-sm font-medium leading-none cursor-pointer transition-all ${task.completed ? 'line-through text-slate-500' : 'text-slate-900 dark:text-slate-100'}`}
+                                  onClick={(e) => {
+                                    // Prevent label click from triggering checkbox directly if we want row click to open dialog
+                                    // But we also want the label to be clickable for the dialog?
+                                    // Actually Label default behavior toggles the input it is 'for'.
+                                    // If we want the label to open the dialog, we should remove the 'htmlFor' or handle the click.
+                                    // Let's remove htmlFor from Label or stop propagation if we want it to just toggle.
+                                    // The user said "click on a task you should see details not complete the task".
+                                    // So clicking the text should open dialog.
+                                    e.preventDefault(); // Prevent checkbox toggle
+                                    setSelectedTask(task);
+                                    setIsTaskDialogOpen(true);
+                                  }}
                                 >
                                   {task.title}
                                 </Label>
@@ -725,6 +764,66 @@ export default function ContactDetailPage() {
           </div>
         </div>
       </div>
+      {/* Task Details Dialog */}
+      <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{selectedTask?.title}</DialogTitle>
+            <DialogDescription>
+              Task details and status
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">Status</span>
+                <Badge variant={selectedTask?.completed ? "secondary" : "outline"} className={selectedTask?.completed ? "bg-green-100 text-green-700 hover:bg-green-100" : "text-slate-600"}>
+                  {selectedTask?.completed ? "Completed" : "Pending"}
+                </Badge>
+              </div>
+              
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-slate-500">Due Date</span>
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="h-4 w-4 text-slate-400" />
+                  <span>{selectedTask?.dueDate}</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-slate-500">Assignee</span>
+                <div className="flex items-center gap-2 text-sm">
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                      {selectedTask?.assignee?.slice(0, 2).toUpperCase() || "ME"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>{selectedTask?.assignee || "Unassigned"}</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-slate-500">Description</span>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900 p-3 rounded-md border border-slate-100 dark:border-slate-800">
+                  {selectedTask?.description || "No description provided."}
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTaskDialogOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => {
+                toggleTask(selectedTask.id);
+                setIsTaskDialogOpen(false);
+              }}
+              className={selectedTask?.completed ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-primary text-primary-foreground"}
+            >
+              {selectedTask?.completed ? "Mark as Incomplete" : "Mark as Complete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
