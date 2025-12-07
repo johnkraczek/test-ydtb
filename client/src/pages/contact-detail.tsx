@@ -480,16 +480,16 @@ export default function ContactDetailPage() {
       </div>
 
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 h-[calc(100vh-200px)]">
         {/* Main Chat/Activity Stream */}
-        <div className="md:col-span-2 space-y-6">
-          <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm">
-             <CardHeader>
+        <div className="h-full">
+          <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+             <CardHeader className="flex-none">
                <CardTitle className="text-base">Activity Stream</CardTitle>
              </CardHeader>
-             <CardContent className="space-y-6">
+             <CardContent className="flex-1 overflow-y-auto min-h-0">
                {/* Activity List */}
-               <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+               <div className="space-y-6 pr-2">
                  {activities.slice().reverse().map((activity) => { 
                     const isRestaurant = activity.source === 'restaurant';
                     
@@ -572,69 +572,72 @@ export default function ContactDetailPage() {
                     );
                  })}
                </div>
-
-               {/* Composer Area (Sticky Bottom or Just Below) */}
-               <div className="mt-8 pt-6 border-t border-dashed border-zinc-200 dark:border-zinc-800">
-                 <h3 className="text-sm font-medium text-muted-foreground mb-4">Send a Message</h3>
-                 
-                 <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-4">
-                      <TabsTrigger value="email">Email</TabsTrigger>
-                      <TabsTrigger value="sms">SMS</TabsTrigger>
-                    </TabsList>
-                    
-                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                      <TabsContent value="email" className="mt-0 space-y-3">
-                        <Input 
-                          placeholder="Subject line..." 
-                          value={messageSubject}
-                          onChange={(e) => setMessageSubject(e.target.value)}
-                          className="border-0 border-b border-zinc-100 dark:border-zinc-800 rounded-none px-0 focus-visible:ring-0 font-medium bg-transparent"
-                        />
-                        <Textarea 
-                          placeholder={`Hi ${customer.firstName}, ...`}
-                          className="min-h-[100px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
-                          value={messageBody}
-                          onChange={(e) => setMessageBody(e.target.value)}
-                        />
-                      </TabsContent>
-                      
-                      <TabsContent value="sms" className="mt-0 space-y-3">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                          <MessageSquare className="h-3 w-3" />
-                          <span>SMS to {customer.phone}</span>
-                        </div>
-                        <Textarea 
-                          placeholder="Type your SMS message here..." 
-                          maxLength={160}
-                          value={messageBody}
-                          onChange={(e) => setMessageBody(e.target.value)}
-                          className="min-h-[80px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
-                        />
-                      </TabsContent>
-
-                      <div className="flex justify-between items-center pt-2 mt-2 border-t border-zinc-50 dark:border-zinc-800">
-                        <div className="text-xs text-muted-foreground">
-                          {messageType === 'sms' && `${messageBody.length}/160 chars`}
-                        </div>
-                        <Button 
-                          onClick={handleSendMessage} 
-                          disabled={!messageBody}
-                          size="sm"
-                          className="rounded-full px-6"
-                        >
-                          Send <Send className="ml-2 h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Tabs>
-               </div>
              </CardContent>
           </Card>
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-6">
+        <div className="h-full space-y-6 overflow-y-auto">
+           {/* Composer Card */}
+           <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+             <CardHeader>
+               <CardTitle className="text-base">Send a Message</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="email">Email</TabsTrigger>
+                    <TabsTrigger value="sms">SMS</TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                    <TabsContent value="email" className="mt-0 space-y-3">
+                      <Input 
+                        placeholder="Subject line..." 
+                        value={messageSubject}
+                        onChange={(e) => setMessageSubject(e.target.value)}
+                        className="border-0 border-b border-zinc-100 dark:border-zinc-800 rounded-none px-0 focus-visible:ring-0 font-medium bg-transparent"
+                      />
+                      <Textarea 
+                        placeholder={`Hi ${customer.firstName}, ...`}
+                        className="min-h-[150px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
+                        value={messageBody}
+                        onChange={(e) => setMessageBody(e.target.value)}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="sms" className="mt-0 space-y-3">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                        <MessageSquare className="h-3 w-3" />
+                        <span>SMS to {customer.phone}</span>
+                      </div>
+                      <Textarea 
+                        placeholder="Type your SMS message here..." 
+                        maxLength={160}
+                        value={messageBody}
+                        onChange={(e) => setMessageBody(e.target.value)}
+                        className="min-h-[120px] border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent"
+                      />
+                    </TabsContent>
+
+                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-zinc-50 dark:border-zinc-800">
+                      <div className="text-xs text-muted-foreground">
+                        {messageType === 'sms' && `${messageBody.length}/160 chars`}
+                      </div>
+                      <Button 
+                        onClick={handleSendMessage} 
+                        disabled={!messageBody}
+                        size="sm"
+                        className="rounded-full px-6"
+                      >
+                        Send <Send className="ml-2 h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </Tabs>
+             </CardContent>
+           </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Customer Notes</CardTitle>
