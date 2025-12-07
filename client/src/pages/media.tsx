@@ -40,7 +40,7 @@ import {
   ContextMenuCheckboxItem,
 } from "@/components/ui/context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, pointerWithin, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useMedia, FileSystemItem } from "@/context/media-context";
 
 export default function MediaPage() {
@@ -626,7 +626,7 @@ export default function MediaPage() {
   return (
     <DndContext 
       sensors={sensors}
-      collisionDetection={closestCenter} 
+      collisionDetection={pointerWithin} 
       onDragStart={handleDragStart} 
       onDragEnd={handleDragEnd}
     >
