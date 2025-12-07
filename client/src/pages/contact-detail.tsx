@@ -138,23 +138,6 @@ function CustomerFormContent({ formData, setFormData }: { formData: any, setForm
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="tier">Loyalty Tier</Label>
-            <Select 
-              value={formData.tier} 
-              onValueChange={(val) => setFormData({...formData, tier: val})}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select tier" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Bronze">Bronze</SelectItem>
-                <SelectItem value="Silver">Silver</SelectItem>
-                <SelectItem value="Gold">Gold</SelectItem>
-                <SelectItem value="Platinum">Platinum</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </div>
 
