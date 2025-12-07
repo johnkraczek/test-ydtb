@@ -94,14 +94,14 @@ export default function MediaPage() {
         ref={setNodeRef} 
         {...listeners} 
         {...attributes} 
-        className={`${isDragging ? 'opacity-50' : ''}`}
+        className={`${isDragging ? 'opacity-50' : ''} h-full`}
       >
         {children}
       </div>
     );
   };
 
-  const DroppableFolder = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+  const DroppableFolder = ({ item, children, className = '' }: { item: FileSystemItem, children: React.ReactNode, className?: string }) => {
     const { setNodeRef, isOver } = useDroppable({
       id: item.id,
       data: item
@@ -110,7 +110,7 @@ export default function MediaPage() {
     return (
       <div 
         ref={setNodeRef}
-        className={`${isOver ? 'bg-primary/10 ring-2 ring-primary ring-inset rounded-lg' : ''}`}
+        className={`${className} ${isOver ? 'bg-primary/10 ring-2 ring-primary ring-inset rounded-lg z-20' : ''}`}
       >
         {children}
       </div>
@@ -178,11 +178,14 @@ export default function MediaPage() {
                   >
                     <td className="px-4 py-2">
                       <DraggableItem item={item}>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 relative">
+                          {item.type === 'folder' && (
+                             <DroppableFolder item={item} className="absolute inset-0 -m-2 rounded-md pointer-events-none">
+                                <div className="w-full h-full" />
+                             </DroppableFolder>
+                          )}
                           {item.type === 'folder' ? (
-                            <DroppableFolder item={item}>
                               <Folder className="h-5 w-5 text-blue-500 fill-blue-500/20" />
-                            </DroppableFolder>
                           ) : item.type === 'image' ? (
                             <div className="h-8 w-8 rounded overflow-hidden bg-slate-100 border border-slate-200">
                                 {item.url ? <img src={item.url} className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 m-1.5 text-purple-500" />}
@@ -345,11 +348,14 @@ export default function MediaPage() {
                    if (item.type === 'folder') navigateToFolder(item);
                 }}
               >
+                {item.type === 'folder' && (
+                    <DroppableFolder item={item} className="absolute inset-0 z-10 pointer-events-none rounded-xl">
+                        <div className="w-full h-full" />
+                    </DroppableFolder>
+                )}
                 <div className="aspect-square w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center relative">
                   {item.type === 'folder' ? (
-                    <DroppableFolder item={item}>
                       <Folder className="h-12 w-12 text-blue-500 fill-blue-500/20 transition-transform group-hover:scale-110 duration-300" />
-                    </DroppableFolder>
                   ) : item.type === 'image' ? (
                     item.url ? (
                       <img src={item.url} alt={item.name} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
