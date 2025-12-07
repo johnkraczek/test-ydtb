@@ -593,10 +593,32 @@ export default function ContactsPage() {
                 </button>
               </div>
 
-              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
-                <CheckCircle className="h-4 w-4" />
-                Status
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <CheckCircle className="h-4 w-4" />
+                    Status
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-1" align="start">
+                  <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                    <span>Active</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                    <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                    <span>Lead</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                    <div className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                    <span>Inactive</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                    <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                    <span>Do Not Contact</span>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <Popover>
                 <PopoverTrigger asChild>
@@ -798,10 +820,29 @@ export default function ContactsPage() {
                 <Trash className="h-4 w-4 text-red-400" />
               </Button>
 
-              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
-                <MoreHorizontal className="h-4 w-4" />
-                More
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                    More
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem>
+                    Archive
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem>
+                    Merge Contacts
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         )}
