@@ -395,98 +395,99 @@ export default function MediaPage() {
     );
   };
 
+  const CustomHeader = () => (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 backdrop-blur-sm px-8 py-4 transition-all duration-300">
+      <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-9 w-9 shrink-0 text-slate-500 hover:text-slate-700" 
+            disabled={currentPath.length === 0}
+            onClick={navigateUp}
+          >
+            <ChevronRight className="h-4 w-4 rotate-180" />
+          </Button>
+          
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+          
+          {/* Breadcrumbs */}
+          <div className="flex items-center text-sm text-slate-500 whitespace-nowrap px-1">
+            <span 
+                className="cursor-pointer hover:text-primary transition-colors flex items-center gap-1 font-medium"
+                onClick={() => setCurrentPath([])}
+            >
+                <Home className="h-3.5 w-3.5" />
+            </span>
+            {currentPath.map((folder, index) => (
+                <div key={folder.id} className="flex items-center">
+                    <ChevronRight className="h-4 w-4 mx-1 opacity-50" />
+                    <span 
+                        className={`cursor-pointer hover:text-primary transition-colors ${index === currentPath.length - 1 ? 'font-medium text-slate-900 dark:text-slate-100' : ''}`}
+                        onClick={() => {
+                            setCurrentPath(currentPath.slice(0, index + 1));
+                        }}
+                    >
+                        {folder.name}
+                    </span>
+                </div>
+            ))}
+          </div>
+      </div>
+
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* View Toggles */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 shrink-0">
+            <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`h-7 w-7 rounded-md ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                onClick={() => setViewMode('grid')}
+            >
+                <Grid className="h-4 w-4" />
+            </Button>
+            <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`h-7 w-7 rounded-md ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                onClick={() => setViewMode('list')}
+            >
+                <List className="h-4 w-4" />
+            </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`h-7 w-7 rounded-md ${viewMode === 'columns' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                onClick={() => setViewMode('columns')}
+            >
+                <Columns className="h-4 w-4" />
+            </Button>
+        </div>
+        
+        <div className="relative hidden sm:block">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input placeholder="Search files..." className="pl-9 h-9 w-[200px] bg-white dark:bg-slate-900" />
+        </div>
+        
+        <Button className="h-9 gap-2 shadow-md shadow-primary/20">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">New Folder</span>
+        </Button>
+        <Button variant="outline" className="h-9 gap-2">
+            <Upload className="h-4 w-4" />
+            <span className="hidden sm:inline">Upload</span>
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <DashboardLayout activeTool="media">
+      <DashboardLayout activeTool="media" header={<CustomHeader />}>
         <div className="flex h-[calc(100vh-140px)] gap-6">
           {/* Main Content */}
-          <div className="flex-1 flex flex-col gap-4 min-w-0">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/50 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800 backdrop-blur-sm shadow-sm">
-              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
-                 <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-9 w-9 shrink-0" 
-                    disabled={currentPath.length === 0}
-                    onClick={navigateUp}
-                 >
-                    <ChevronRight className="h-4 w-4 rotate-180" />
-                 </Button>
-                 
-                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
-                 
-                 {/* Breadcrumbs */}
-                 <div className="flex items-center text-sm text-slate-500 whitespace-nowrap px-1">
-                    <span 
-                        className="cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
-                        onClick={() => setCurrentPath([])}
-                    >
-                        <Home className="h-3.5 w-3.5" />
-                    </span>
-                    {currentPath.map((folder, index) => (
-                        <div key={folder.id} className="flex items-center">
-                            <ChevronRight className="h-4 w-4 mx-1 opacity-50" />
-                            <span 
-                                className={`cursor-pointer hover:text-primary transition-colors ${index === currentPath.length - 1 ? 'font-medium text-slate-900 dark:text-slate-100' : ''}`}
-                                onClick={() => {
-                                    setCurrentPath(currentPath.slice(0, index + 1));
-                                }}
-                            >
-                                {folder.name}
-                            </span>
-                        </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {/* View Toggles */}
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 shrink-0">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={`h-7 w-7 rounded-md ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
-                        onClick={() => setViewMode('grid')}
-                    >
-                        <Grid className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={`h-7 w-7 rounded-md ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
-                        onClick={() => setViewMode('list')}
-                    >
-                        <List className="h-4 w-4" />
-                    </Button>
-                     <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={`h-7 w-7 rounded-md ${viewMode === 'columns' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
-                        onClick={() => setViewMode('columns')}
-                    >
-                        <Columns className="h-4 w-4" />
-                    </Button>
-                </div>
-                
-                <div className="relative hidden sm:block">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input placeholder="Search files..." className="pl-9 h-9 w-[200px] bg-white dark:bg-slate-900" />
-                </div>
-                
-                <Button className="h-9 gap-2 shadow-md shadow-primary/20">
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">New Folder</span>
-                </Button>
-                <Button variant="outline" className="h-9 gap-2">
-                    <Upload className="h-4 w-4" />
-                    <span className="hidden sm:inline">Upload</span>
-                </Button>
-              </div>
-            </div>
-
+          <div className="flex-1 flex flex-col gap-4 min-w-0 h-full">
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto pr-2">
                {renderContent()}
             </div>
           </div>

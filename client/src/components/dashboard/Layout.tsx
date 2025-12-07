@@ -10,9 +10,10 @@ import { ToolSidebar } from "./sidebars/ToolSidebar";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   activeTool?: string;
+  header?: React.ReactNode;
 }
 
-export default function DashboardLayout({ children, activeTool: initialActiveTool = "home" }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, activeTool: initialActiveTool = "home", header }: DashboardLayoutProps) {
   const [activeTool, setActiveTool] = useState(initialActiveTool);
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const [location, setLocation] = useLocation();
@@ -68,19 +69,21 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
             {/* Main Content Area */}
             <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300`}>
               {/* Page Header */}
-              <DashboardPageHeader
-                description={
-                  activeTool === "users" ? "Manage your team and contacts." : 
-                  activeTool === "media" ? "Manage and organize your media assets." :
-                  "Here's what's happening with your projects today."
-                }
-                title={
-                  activeTool === "users" ? "Contacts" : 
-                  activeTool === "media" ? "Media Storage" :
-                  "Dashboard"
-                }
-                isBorderVisible={true}
-              />
+              {header ? header : (
+                <DashboardPageHeader
+                  description={
+                    activeTool === "users" ? "Manage your team and contacts." : 
+                    activeTool === "media" ? "Manage and organize your media assets." :
+                    "Here's what's happening with your projects today."
+                  }
+                  title={
+                    activeTool === "users" ? "Contacts" : 
+                    activeTool === "media" ? "Media Storage" :
+                    "Dashboard"
+                  }
+                  isBorderVisible={true}
+                />
+              )}
 
               {/* Main content scrollable area */}
               <div className="flex-1 overflow-auto p-8">
