@@ -141,8 +141,11 @@ export default function MediaPage() {
     );
   };
 
-  const handleSelection = (item: FileSystemItem, event: React.MouseEvent) => {
+  const handleSelection = (item: FileSystemItem, event: React.MouseEvent, contextItems?: FileSystemItem[]) => {
     event.stopPropagation();
+    
+    // Use provided context items or default to currentItems (for grid/list view)
+    const effectiveItems = contextItems || currentItems;
     
     if (event.ctrlKey || event.metaKey) {
       // Toggle selection
@@ -154,13 +157,13 @@ export default function MediaPage() {
     } else if (event.shiftKey && selectedItems.length > 0) {
       // Range selection
       const lastSelectedId = selectedItems[selectedItems.length - 1];
-      const currentIndex = currentItems.findIndex(i => i.id === item.id);
-      const lastIndex = currentItems.findIndex(i => i.id === lastSelectedId);
+      const currentIndex = effectiveItems.findIndex(i => i.id === item.id);
+      const lastIndex = effectiveItems.findIndex(i => i.id === lastSelectedId);
       
       if (currentIndex !== -1 && lastIndex !== -1) {
         const start = Math.min(currentIndex, lastIndex);
         const end = Math.max(currentIndex, lastIndex);
-        const range = currentItems.slice(start, end + 1).map(i => i.id);
+        const range = effectiveItems.slice(start, end + 1).map(i => i.id);
         
         // Add range to existing selection (union)
         setSelectedItems(prev => Array.from(new Set([...prev, ...range])));
@@ -377,13 +380,18 @@ export default function MediaPage() {
                                 : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                           }`}
                           onClick={(e) => {
+                            // Always truncate path to current level first (closing any child columns) when interacting with this column
+                            const ancestors = currentPath.slice(0, index);
+
                             if (item.type === 'folder' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-                                // If clicking a folder at current level, truncate path after this level and add new folder
-                                const newPath = currentPath.slice(0, index);
-                                newPath.push(item);
+                                // Navigate into folder
+                                const newPath = [...ancestors, item];
                                 setCurrentPath(newPath);
+                                setSelectedItems([item.id]);
                             } else {
-                                handleSelection(item, e);
+                                // Selecting file(s) or modifying selection
+                                setCurrentPath(ancestors);
+                                handleSelection(item, e, column.items);
                             }
                           }}
                         >
