@@ -352,9 +352,9 @@ export default function ContactDetailPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="w-full justify-start h-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 rounded-none p-0 gap-6">
                 <TabsTrigger 
@@ -424,6 +424,53 @@ export default function ContactDetailPage() {
 
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                       <CardHeader>
+                        <CardTitle className="text-base font-medium">Contact Information</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                            <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="text-xs text-slate-500 uppercase font-medium">Email</p>
+                            <p className="text-sm font-medium truncate">{contact.email}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                            <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-medium">Phone</p>
+                            <p className="text-sm font-medium">{contact.phone}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                            <MapPin className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-medium">Location</p>
+                            <p className="text-sm font-medium">San Francisco, CA</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                            <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-medium">Date of Birth</p>
+                            <p className="text-sm font-medium">{format(contact.dob, 'MMM d, yyyy')}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                      <CardHeader>
                         <CardTitle className="text-base font-medium flex items-center gap-2">
                           <Tag className="h-4 w-4 text-slate-400" />
                           Segmentation
@@ -447,6 +494,38 @@ export default function ContactDetailPage() {
                               </Badge>
                             ))}
                           </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                      <CardHeader>
+                        <CardTitle className="text-base font-medium flex items-center gap-2">
+                          <Ban className="h-4 w-4 text-slate-400" />
+                          Do Not Disturb (DND)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="dnd-email" className="text-sm font-medium">Email</Label>
+                          <Switch id="dnd-email" checked={contact.dnd.email} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="dnd-sms" className="text-sm font-medium">SMS</Label>
+                          <Switch id="dnd-sms" checked={contact.dnd.sms} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="dnd-call" className="text-sm font-medium">Calls</Label>
+                          <Switch id="dnd-call" checked={contact.dnd.call} />
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="dnd-inbound-call" className="text-sm font-medium">Inbound Calls</Label>
+                          <Switch id="dnd-inbound-call" checked={contact.dnd.inboundCall} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="dnd-inbound-sms" className="text-sm font-medium">Inbound SMS</Label>
+                          <Switch id="dnd-inbound-sms" checked={contact.dnd.inboundSms} />
                         </div>
                       </CardContent>
                     </Card>
@@ -679,88 +758,6 @@ export default function ContactDetailPage() {
                 </TabsContent>
               </div>
             </Tabs>
-          </div>
-
-          {/* Right Sidebar - Info */}
-          <div className="space-y-6">
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base font-medium">Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
-                    <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="overflow-hidden">
-                    <p className="text-xs text-slate-500 uppercase font-medium">Email</p>
-                    <p className="text-sm font-medium truncate">{contact.email}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
-                    <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase font-medium">Phone</p>
-                    <p className="text-sm font-medium">{contact.phone}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
-                    <MapPin className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase font-medium">Location</p>
-                    <p className="text-sm font-medium">San Francisco, CA</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
-                    <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase font-medium">Date of Birth</p>
-                    <p className="text-sm font-medium">{format(contact.dob, 'MMM d, yyyy')}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base font-medium flex items-center gap-2">
-                  <Ban className="h-4 w-4 text-slate-400" />
-                  Do Not Disturb (DND)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dnd-email" className="text-sm font-medium">Email</Label>
-                  <Switch id="dnd-email" checked={contact.dnd.email} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dnd-sms" className="text-sm font-medium">SMS</Label>
-                  <Switch id="dnd-sms" checked={contact.dnd.sms} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dnd-call" className="text-sm font-medium">Calls</Label>
-                  <Switch id="dnd-call" checked={contact.dnd.call} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dnd-inbound-call" className="text-sm font-medium">Inbound Calls</Label>
-                  <Switch id="dnd-inbound-call" checked={contact.dnd.inboundCall} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dnd-inbound-sms" className="text-sm font-medium">Inbound SMS</Label>
-                  <Switch id="dnd-inbound-sms" checked={contact.dnd.inboundSms} />
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
