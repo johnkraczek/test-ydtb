@@ -36,7 +36,7 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useMedia, FileSystemItem } from "@/context/media-context";
 
 export default function MediaPage() {
@@ -54,6 +54,17 @@ export default function MediaPage() {
   } = useMedia();
 
   const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
+
+  // Configure sensors for better click/drag distinction
+  // Require a hold of 200ms to start dragging, allowing clicks to pass through immediately if released earlier
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  );
 
   const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
   const currentItems = items.filter(item => item.parentId === currentFolderId);
@@ -481,7 +492,12 @@ export default function MediaPage() {
   );
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter} 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+    >
       <DashboardLayout activeTool="media" header={<CustomHeader />}>
         <div className="flex h-[calc(100vh-140px)] gap-6">
           {/* Main Content */}
