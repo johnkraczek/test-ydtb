@@ -28,24 +28,6 @@ const mainTools = [
     active: true,
   },
   {
-    id: "documents",
-    icon: FileText,
-    label: "Documents",
-    active: false,
-  },
-  {
-    id: "analytics",
-    icon: BarChart3,
-    label: "Analytics",
-    active: false,
-  },
-  {
-    id: "database",
-    icon: Database,
-    label: "Database",
-    active: false,
-  },
-  {
     id: "users",
     icon: Users,
     label: "Contacts",

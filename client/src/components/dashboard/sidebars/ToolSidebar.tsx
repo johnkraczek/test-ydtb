@@ -42,10 +42,6 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
     switch (toolId) {
       case "home":
         return <HomeSidebarContent />;
-      case "documents":
-        return <DocumentsSidebarContent />;
-      case "analytics":
-        return <AnalyticsSidebarContent />;
       case "users":
         return <ContactsSidebarContent />;
       case "media":
@@ -281,40 +277,6 @@ function HomeSidebarContent() {
   );
 }
 
-function DocumentsSidebarContent() {
-  return (
-    <div className="space-y-1">
-      <SidebarSection title="Library">
-        <SidebarItem icon={Folder} label="All Documents" active />
-        <SidebarItem icon={User} label="Shared with Me" badge="12" />
-        <SidebarItem icon={Clock} label="Recent" />
-      </SidebarSection>
-      
-       <SidebarSection title="Folders">
-        <SidebarItem icon={Folder} label="Contracts" />
-        <SidebarItem icon={Folder} label="Invoices" />
-        <SidebarItem icon={Folder} label="Specs" />
-      </SidebarSection>
-    </div>
-  );
-}
-
-function AnalyticsSidebarContent() {
-  return (
-    <div className="space-y-1">
-      <SidebarSection title="Dashboards">
-        <SidebarItem icon={PieChart} label="Overview" active />
-        <SidebarItem icon={ArrowUpRight} label="Real-time" badge="Live" />
-      </SidebarSection>
-      
-      <SidebarSection title="Reports">
-        <SidebarItem icon={FileText} label="Weekly Summary" />
-        <SidebarItem icon={FileText} label="Monthly Growth" />
-        <SidebarItem icon={FileText} label="User Retention" />
-      </SidebarSection>
-    </div>
-  );
-}
 
 function ContactsSidebarContent() {
   return (
