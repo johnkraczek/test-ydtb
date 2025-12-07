@@ -36,7 +36,10 @@ import {
   MousePointerClick
 } from "lucide-react";
 import { Link, useRoute } from "wouter";
+import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
+
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -184,6 +187,36 @@ export default function ContactDetailPage() {
     },
   ];
 
+  const [notes, setNotes] = useState([
+    {
+      id: "1",
+      content: "Customer is interested in the new product line. Follow up next week.",
+      author: "John Doe",
+      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)
+    },
+    {
+      id: "2",
+      content: "Called to discuss contract renewal. They are happy with the service.",
+      author: "Jane Smith", 
+      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)
+    }
+  ]);
+  const [newNote, setNewNote] = useState("");
+
+  const handleAddNote = () => {
+    if (!newNote.trim()) return;
+    setNotes([
+      {
+        id: Math.random().toString(),
+        content: newNote,
+        author: "Me",
+        date: new Date()
+      },
+      ...notes
+    ]);
+    setNewNote("");
+  };
+
   return (
     <DashboardLayout activeTool="users">
       <div className="space-y-6">
@@ -268,6 +301,12 @@ export default function ContactDetailPage() {
                   className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-2 font-medium"
                 >
                   Tasks
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notes" 
+                  className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-2 font-medium"
+                >
+                  Notes
                 </TabsTrigger>
               </TabsList>
               
@@ -431,6 +470,51 @@ export default function ContactDetailPage() {
                             <p className="text-xs text-slate-500">Completed yesterday</p>
                           </div>
                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="notes">
+                  <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <StickyNote className="h-5 w-5 text-slate-400" />
+                        Notes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="note">Add a note</Label>
+                          <Textarea 
+                            id="note" 
+                            placeholder="Type your note here..." 
+                            className="min-h-[100px] bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex justify-end">
+                          <Button size="sm" onClick={handleAddNote} disabled={!newNote.trim()}>
+                            Add Note
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-4">
+                        {notes.map((note) => (
+                          <div key={note.id} className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{note.author}</span>
+                              <span className="text-xs text-slate-500">{formatDistanceToNow(note.date, { addSuffix: true })}</span>
+                            </div>
+                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                              {note.content}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
