@@ -470,21 +470,6 @@ export default function ContactDetailPage() {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="w-[160px]">
-              <Select value={metricsFilter} onValueChange={setMetricsFilter}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select range" />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  <SelectItem value="last_week">Last Week</SelectItem>
-                  <SelectItem value="last_month">Last Month</SelectItem>
-                  <SelectItem value="last_quarter">Last Quarter</SelectItem>
-                  <SelectItem value="last_year">Last Year</SelectItem>
-                  <SelectItem value="all_time">All Time</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" onClick={() => setFormData({...customer})}>Edit Profile</Button>
