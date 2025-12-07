@@ -20,7 +20,8 @@ import {
   Move,
   Info,
   ExternalLink,
-  Scissors
+  Scissors,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -436,7 +437,11 @@ export default function MediaPage() {
                   <div className={`absolute top-2 right-2 h-5 w-5 rounded-full border bg-white flex items-center justify-center transition-opacity ${
                       selectedItems.includes(item.id) ? 'opacity-100 border-blue-500 bg-blue-500 text-white' : 'opacity-0 group-hover:opacity-100 border-slate-200 text-transparent'
                   }`}>
-                    <div className="h-2 w-2 rounded-full bg-current" />
+                    {selectedItems.includes(item.id) ? (
+                        <Check className="h-3 w-3" />
+                    ) : (
+                        <div className="h-2 w-2 rounded-full bg-current" />
+                    )}
                   </div>
                 </div>
                 
