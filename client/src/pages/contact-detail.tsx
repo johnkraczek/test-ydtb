@@ -789,7 +789,7 @@ export default function ContactDetailPage() {
                 </TabsContent>
                 
                 <TabsContent value="activity">
-                  <div className="space-y-6 p-1">
+                  <div className="space-y-6 p-1 max-w-3xl mx-auto">
                     {activities.map((activity) => (
                       <div 
                         key={activity.id} 
