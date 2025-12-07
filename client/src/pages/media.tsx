@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { 
   Folder, 
@@ -95,23 +95,35 @@ export default function MediaPage() {
     setDraggedItem(null);
   };
 
-  const DraggableItem = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+  const DraggableItem = React.forwardRef<HTMLDivElement, { item: FileSystemItem, children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>>(
+    ({ item, children, className, ...props }, ref) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
       id: item.id,
       data: item
     });
 
+    const setRef = (element: HTMLDivElement | null) => {
+      setNodeRef(element);
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = element;
+      }
+    };
+
     return (
       <div 
-        ref={setNodeRef} 
+        ref={setRef} 
         {...listeners} 
         {...attributes} 
-        className={`${isDragging ? 'opacity-50' : ''}`}
+        {...props}
+        className={`${className || ''} ${isDragging ? 'opacity-50' : ''}`}
       >
         {children}
       </div>
     );
-  };
+  });
+  DraggableItem.displayName = "DraggableItem";
 
   const DroppableFolder = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
     const { setNodeRef, isOver } = useDroppable({
@@ -250,7 +262,8 @@ export default function MediaPage() {
                   <tr 
                     className={`group cursor-pointer transition-colors ${selectedItems.includes(item.id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                     onClick={(e) => handleSelection(item, e)}
-                    onDoubleClick={() => {
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
                         if (item.type === 'folder') navigateToFolder(item);
                     }}
                   >
@@ -414,7 +427,8 @@ export default function MediaPage() {
                     : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800'
                 }`}
                 onClick={(e) => handleSelection(item, e)}
-                onDoubleClick={() => {
+                onDoubleClick={(e) => {
+                   e.stopPropagation();
                    if (item.type === 'folder') navigateToFolder(item);
                 }}
               >
