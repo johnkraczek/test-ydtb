@@ -83,7 +83,7 @@ export default function MediaPage() {
     setDraggedItem(null);
   };
 
-  const DraggableItem = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+  const DraggableItem = ({ item, children, className = '' }: { item: FileSystemItem, children: React.ReactNode, className?: string }) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
       id: item.id,
       data: item
@@ -94,7 +94,7 @@ export default function MediaPage() {
         ref={setNodeRef} 
         {...listeners} 
         {...attributes} 
-        className={`${isDragging ? 'opacity-50' : ''} h-full`}
+        className={`${isDragging ? 'opacity-50' : ''} ${className}`}
       >
         {children}
       </div>
@@ -177,7 +177,7 @@ export default function MediaPage() {
                     }}
                   >
                     <td className="px-4 py-2">
-                      <DraggableItem item={item}>
+                      <DraggableItem item={item} className="h-full">
                         <div className="flex items-center gap-3 relative">
                           {item.type === 'folder' && (
                              <DroppableFolder item={item} className="absolute inset-0 -m-2 rounded-md pointer-events-none">
@@ -239,8 +239,9 @@ export default function MediaPage() {
                     
                     return (
                       <ContextMenuWrapper key={item.id} item={item}>
+                        <DraggableItem item={item}>
                          <div
-                          className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${
+                          className={`relative flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${
                             isSelected || isLeafSelected
                               ? 'bg-blue-500 text-white' 
                               : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
@@ -256,6 +257,11 @@ export default function MediaPage() {
                             }
                           }}
                         >
+                          {item.type === 'folder' && (
+                              <DroppableFolder item={item} className="absolute inset-0 z-10 pointer-events-none rounded-md">
+                                  <div className="w-full h-full" />
+                              </DroppableFolder>
+                          )}
                           <div className="flex items-center gap-2 truncate">
                             {item.type === 'folder' ? (
                               <Folder className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white fill-white/20' : 'text-blue-500 fill-blue-500/20'}`} />
@@ -270,6 +276,7 @@ export default function MediaPage() {
                             <ChevronRight className={`h-3.5 w-3.5 ${isSelected || isLeafSelected ? 'text-white/70' : 'text-slate-400'}`} />
                           )}
                         </div>
+                        </DraggableItem>
                       </ContextMenuWrapper>
                     );
                   })}
@@ -331,7 +338,7 @@ export default function MediaPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {currentItems.map(item => (
           <ContextMenuWrapper key={item.id} item={item}>
-            <DraggableItem item={item}>
+            <DraggableItem item={item} className="h-full">
               <div 
                 className={`group relative flex flex-col gap-2 p-3 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${
                   selectedItems.includes(item.id)
