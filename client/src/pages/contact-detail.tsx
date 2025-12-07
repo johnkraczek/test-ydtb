@@ -27,10 +27,16 @@ import {
   MessageCircle,
   History,
   CheckSquare,
-  Plus
+  Plus,
+  StickyNote,
+  CreditCard,
+  Ticket,
+  UserPlus,
+  Eye,
+  MousePointerClick
 } from "lucide-react";
 import { Link, useRoute } from "wouter";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -62,6 +68,121 @@ export default function ContactDetailPage() {
       inboundSms: true
     }
   };
+
+  // Mock activity data
+  const activities = [
+    {
+      id: "1",
+      type: "note",
+      direction: "outbound",
+      title: "ADDED NOTE",
+      description: "Customer prefers booth seating near the window.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90), // 3 months ago
+      icon: StickyNote,
+    },
+    {
+      id: "2",
+      type: "review",
+      direction: "inbound",
+      title: "LEFT 5-STAR REVIEW",
+      description: '"Amazing service and the gluten free pasta was incredible!"',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60), // 2 months ago
+      icon: Star,
+      metadata: { rating: 5, label: "Rating: 5/5" }
+    },
+    {
+      id: "3",
+      type: "profile",
+      direction: "outbound",
+      title: "UPDATED PROFILE",
+      description: "Updated dietary restrictions: Gluten Free.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60), // 2 months ago
+      icon: Edit,
+    },
+    {
+      id: "4",
+      type: "tag",
+      direction: "outbound",
+      title: "ADDED TAG",
+      description: 'Added tag "Wine Lover" based on purchase history.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30), // 1 month ago
+      icon: Tag,
+    },
+    {
+      id: "5",
+      type: "email",
+      direction: "outbound",
+      title: "SENT SPECIAL OFFER",
+      description: 'Sent "Free Dessert" offer for birthday.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30), // 1 month ago
+      icon: Mail,
+      metadata: { label: "Expires in 30 days" }
+    },
+    {
+      id: "6",
+      type: "sms",
+      direction: "outbound",
+      title: "SENT SMS CAMPAIGN",
+      description: "Hey Alice! Come in this week for double points on all entrees.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 21), // 3 weeks ago
+      icon: MessageSquare,
+    },
+    {
+      id: "7",
+      type: "loyalty",
+      direction: "inbound",
+      title: "LOYALTY CARD ACTIVATED",
+      description: "Customer activated digital loyalty card.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), // 2 weeks ago
+      icon: CreditCard,
+    },
+    {
+      id: "8",
+      type: "page_view",
+      direction: "inbound",
+      title: "PAGE VIEW",
+      description: "Visited 'Menu' page on website.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10), // 10 days ago
+      icon: Eye,
+    },
+    {
+      id: "9",
+      type: "trigger_link",
+      direction: "inbound",
+      title: "TRIGGER LINK CLICKED",
+      description: "Clicked 'View Menu' link in SMS.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9), // 9 days ago
+      icon: MousePointerClick,
+    },
+    {
+      id: "10",
+      type: "signup",
+      direction: "inbound",
+      title: "NEW SIGNUP",
+      description: "Signed up for weekly newsletter.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8), // 8 days ago
+      icon: UserPlus,
+    },
+    {
+      id: "11",
+      type: "loyalty_checkin",
+      direction: "inbound",
+      title: "LOYALTY CHECK-IN",
+      description: "Earned 45 points.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 1 week ago
+      icon: MapPin,
+    },
+    {
+      id: "12",
+      type: "coupon",
+      direction: "inbound",
+      title: "REDEEMED COUPON",
+      description: 'Used "Free Appetizer" coupon with main course order.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+      icon: Ticket,
+      metadata: { label: "Ticket Value: $45.20" }
+    },
+  ];
 
   return (
     <DashboardLayout activeTool="users">
@@ -221,48 +342,63 @@ export default function ContactDetailPage() {
                 </TabsContent>
                 
                 <TabsContent value="activity">
-                  <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <History className="h-5 w-5 text-slate-400" />
-                        Recent Activity
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-800 space-y-8">
-                        <div className="relative">
-                          <div className="absolute -left-[31px] bg-blue-100 dark:bg-blue-900/20 p-1.5 rounded-full border-4 border-white dark:border-slate-900">
-                            <PhoneIncoming className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <div className="space-y-6 p-1">
+                    {activities.map((activity) => (
+                      <div 
+                        key={activity.id} 
+                        className={`flex w-full ${activity.direction === 'inbound' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`flex gap-4 max-w-[80%] ${activity.direction === 'inbound' ? 'flex-row-reverse' : 'flex-row'}`}>
+                          {/* Icon Bubble */}
+                          <div className={`
+                            flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center shadow-sm z-10
+                            ${activity.direction === 'inbound' 
+                              ? 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400' 
+                              : 'bg-primary text-primary-foreground'}
+                          `}>
+                            <activity.icon className="h-5 w-5" />
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">Inbound Call from Alice</p>
-                            <p className="text-xs text-slate-500">Today at 10:30 AM • Duration: 5m 23s</p>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Discussed project requirements and timeline for Q4.</p>
-                          </div>
-                        </div>
 
-                        <div className="relative">
-                          <div className="absolute -left-[31px] bg-purple-100 dark:bg-purple-900/20 p-1.5 rounded-full border-4 border-white dark:border-slate-900">
-                            <Mail className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">Email Sent: Welcome Aboard</p>
-                            <p className="text-xs text-slate-500">Yesterday at 2:15 PM</p>
-                          </div>
-                        </div>
+                          {/* Content Card */}
+                          <div className={`
+                            relative p-4 rounded-xl shadow-sm border
+                            ${activity.direction === 'inbound' 
+                              ? 'bg-primary text-primary-foreground border-primary' 
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100'}
+                          `}>
+                            <div className="flex items-center justify-between gap-4 mb-1">
+                              <span className={`text-xs font-bold uppercase tracking-wider ${activity.direction === 'inbound' ? 'text-primary-foreground/90' : 'text-primary'}`}>
+                                {activity.title}
+                              </span>
+                              <span className={`text-xs ${activity.direction === 'inbound' ? 'text-primary-foreground/70' : 'text-slate-400'}`}>
+                                {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
+                              </span>
+                            </div>
+                            
+                            <p className={`text-sm leading-relaxed ${activity.direction === 'inbound' ? 'text-primary-foreground/90' : 'text-slate-600 dark:text-slate-400'}`}>
+                              {activity.description}
+                            </p>
 
-                        <div className="relative">
-                          <div className="absolute -left-[31px] bg-green-100 dark:bg-green-900/20 p-1.5 rounded-full border-4 border-white dark:border-slate-900">
-                            <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">Task Completed: Initial Setup</p>
-                            <p className="text-xs text-slate-500">Oct 24, 2023</p>
+                            {activity.metadata && (
+                              <div className="mt-3">
+                                <Badge 
+                                  variant="secondary" 
+                                  className={`
+                                    font-mono text-xs
+                                    ${activity.direction === 'inbound' 
+                                      ? 'bg-white/20 text-primary-foreground hover:bg-white/30 border-transparent' 
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}
+                                  `}
+                                >
+                                  {activity.metadata.label}
+                                </Badge>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="tasks">
