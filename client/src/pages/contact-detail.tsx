@@ -40,6 +40,27 @@ import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 
 import { Textarea } from "@/components/ui/textarea";
+import { 
+  DndContext, 
+  DragOverlay, 
+  closestCorners, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  DragStartEvent, 
+  DragOverEvent, 
+  DragEndEvent,
+  useDroppable
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy, 
+  useSortable 
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   Select,
   SelectContent,
@@ -56,6 +77,96 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+function SortableTaskItem({ task, onClick }: { task: any, onClick: () => void }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: task.id, data: { task } });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Card 
+        className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+        onClick={onClick}
+      >
+        <CardContent className="p-3 space-y-3">
+          <div className="space-y-1">
+            <span className="text-sm font-medium leading-tight block">{task.title}</span>
+            {task.description && (
+              <p className="text-xs text-slate-500 line-clamp-2">{task.description}</p>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-1.5">
+              <Avatar className="h-5 w-5">
+                <AvatarFallback className="text-[9px] bg-primary/10 text-primary">
+                  {task.assignee?.slice(0, 2).toUpperCase() || "ME"}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-slate-500">{task.assignee}</span>
+            </div>
+            
+            {task.dueDate && (
+              <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-slate-200 dark:border-slate-700 text-slate-500">
+                {task.dueDate.includes("Due") ? task.dueDate.replace("Due ", "") : "Done"}
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function KanbanColumn({ column, tasks, onClickTask }: { column: any, tasks: any[], onClickTask: (task: any) => void }) {
+  const { setNodeRef } = useDroppable({
+    id: column.id,
+  });
+
+  const columnTasks = tasks.filter(t => t.status === column.id);
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      className={`flex flex-col rounded-lg border border-slate-200 dark:border-slate-800 ${column.color} bg-opacity-50 h-full`}
+    >
+       <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-t-lg flex items-center justify-between">
+          <span className="font-medium text-sm">{column.title}</span>
+          <Badge variant="secondary" className="bg-white dark:bg-slate-800 text-xs">
+            {columnTasks.length}
+          </Badge>
+       </div>
+       
+       <div className="flex-1 p-3 space-y-3 overflow-y-auto min-h-[100px]">
+         <SortableContext 
+           items={columnTasks.map(t => t.id)} 
+           strategy={verticalListSortingStrategy}
+         >
+           {columnTasks.map(task => (
+             <SortableTaskItem key={task.id} task={task} onClick={() => onClickTask(task)} />
+           ))}
+         </SortableContext>
+         {columnTasks.length === 0 && (
+            <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-lg flex items-center justify-center text-slate-400 text-xs">
+              Drop here
+            </div>
+         )}
+       </div>
+    </div>
+  );
+}
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -312,6 +423,109 @@ export default function ContactDetailPage() {
     { id: "in-progress", title: "In Progress", color: "bg-blue-50 dark:bg-blue-900/20" },
     { id: "done", title: "Done", color: "bg-green-50 dark:bg-green-900/20" }
   ];
+
+  // Drag and Drop Logic
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as string);
+  }
+
+  function handleDragOver(event: DragOverEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Find the tasks
+    const activeTask = tasks.find(t => t.id === activeId);
+    const overTask = tasks.find(t => t.id === overId);
+    
+    if (!activeTask) return;
+
+    const activeColumnId = activeTask.status;
+    let overColumnId;
+
+    if (overTask) {
+      overColumnId = overTask.status;
+    } else {
+      // Check if over is a column id
+      if (columns.find(c => c.id === overId)) {
+        overColumnId = overId;
+      } else {
+        return;
+      }
+    }
+
+    if (activeColumnId !== overColumnId) {
+       setTasks((tasks) => {
+        const activeIndex = tasks.findIndex((t) => t.id === activeId);
+        const overIndex = tasks.findIndex((t) => t.id === overId);
+        
+        const newTasks = [...tasks];
+        // Update status immediately for smooth transition
+        newTasks[activeIndex] = { ...newTasks[activeIndex], status: overColumnId };
+        
+        // Also update completed status if moved to done
+        if (overColumnId === "done") {
+          newTasks[activeIndex].completed = true;
+        } else {
+           newTasks[activeIndex].completed = false;
+        }
+
+        return arrayMove(newTasks, activeIndex, overIndex >= 0 ? overIndex : activeIndex); 
+      });
+    }
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    const activeId = active.id as string;
+    const overId = over?.id as string;
+
+    if (!over) {
+      setActiveId(null);
+      return;
+    }
+
+    const activeTask = tasks.find(t => t.id === activeId);
+    const overTask = tasks.find(t => t.id === overId);
+    
+    const activeColumnId = activeTask?.status;
+    let overColumnId;
+    
+    if (overTask) {
+      overColumnId = overTask.status;
+    } else if (columns.find(c => c.id === overId)) {
+      overColumnId = overId;
+    } else {
+      overColumnId = activeColumnId;
+    }
+
+    if (activeColumnId === overColumnId && activeId !== overId) {
+       setTasks((tasks) => {
+          const oldIndex = tasks.findIndex((t) => t.id === activeId);
+          const newIndex = tasks.findIndex((t) => t.id === overId);
+          return arrayMove(tasks, oldIndex, newIndex);
+       });
+    } 
+
+    setActiveId(null);
+  }
+
+  const activeTask = activeId ? tasks.find(t => t.id === activeId) : null;
 
   return (
     <DashboardLayout activeTool="users">
@@ -627,60 +841,57 @@ export default function ContactDetailPage() {
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-300px)] min-h-[500px]">
-                    {columns.map(column => (
-                      <div key={column.id} className={`flex flex-col rounded-lg border border-slate-200 dark:border-slate-800 ${column.color} bg-opacity-50 h-full`}>
-                        <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-t-lg flex items-center justify-between">
-                          <span className="font-medium text-sm">{column.title}</span>
-                          <Badge variant="secondary" className="bg-white dark:bg-slate-800 text-xs">
-                            {tasks.filter(t => t.status === column.id).length}
-                          </Badge>
-                        </div>
-                        <div className="flex-1 p-3 space-y-3 overflow-y-auto">
-                          {tasks.filter(t => t.status === column.id).map(task => (
-                            <Card 
-                              key={task.id} 
-                              className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setIsTaskDialogOpen(true);
-                              }}
-                            >
-                              <CardContent className="p-3 space-y-3">
-                                <div className="space-y-1">
-                                  <span className="text-sm font-medium leading-tight block">{task.title}</span>
-                                  {task.description && (
-                                    <p className="text-xs text-slate-500 line-clamp-2">{task.description}</p>
-                                  )}
-                                </div>
-                                
-                                <div className="flex items-center justify-between pt-1">
-                                  <div className="flex items-center gap-1.5">
-                                    <Avatar className="h-5 w-5">
-                                      <AvatarFallback className="text-[9px] bg-primary/10 text-primary">
-                                        {task.assignee?.slice(0, 2).toUpperCase() || "ME"}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <span className="text-xs text-slate-500">{task.assignee}</span>
-                                  </div>
-                                  
-                                  {task.dueDate && (
-                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-slate-200 dark:border-slate-700 text-slate-500">
-                                      {task.dueDate.includes("Due") ? task.dueDate.replace("Due ", "") : "Done"}
-                                    </Badge>
-                                  )}
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                          {tasks.filter(t => t.status === column.id).length === 0 && (
-                            <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-lg flex items-center justify-center text-slate-400 text-xs">
-                              No tasks
-                            </div>
-                          )}
-                        </div>
+                  <div className="h-[calc(100vh-300px)] min-h-[500px]">
+                    <DndContext 
+                      sensors={sensors} 
+                      collisionDetection={closestCorners} 
+                      onDragStart={handleDragStart} 
+                      onDragOver={handleDragOver} 
+                      onDragEnd={handleDragEnd}
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+                        {columns.map(column => (
+                          <KanbanColumn 
+                            key={column.id} 
+                            column={column} 
+                            tasks={tasks} 
+                            onClickTask={(task) => {
+                              setSelectedTask(task);
+                              setIsTaskDialogOpen(true);
+                            }} 
+                          />
+                        ))}
                       </div>
-                    ))}
+                      <DragOverlay>
+                        {activeTask ? (
+                          <Card className="cursor-grabbing shadow-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 opacity-90 rotate-3 scale-105 w-[300px]">
+                            <CardContent className="p-3 space-y-3">
+                              <div className="space-y-1">
+                                <span className="text-sm font-medium leading-tight block">{activeTask.title}</span>
+                                {activeTask.description && (
+                                  <p className="text-xs text-slate-500 line-clamp-2">{activeTask.description}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center justify-between pt-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Avatar className="h-5 w-5">
+                                    <AvatarFallback className="text-[9px] bg-primary/10 text-primary">
+                                      {activeTask.assignee?.slice(0, 2).toUpperCase() || "ME"}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="text-xs text-slate-500">{activeTask.assignee}</span>
+                                </div>
+                                {activeTask.dueDate && (
+                                  <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-slate-200 dark:border-slate-700 text-slate-500">
+                                    {activeTask.dueDate.includes("Due") ? activeTask.dueDate.replace("Due ", "") : "Done"}
+                                  </Badge>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                      </DragOverlay>
+                    </DndContext>
                   </div>
                 </TabsContent>
                 <TabsContent value="notes">
