@@ -631,7 +631,7 @@ export default function MediaPage() {
       onDragEnd={handleDragEnd}
     >
       <DashboardLayout activeTool="media" header={<CustomHeader />}>
-        <div className="flex h-[calc(100vh-140px)] gap-6">
+        <div className="flex h-full gap-6">
           {/* Main Content */}
           <div className="flex-1 flex flex-col gap-4 min-w-0 h-full">
             {/* Content Area */}
