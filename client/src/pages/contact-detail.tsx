@@ -241,6 +241,7 @@ export default function ContactDetailPage() {
       description: "Check if they reviewed the latest pricing tier we sent last week.",
       dueDate: "Due tomorrow at 5:00 PM",
       completed: false,
+      status: "todo",
       assignee: "Me"
     },
     {
@@ -249,6 +250,7 @@ export default function ContactDetailPage() {
       description: "Send the standard welcome packet and API documentation.",
       dueDate: "Completed yesterday",
       completed: true,
+      status: "done",
       assignee: "Jane Smith"
     },
     {
@@ -257,19 +259,32 @@ export default function ContactDetailPage() {
       description: "Coordinate with the sales engineering team to find a slot.",
       dueDate: "Due in 2 days",
       completed: false,
+      status: "in-progress",
       assignee: "Me"
     }
   ]);
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
 
   const toggleTask = (id: string) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    setTasks(tasks.map(t => {
+      if (t.id === id) {
+        const newCompleted = !t.completed;
+        return { 
+          ...t, 
+          completed: newCompleted,
+          status: newCompleted ? "done" : "todo"
+        };
+      }
+      return t;
+    }));
   };
 
   const [newTask, setNewTask] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
+  const [newTaskDate, setNewTaskDate] = useState("");
 
   const handleAddTask = () => {
     if (!newTask.trim()) return;
@@ -280,15 +295,23 @@ export default function ContactDetailPage() {
         description: "",
         dueDate: "Due in 3 days",
         completed: false,
+        status: "todo",
         assignee: assignedTo || "Me"
       },
       ...tasks
     ]);
     setNewTask("");
     setAssignedTo("");
+    setIsAddTaskDialogOpen(false);
   };
 
   const filteredTasks = showCompletedTasks ? tasks : tasks.filter(t => !t.completed);
+
+  const columns = [
+    { id: "todo", title: "To Do", color: "bg-slate-100 dark:bg-slate-800" },
+    { id: "in-progress", title: "In Progress", color: "bg-blue-50 dark:bg-blue-900/20" },
+    { id: "done", title: "Done", color: "bg-green-50 dark:bg-green-900/20" }
+  ];
 
   return (
     <DashboardLayout activeTool="users">
@@ -593,123 +616,72 @@ export default function ContactDetailPage() {
                 </TabsContent>
 
                 <TabsContent value="tasks">
-                  <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          <CheckSquare className="h-5 w-5 text-slate-400" />
-                          Tasks
-                        </CardTitle>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-2 mr-2">
-                            <Switch 
-                              id="show-completed" 
-                              checked={showCompletedTasks}
-                              onCheckedChange={setShowCompletedTasks}
-                            />
-                            <Label htmlFor="show-completed" className="text-sm font-normal text-slate-600 dark:text-slate-400">
-                              Show completed
-                            </Label>
-                          </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                      <CheckSquare className="h-5 w-5 text-slate-400" />
+                      Tasks Board
+                    </h2>
+                    <Button size="sm" onClick={() => setIsAddTaskDialogOpen(true)} className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add Task
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-300px)] min-h-[500px]">
+                    {columns.map(column => (
+                      <div key={column.id} className={`flex flex-col rounded-lg border border-slate-200 dark:border-slate-800 ${column.color} bg-opacity-50 h-full`}>
+                        <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-t-lg flex items-center justify-between">
+                          <span className="font-medium text-sm">{column.title}</span>
+                          <Badge variant="secondary" className="bg-white dark:bg-slate-800 text-xs">
+                            {tasks.filter(t => t.status === column.id).length}
+                          </Badge>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {filteredTasks.length > 0 ? (
-                          filteredTasks.map(task => (
-                            <div 
+                        <div className="flex-1 p-3 space-y-3 overflow-y-auto">
+                          {tasks.filter(t => t.status === column.id).map(task => (
+                            <Card 
                               key={task.id} 
-                              className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80 cursor-pointer"
+                              className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                               onClick={() => {
                                 setSelectedTask(task);
                                 setIsTaskDialogOpen(true);
                               }}
                             >
-                              <div onClick={(e) => e.stopPropagation()}>
-                                <Checkbox 
-                                  id={`task-${task.id}`} 
-                                  checked={task.completed}
-                                  onCheckedChange={() => toggleTask(task.id)}
-                                />
-                              </div>
-                              <div className="space-y-1 w-full">
-                                <Label 
-                                  htmlFor={`task-${task.id}`} 
-                                  className={`text-sm font-medium leading-none cursor-pointer transition-all ${task.completed ? 'line-through text-slate-500' : 'text-slate-900 dark:text-slate-100'}`}
-                                  onClick={(e) => {
-                                    // Prevent label click from triggering checkbox directly if we want row click to open dialog
-                                    // But we also want the label to be clickable for the dialog?
-                                    // Actually Label default behavior toggles the input it is 'for'.
-                                    // If we want the label to open the dialog, we should remove the 'htmlFor' or handle the click.
-                                    // Let's remove htmlFor from Label or stop propagation if we want it to just toggle.
-                                    // The user said "click on a task you should see details not complete the task".
-                                    // So clicking the text should open dialog.
-                                    e.preventDefault(); // Prevent checkbox toggle
-                                    setSelectedTask(task);
-                                    setIsTaskDialogOpen(true);
-                                  }}
-                                >
-                                  {task.title}
-                                </Label>
-                                <p className="text-xs text-slate-500">{task.dueDate}</p>
-                              </div>
+                              <CardContent className="p-3 space-y-3">
+                                <div className="space-y-1">
+                                  <span className="text-sm font-medium leading-tight block">{task.title}</span>
+                                  {task.description && (
+                                    <p className="text-xs text-slate-500 line-clamp-2">{task.description}</p>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center justify-between pt-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <Avatar className="h-5 w-5">
+                                      <AvatarFallback className="text-[9px] bg-primary/10 text-primary">
+                                        {task.assignee?.slice(0, 2).toUpperCase() || "ME"}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-xs text-slate-500">{task.assignee}</span>
+                                  </div>
+                                  
+                                  {task.dueDate && (
+                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-slate-200 dark:border-slate-700 text-slate-500">
+                                      {task.dueDate.includes("Due") ? task.dueDate.replace("Due ", "") : "Done"}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                          {tasks.filter(t => t.status === column.id).length === 0 && (
+                            <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-lg flex items-center justify-center text-slate-400 text-xs">
+                              No tasks
                             </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-8 text-slate-500 text-sm">
-                            No {showCompletedTasks ? '' : 'pending'} tasks found
-                          </div>
-                        )}
-                        
-                        <Separator className="my-4" />
-                        
-                        <div className="space-y-4 pt-2">
-                          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">Add New Task</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="assignee" className="text-xs">Assign To</Label>
-                              <Select value={assignedTo} onValueChange={setAssignedTo}>
-                                <SelectTrigger id="assignee" className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                                  <SelectValue placeholder="Select team member" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="me">Me</SelectItem>
-                                  <SelectItem value="john">John Doe</SelectItem>
-                                  <SelectItem value="jane">Jane Smith</SelectItem>
-                                  <SelectItem value="sarah">Sarah Connor</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="dueDate" className="text-xs">Due Date</Label>
-                              <Button variant="outline" className="w-full justify-start text-left font-normal bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500">
-                                <Calendar className="mr-2 h-4 w-4" />
-                                <span>Pick a date</span>
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="taskDescription" className="text-xs">Task Description</Label>
-                            <Textarea 
-                              id="taskDescription" 
-                              placeholder="What needs to be done?" 
-                              className="min-h-[80px] bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                              value={newTask}
-                              onChange={(e) => setNewTask(e.target.value)}
-                            />
-                          </div>
-                          
-                          <div className="flex justify-end pt-2">
-                            <Button size="sm" onClick={handleAddTask} disabled={!newTask.trim()}>
-                              Add Task
-                            </Button>
-                          </div>
+                          )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </div>
                 </TabsContent>
                 <TabsContent value="notes">
                   <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
@@ -761,6 +733,67 @@ export default function ContactDetailPage() {
           </div>
         </div>
       </div>
+      {/* Add Task Dialog */}
+      <Dialog open={isAddTaskDialogOpen} onOpenChange={setIsAddTaskDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+            <DialogDescription>
+              Create a new task for this contact.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="modal-task-title">Task Title</Label>
+                <Input 
+                  id="modal-task-title" 
+                  placeholder="Task title" 
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="modal-assignee">Assign To</Label>
+                <Select value={assignedTo} onValueChange={setAssignedTo}>
+                  <SelectTrigger id="modal-assignee">
+                    <SelectValue placeholder="Select team member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="me">Me</SelectItem>
+                    <SelectItem value="john">John Doe</SelectItem>
+                    <SelectItem value="jane">Jane Smith</SelectItem>
+                    <SelectItem value="sarah">Sarah Connor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="modal-dueDate">Due Date</Label>
+                <Button variant="outline" className="w-full justify-start text-left font-normal text-slate-500">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span>Pick a date</span>
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modal-description">Description</Label>
+                <Textarea 
+                  id="modal-description" 
+                  placeholder="Task description..." 
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddTaskDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddTask} disabled={!newTask.trim()}>Create Task</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Task Details Dialog */}
       <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
