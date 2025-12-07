@@ -22,7 +22,8 @@ import {
   ExternalLink,
   Scissors,
   Check,
-  Star
+  Star,
+  PanelRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,9 @@ export default function MediaPage() {
     navigateToFolder, 
     navigateUp,
     favoriteItems,
-    toggleFavorite
+    toggleFavorite,
+    isPreviewVisible,
+    togglePreview
   } = useMedia();
 
   const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
@@ -431,7 +434,8 @@ export default function MediaPage() {
             </div>
           ))}
           {/* Preview Column */}
-           <div className="min-w-[300px] flex-1 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-center text-center border-l border-slate-200 dark:border-slate-800">
+          {isPreviewVisible && (
+           <div className="min-w-[300px] flex-1 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-center text-center border-l border-slate-200 dark:border-slate-800 transition-all duration-300">
               {selectedItems.length > 0 ? (
                   <FilePreview selectedItem={items.find(i => i.id === selectedItems[0])} />
               ) : (
@@ -443,6 +447,7 @@ export default function MediaPage() {
                   </div>
               )}
           </div>
+          )}
         </div>
       );
     }
@@ -588,6 +593,18 @@ export default function MediaPage() {
                 <Columns className="h-4 w-4" />
             </Button>
         </div>
+
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2" />
+
+        <Button
+            variant="ghost"
+            size="icon"
+            className={`h-9 w-9 text-slate-500 hover:text-slate-700 ${isPreviewVisible ? 'bg-slate-100 dark:bg-slate-800 text-primary' : ''}`}
+            onClick={togglePreview}
+            title="Toggle Preview Pane"
+        >
+            <PanelRight className="h-4 w-4" />
+        </Button>
         
         <div className="relative hidden sm:block">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -624,10 +641,19 @@ export default function MediaPage() {
           </div>
           
           {/* Global Preview Sidebar for Grid/List */}
-          {(viewMode !== 'columns' && selectedItems.length > 0) && (
+          {(viewMode !== 'columns' && isPreviewVisible) && (
              <div className="w-[300px] flex-shrink-0 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-start text-center border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
                   <div className="sticky top-0 w-full flex flex-col items-center">
-                     <FilePreview selectedItem={items.find(i => i.id === selectedItems[0])} />
+                     {selectedItems.length > 0 ? (
+                        <FilePreview selectedItem={items.find(i => i.id === selectedItems[0])} />
+                     ) : (
+                        <div className="text-slate-400 flex flex-col items-center gap-3 pt-20">
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
+                                <Columns className="h-8 w-8 opacity-50" />
+                            </div>
+                            <p>Select an item to view details</p>
+                        </div>
+                     )}
                   </div>
              </div>
           )}

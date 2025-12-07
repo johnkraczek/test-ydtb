@@ -25,6 +25,8 @@ interface MediaContextType {
   toggleFavorite: (itemId: string) => void;
   viewMode: 'grid' | 'list' | 'columns';
   setViewMode: React.Dispatch<React.SetStateAction<'grid' | 'list' | 'columns'>>;
+  isPreviewVisible: boolean;
+  togglePreview: () => void;
   navigateToFolder: (folder: FileSystemItem) => void;
   navigateUp: () => void;
 }
@@ -73,6 +75,7 @@ export function MediaProvider({ children }: { children: ReactNode }) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'columns'>('grid');
+  const [isPreviewVisible, setIsPreviewVisible] = useState(true);
 
   const toggleFavorite = (itemId: string) => {
     setFavoriteItems(prev => 
@@ -81,6 +84,8 @@ export function MediaProvider({ children }: { children: ReactNode }) {
         : [...prev, itemId]
     );
   };
+
+  const togglePreview = () => setIsPreviewVisible(prev => !prev);
 
   const navigateToFolder = (folder: FileSystemItem) => {
     const path: FileSystemItem[] = [];
@@ -118,6 +123,8 @@ export function MediaProvider({ children }: { children: ReactNode }) {
       toggleFavorite,
       viewMode,
       setViewMode,
+      isPreviewVisible,
+      togglePreview,
       navigateToFolder,
       navigateUp
     }}>
