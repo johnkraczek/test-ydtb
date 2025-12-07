@@ -434,13 +434,15 @@ export default function MediaPage() {
                   )}
                   
                   {/* Selection Checkbox (visible on hover or selected) */}
-                  <div className={`absolute top-2 right-2 h-5 w-5 rounded-full border bg-white flex items-center justify-center transition-opacity ${
-                      selectedItems.includes(item.id) ? 'opacity-100 border-blue-500 bg-blue-500 text-white' : 'opacity-0 group-hover:opacity-100 border-slate-200 text-transparent'
+                  <div className={`absolute top-2 right-2 h-5 w-5 rounded-full border flex items-center justify-center transition-opacity ${
+                      selectedItems.includes(item.id) 
+                        ? 'opacity-100 border-blue-500 bg-blue-500 text-white' 
+                        : 'opacity-0 group-hover:opacity-100 border-slate-200 bg-white text-transparent'
                   }`}>
                     {selectedItems.includes(item.id) ? (
                         <Check className="h-3 w-3" />
                     ) : (
-                        <div className="h-2 w-2 rounded-full bg-current" />
+                        <div className="h-2 w-2 rounded-full bg-slate-300" />
                     )}
                   </div>
                 </div>
