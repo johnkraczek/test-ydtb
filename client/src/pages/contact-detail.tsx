@@ -96,7 +96,7 @@ function SortableTaskItem({ task, onClick, onMoveNext }: { task: any, onClick: (
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} id={`task-card-${task.id}`}>
       <Card 
         className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 group"
         onClick={onClick}
@@ -468,9 +468,14 @@ export default function ContactDetailPage() {
   );
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeWidth, setActiveWidth] = useState<number | null>(null);
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
+    const element = document.getElementById(`task-card-${event.active.id}`);
+    if (element) {
+      setActiveWidth(element.offsetWidth);
+    }
   }
 
   function handleDragOver(event: DragOverEvent) {
@@ -906,7 +911,10 @@ export default function ContactDetailPage() {
                       </div>
                       <DragOverlay>
                         {activeTask ? (
-                          <Card className="cursor-grabbing shadow-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 opacity-90 rotate-3 scale-105 w-[300px]">
+                          <Card 
+                            className="cursor-grabbing shadow-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 opacity-90 rotate-3 scale-105"
+                            style={{ width: activeWidth ? `${activeWidth}px` : 'auto' }}
+                          >
                             <CardContent className="p-3 space-y-3">
                               <div className="space-y-1">
                                 <span className="text-sm font-medium leading-tight block">{activeTask.title}</span>
