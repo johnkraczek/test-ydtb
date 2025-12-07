@@ -626,11 +626,11 @@ export default function ContactDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="messaging" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-2">
+        <TabsContent value="messaging" className="mt-6 h-[calc(100vh-220px)]">
+          <div className="grid gap-6 md:grid-cols-2 h-full pb-2">
             {/* Main Chat/Activity Stream */}
-            <div>
-              <Card className="h-[500px] border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+            <div className="h-full">
+              <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
                 <CardHeader className="flex-none border-b">
                   <CardTitle className="text-base">Activity Stream</CardTitle>
                 </CardHeader>
@@ -724,8 +724,8 @@ export default function ContactDetailPage() {
             </div>
 
             {/* Right Sidebar - Composer */}
-            <div className="">
-              <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="h-full">
+              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">Send a Message</CardTitle>
                 </CardHeader>
