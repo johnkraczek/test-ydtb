@@ -217,6 +217,35 @@ export default function ContactDetailPage() {
     setNewNote("");
   };
 
+  // Mock tasks data
+  const [tasks, setTasks] = useState([
+    {
+      id: "1",
+      title: "Follow up on proposal",
+      dueDate: "Due tomorrow at 5:00 PM",
+      completed: false
+    },
+    {
+      id: "2",
+      title: "Send onboarding docs",
+      dueDate: "Completed yesterday",
+      completed: true
+    },
+    {
+      id: "3",
+      title: "Schedule product demo",
+      dueDate: "Due in 2 days",
+      completed: false
+    }
+  ]);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(false);
+
+  const toggleTask = (id: string) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const filteredTasks = showCompletedTasks ? tasks : tasks.filter(t => !t.completed);
+
   return (
     <DashboardLayout activeTool="users">
       <div className="space-y-6">
@@ -448,28 +477,50 @@ export default function ContactDetailPage() {
                           <CheckSquare className="h-5 w-5 text-slate-400" />
                           Tasks
                         </CardTitle>
-                        <Button size="sm" variant="outline" className="h-8 gap-2">
-                          <Plus className="h-3.5 w-3.5" />
-                          Add Task
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 mr-2">
+                            <Switch 
+                              id="show-completed" 
+                              checked={showCompletedTasks}
+                              onCheckedChange={setShowCompletedTasks}
+                            />
+                            <Label htmlFor="show-completed" className="text-sm font-normal text-slate-600 dark:text-slate-400">
+                              Show completed
+                            </Label>
+                          </div>
+                          <Button size="sm" variant="outline" className="h-8 gap-2">
+                            <Plus className="h-3.5 w-3.5" />
+                            Add Task
+                          </Button>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                          <Checkbox id="task1" />
-                          <div className="space-y-1">
-                            <Label htmlFor="task1" className="text-sm font-medium leading-none cursor-pointer">Follow up on proposal</Label>
-                            <p className="text-xs text-slate-500">Due tomorrow at 5:00 PM</p>
+                        {filteredTasks.length > 0 ? (
+                          filteredTasks.map(task => (
+                            <div key={task.id} className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80">
+                              <Checkbox 
+                                id={`task-${task.id}`} 
+                                checked={task.completed}
+                                onCheckedChange={() => toggleTask(task.id)}
+                              />
+                              <div className="space-y-1 w-full">
+                                <Label 
+                                  htmlFor={`task-${task.id}`} 
+                                  className={`text-sm font-medium leading-none cursor-pointer transition-all ${task.completed ? 'line-through text-slate-500' : 'text-slate-900 dark:text-slate-100'}`}
+                                >
+                                  {task.title}
+                                </Label>
+                                <p className="text-xs text-slate-500">{task.dueDate}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-slate-500 text-sm">
+                            No {showCompletedTasks ? '' : 'pending'} tasks found
                           </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                          <Checkbox id="task2" defaultChecked />
-                          <div className="space-y-1">
-                            <Label htmlFor="task2" className="text-sm font-medium leading-none cursor-pointer line-through text-slate-500">Send onboarding docs</Label>
-                            <p className="text-xs text-slate-500">Completed yesterday</p>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
