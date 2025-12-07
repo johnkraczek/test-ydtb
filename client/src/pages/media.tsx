@@ -370,9 +370,11 @@ export default function MediaPage() {
                       <ContextMenuWrapper key={item.id} item={item}>
                          <div
                           className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${
-                            isSelected || isLeafSelected
+                            isLeafSelected
                               ? 'bg-blue-500 text-white' 
-                              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+                              : isSelected
+                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100'
+                                : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                           }`}
                           onClick={(e) => {
                             if (item.type === 'folder' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
@@ -387,16 +389,16 @@ export default function MediaPage() {
                         >
                           <div className="flex items-center gap-2 truncate">
                             {item.type === 'folder' ? (
-                              <Folder className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white fill-white/20' : 'text-blue-500 fill-blue-500/20'}`} />
+                              <Folder className={`h-4 w-4 ${isLeafSelected ? 'text-white fill-white/20' : isSelected ? 'text-slate-500 fill-slate-500/20' : 'text-blue-500 fill-blue-500/20'}`} />
                             ) : item.type === 'image' ? (
-                              <ImageIcon className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white' : 'text-purple-500'}`} />
+                              <ImageIcon className={`h-4 w-4 ${isLeafSelected ? 'text-white' : 'text-purple-500'}`} />
                             ) : (
-                              <FileText className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white' : 'text-slate-400'}`} />
+                              <FileText className={`h-4 w-4 ${isLeafSelected ? 'text-white' : 'text-slate-400'}`} />
                             )}
                             <span className="truncate">{item.name}</span>
                           </div>
                           {item.type === 'folder' && (
-                            <ChevronRight className={`h-3.5 w-3.5 ${isSelected || isLeafSelected ? 'text-white/70' : 'text-slate-400'}`} />
+                            <ChevronRight className={`h-3.5 w-3.5 ${isLeafSelected ? 'text-white/70' : isSelected ? 'text-slate-500' : 'text-slate-400'}`} />
                           )}
                         </div>
                       </ContextMenuWrapper>
