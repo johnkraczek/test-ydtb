@@ -164,7 +164,7 @@ export default function MediaPage() {
   const ContextMenuWrapper = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
     return (
       <ContextMenu>
-        <ContextMenuTrigger onContextMenu={(e) => {
+        <ContextMenuTrigger asChild onContextMenu={(e) => {
             // If item is not in selection, select it exclusively
             if (!selectedItems.includes(item.id)) {
                 setSelectedItems([item.id]);
