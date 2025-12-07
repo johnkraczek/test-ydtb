@@ -128,36 +128,102 @@ export default function MediaPage() {
     );
   };
 
+  const handleSelection = (item: FileSystemItem, event: React.MouseEvent) => {
+    event.stopPropagation();
+    
+    if (event.ctrlKey || event.metaKey) {
+      // Toggle selection
+      setSelectedItems(prev => 
+        prev.includes(item.id) 
+          ? prev.filter(id => id !== item.id) 
+          : [...prev, item.id]
+      );
+    } else if (event.shiftKey && selectedItems.length > 0) {
+      // Range selection
+      const lastSelectedId = selectedItems[selectedItems.length - 1];
+      const currentIndex = currentItems.findIndex(i => i.id === item.id);
+      const lastIndex = currentItems.findIndex(i => i.id === lastSelectedId);
+      
+      if (currentIndex !== -1 && lastIndex !== -1) {
+        const start = Math.min(currentIndex, lastIndex);
+        const end = Math.max(currentIndex, lastIndex);
+        const range = currentItems.slice(start, end + 1).map(i => i.id);
+        
+        // Add range to existing selection (union)
+        setSelectedItems(prev => Array.from(new Set([...prev, ...range])));
+      } else {
+        setSelectedItems([item.id]);
+      }
+    } else {
+      // Single selection (exclusive)
+      setSelectedItems([item.id]);
+    }
+  };
+
   const ContextMenuWrapper = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
     return (
       <ContextMenu>
-        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuTrigger onContextMenu={(e) => {
+            // If item is not in selection, select it exclusively
+            if (!selectedItems.includes(item.id)) {
+                setSelectedItems([item.id]);
+            }
+        }}>
+            {children}
+        </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
-          <DropdownMenuLabel className="truncate max-w-[200px]">{item.name}</DropdownMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuItem inset>
-            <ExternalLink className="mr-2 h-4 w-4" /> Open
-          </ContextMenuItem>
-          <ContextMenuItem inset>
-            <Info className="mr-2 h-4 w-4" /> Get Info
-          </ContextMenuItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem inset>
-            <Copy className="mr-2 h-4 w-4" /> Copy
-            <ContextMenuShortcut>⌘C</ContextMenuShortcut>
-          </ContextMenuItem>
-          <ContextMenuItem inset>
-            <Scissors className="mr-2 h-4 w-4" /> Cut
-            <ContextMenuShortcut>⌘X</ContextMenuShortcut>
-          </ContextMenuItem>
-          <ContextMenuItem inset>
-            <Move className="mr-2 h-4 w-4" /> Move to...
-          </ContextMenuItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem inset className="text-red-600">
-            <Trash className="mr-2 h-4 w-4" /> Delete
-            <ContextMenuShortcut>⌫</ContextMenuShortcut>
-          </ContextMenuItem>
+          {selectedItems.length > 1 ? (
+              <>
+                 <DropdownMenuLabel className="truncate max-w-[200px]">
+                    Selected {selectedItems.length} items
+                 </DropdownMenuLabel>
+                 <ContextMenuSeparator />
+                 <ContextMenuItem inset>
+                    <Copy className="mr-2 h-4 w-4" /> Copy {selectedItems.length} Items
+                    <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+                 </ContextMenuItem>
+                 <ContextMenuItem inset>
+                    <Scissors className="mr-2 h-4 w-4" /> Cut {selectedItems.length} Items
+                    <ContextMenuShortcut>⌘X</ContextMenuShortcut>
+                 </ContextMenuItem>
+                 <ContextMenuItem inset>
+                    <Move className="mr-2 h-4 w-4" /> Move to...
+                 </ContextMenuItem>
+                 <ContextMenuSeparator />
+                 <ContextMenuItem inset className="text-red-600">
+                    <Trash className="mr-2 h-4 w-4" /> Delete {selectedItems.length} Items
+                    <ContextMenuShortcut>⌫</ContextMenuShortcut>
+                 </ContextMenuItem>
+              </>
+          ) : (
+              <>
+                <DropdownMenuLabel className="truncate max-w-[200px]">{item.name}</DropdownMenuLabel>
+                <ContextMenuSeparator />
+                <ContextMenuItem inset>
+                    <ExternalLink className="mr-2 h-4 w-4" /> Open
+                </ContextMenuItem>
+                <ContextMenuItem inset>
+                    <Info className="mr-2 h-4 w-4" /> Get Info
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem inset>
+                    <Copy className="mr-2 h-4 w-4" /> Copy
+                    <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem inset>
+                    <Scissors className="mr-2 h-4 w-4" /> Cut
+                    <ContextMenuShortcut>⌘X</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem inset>
+                    <Move className="mr-2 h-4 w-4" /> Move to...
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem inset className="text-red-600">
+                    <Trash className="mr-2 h-4 w-4" /> Delete
+                    <ContextMenuShortcut>⌫</ContextMenuShortcut>
+                </ContextMenuItem>
+              </>
+          )}
         </ContextMenuContent>
       </ContextMenu>
     );
@@ -181,10 +247,10 @@ export default function MediaPage() {
               {currentItems.map(item => (
                 <ContextMenuWrapper key={item.id} item={item}>
                   <tr 
-                    className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
-                    onClick={() => {
-                      if (item.type === 'folder') navigateToFolder(item);
-                      setSelectedItems([item.id]);
+                    className={`group cursor-pointer transition-colors ${selectedItems.includes(item.id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
+                    onClick={(e) => handleSelection(item, e)}
+                    onDoubleClick={() => {
+                        if (item.type === 'folder') navigateToFolder(item);
                     }}
                   >
                     <td className="px-4 py-2">
@@ -253,14 +319,14 @@ export default function MediaPage() {
                               ? 'bg-blue-500 text-white' 
                               : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                           }`}
-                          onClick={() => {
-                            if (item.type === 'folder') {
+                          onClick={(e) => {
+                            if (item.type === 'folder' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
                                 // If clicking a folder at current level, truncate path after this level and add new folder
                                 const newPath = currentPath.slice(0, index);
                                 newPath.push(item);
                                 setCurrentPath(newPath);
                             } else {
-                                setSelectedItems([item.id]);
+                                handleSelection(item, e);
                             }
                           }}
                         >
@@ -346,12 +412,7 @@ export default function MediaPage() {
                     ? 'bg-blue-50/50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 ring-1 ring-blue-200 dark:ring-blue-800'
                     : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800'
                 }`}
-                onClick={() => {
-                  if (item.type === 'folder') {
-                    if (item.type === 'folder') return; // Double click handled separately ideally
-                  }
-                  setSelectedItems([item.id]);
-                }}
+                onClick={(e) => handleSelection(item, e)}
                 onDoubleClick={() => {
                    if (item.type === 'folder') navigateToFolder(item);
                 }}
