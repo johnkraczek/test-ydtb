@@ -28,7 +28,15 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Plus
+  Plus,
+  X,
+  User,
+  Tag,
+  FolderInput,
+  CheckCircle,
+  Copy,
+  Trash,
+  Users
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -47,6 +55,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+} from "@/components/ui/command";
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
@@ -553,6 +577,172 @@ export default function ContactsPage() {
             </div>
           </div>
         </div>
+
+        {/* Selection Bar */}
+        {selectedContacts.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[90vw] animate-in slide-in-from-bottom-4 fade-in duration-200">
+            <div className="bg-zinc-900 text-zinc-100 rounded-lg shadow-2xl p-1.5 flex items-center gap-1 border border-zinc-800 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-3 px-3 border-r border-zinc-700 mr-1 shrink-0">
+                <span className="font-medium text-sm whitespace-nowrap">{selectedContacts.length} Selected</span>
+                <button 
+                  onClick={() => setSelectedContacts([])}
+                  className="text-zinc-500 hover:text-white transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <CheckCircle className="h-4 w-4" />
+                Status
+              </Button>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <User className="h-4 w-4" />
+                    Assignees
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[280px] p-0" align="start">
+                  <div className="p-2 border-b">
+                    <Input placeholder="Search or enter email..." className="h-8 text-sm" />
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto p-1">
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500">
+                        <Users className="h-3 w-3" />
+                      </div>
+                      Unassign
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="font-medium">Jane Doe</div>
+                      </div>
+                      <div className="h-4 w-4 rounded border border-slate-300" />
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="bg-blue-100 text-blue-600">SM</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="font-medium">Sarah Miller</div>
+                      </div>
+                      <div className="h-4 w-4 rounded border border-slate-300" />
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="bg-emerald-100 text-emerald-600">TR</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="font-medium">Tanner Rima</div>
+                      </div>
+                      <div className="h-4 w-4 rounded border border-slate-300" />
+                    </div>
+                  </div>
+                  <div className="p-2 border-t flex items-center gap-2">
+                    <Switch id="notify-assign" className="scale-75" />
+                    <label htmlFor="notify-assign" className="text-xs cursor-pointer">Send notifications</label>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <Calendar className="h-4 w-4" />
+                Dates
+              </Button>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <Tag className="h-4 w-4" />
+                Tags
+              </Button>
+
+              <div className="h-4 w-px bg-zinc-700 mx-1 shrink-0" />
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <FolderInput className="h-4 w-4" />
+                    Move/Add
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0" align="start">
+                  <Tabs defaultValue="move" className="w-full">
+                    <TabsList className="w-full grid grid-cols-2 rounded-none border-b h-10 p-0 bg-transparent">
+                      <TabsTrigger 
+                        value="move" 
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2"
+                      >
+                        Move contacts
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="add" 
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2"
+                      >
+                        Add to
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="p-2">
+                      <Input placeholder="Search Lists..." className="h-8 text-sm" />
+                    </div>
+                    
+                    <div className="px-2 py-1">
+                      <div className="text-xs font-medium text-muted-foreground px-2 py-1 mb-1">Recents</div>
+                      <div className="space-y-0.5">
+                         <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                           <CheckCircle className="h-3.5 w-3.5 text-slate-500" />
+                           <span>VIP Customers</span>
+                         </div>
+                         <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                           <CheckCircle className="h-3.5 w-3.5 text-slate-500" />
+                           <span>New Leads</span>
+                         </div>
+                      </div>
+                    </div>
+                    
+                    <div className="px-2 py-1">
+                      <div className="text-xs font-medium text-muted-foreground px-2 py-1 mb-1">Lists</div>
+                      <div className="space-y-0.5">
+                         <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                           <div className="h-3.5 w-3.5 rounded bg-blue-500" />
+                           <span>Marketing</span>
+                         </div>
+                         <div className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                           <div className="h-3.5 w-3.5 rounded bg-emerald-500" />
+                           <span>Sales</span>
+                         </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2 border-t flex items-center gap-2">
+                      <Switch id="notify-move" className="scale-75" />
+                      <label htmlFor="notify-move" className="text-xs cursor-pointer">Send notifications</label>
+                    </div>
+                  </Tabs>
+                </PopoverContent>
+              </Popover>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <Copy className="h-4 w-4" />
+                Copy
+              </Button>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <Trash className="h-4 w-4 text-red-400" />
+              </Button>
+
+              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                <MoreHorizontal className="h-4 w-4" />
+                More
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
