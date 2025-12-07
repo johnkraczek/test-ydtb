@@ -492,15 +492,15 @@ export default function MediaPage() {
             </div>
           </div>
         </div>
-        <DragOverlay>
+      </DashboardLayout>
+      <DragOverlay>
             {draggedItem ? (
                 <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-xl border border-blue-500 opacity-90 flex items-center gap-2 w-48">
                     {draggedItem.type === 'folder' ? <Folder className="h-5 w-5 text-blue-500" /> : <FileText className="h-5 w-5 text-slate-500" />}
                     <span className="truncate font-medium text-sm">{draggedItem.name}</span>
                 </div>
             ) : null}
-        </DragOverlay>
-      </DashboardLayout>
+      </DragOverlay>
     </DndContext>
   );
 }
