@@ -725,7 +725,7 @@ export default function ContactDetailPage() {
 
             {/* Right Sidebar - Composer */}
             <div className="">
-              <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-[500px]">
                 <CardHeader>
                   <CardTitle className="text-base">Send a Message</CardTitle>
                 </CardHeader>
