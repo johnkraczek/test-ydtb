@@ -36,7 +36,8 @@ import {
   CheckCircle,
   Copy,
   Trash,
-  Users
+  Users,
+  Zap
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -651,15 +652,76 @@ export default function ContactsPage() {
                 </PopoverContent>
               </Popover>
 
-              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
-                <Calendar className="h-4 w-4" />
-                Dates
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <Tag className="h-4 w-4" />
+                    Tags
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[280px] p-0" align="start">
+                  <div className="p-2 border-b">
+                    <Input placeholder="Search tags..." className="h-8 text-sm" />
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto p-1">
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-3.5 w-3.5 rounded-full bg-blue-500" />
+                      <span>VIP</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-3.5 w-3.5 rounded-full bg-emerald-500" />
+                      <span>Lead</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-3.5 w-3.5 rounded-full bg-amber-500" />
+                      <span>Customer</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-3.5 w-3.5 rounded-full bg-purple-500" />
+                      <span>Partner</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <div className="h-3.5 w-3.5 rounded-full bg-rose-500" />
+                      <span>Inactive</span>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-              <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
-                <Tag className="h-4 w-4" />
-                Tags
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
+                    <Zap className="h-4 w-4" />
+                    Automations
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[280px] p-0" align="start">
+                  <div className="p-2 border-b">
+                    <Input placeholder="Search automations..." className="h-8 text-sm" />
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto p-1">
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Active Workflows</div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Zap className="h-3.5 w-3.5 text-amber-500" />
+                      <span>New Lead Welcome</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Zap className="h-3.5 w-3.5 text-blue-500" />
+                      <span>Inactive Re-engagement</span>
+                    </div>
+                    
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1">Triggers</div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Zap className="h-3.5 w-3.5 text-purple-500" />
+                      <span>Birthday Offer</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer text-sm">
+                      <Zap className="h-3.5 w-3.5 text-emerald-500" />
+                      <span>Purchase Follow-up</span>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <div className="h-4 w-px bg-zinc-700 mx-1 shrink-0" />
 
