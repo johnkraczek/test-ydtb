@@ -48,7 +48,9 @@ import {
   Copy,
   Trash,
   Users,
-  Zap
+  Zap,
+  Archive,
+  Merge
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -857,10 +859,12 @@ export default function ContactsPage() {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem className="gap-2">
+                    <Archive className="h-4 w-4" />
                     Archive
                   </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem className="gap-2">
+                    <Merge className="h-4 w-4" />
                     Merge Contacts
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuSeparator />
