@@ -24,6 +24,13 @@ import { Badge } from "@/components/ui/badge";
 import { useMedia, FileSystemItem } from "@/context/media-context";
 import { Card } from "@/components/ui/card";
 
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+
 interface ToolSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -113,7 +120,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
 }
 
 function MediaSidebarContent() {
-  const { items, currentPath, navigateToFolder, setCurrentPath, setSelectedItems, favoriteItems } = useMedia();
+  const { items, currentPath, navigateToFolder, setCurrentPath, setSelectedItems, favoriteItems, toggleFavorite } = useMedia();
   const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
 
   const FileTreeItem = ({ item, level = 0 }: { item: FileSystemItem, level?: number }) => {
@@ -160,31 +167,37 @@ function MediaSidebarContent() {
                 {items
                     .filter(item => favoriteItems.includes(item.id))
                     .map(item => (
-                        <div 
-                            key={item.id}
-                            className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
-                                currentFolderId === item.id 
-                                ? 'bg-primary/10 text-primary font-medium' 
-                                : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                            }`}
-                            onClick={() => {
-                                if (item.type === 'folder') {
-                                    navigateToFolder(item);
-                                } else {
-                                    // Navigate to parent and select item
-                                    // This part is a bit tricky with current navigateToFolder logic which replaces path
-                                    // For now, let's just focus on folders as requested
-                                    if (item.parentId) {
-                                        const parent = items.find(i => i.id === item.parentId);
-                                        if (parent) navigateToFolder(parent);
-                                        setSelectedItems([item.id]);
-                                    }
-                                }
-                            }}
-                        >
-                            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                            <span className="text-sm truncate">{item.name}</span>
-                        </div>
+                        <ContextMenu key={item.id}>
+                            <ContextMenuTrigger>
+                                <div 
+                                    className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                                        currentFolderId === item.id 
+                                        ? 'bg-primary/10 text-primary font-medium' 
+                                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                    }`}
+                                    onClick={() => {
+                                        if (item.type === 'folder') {
+                                            navigateToFolder(item);
+                                        } else {
+                                            // Navigate to parent and select item
+                                            if (item.parentId) {
+                                                const parent = items.find(i => i.id === item.parentId);
+                                                if (parent) navigateToFolder(parent);
+                                                setSelectedItems([item.id]);
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                    <span className="text-sm truncate">{item.name}</span>
+                                </div>
+                            </ContextMenuTrigger>
+                            <ContextMenuContent>
+                                <ContextMenuItem onClick={() => toggleFavorite(item.id)}>
+                                    <Star className="mr-2 h-4 w-4" /> Unpin from Favorites
+                                </ContextMenuItem>
+                            </ContextMenuContent>
+                        </ContextMenu>
                     ))}
             </div>
         )}
