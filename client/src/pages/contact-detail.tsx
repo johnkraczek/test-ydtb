@@ -35,6 +35,7 @@ import {
   Eye,
   MousePointerClick,
   ArrowRight,
+  Save,
 } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useState } from "react";
@@ -204,7 +205,7 @@ export default function ContactDetailPage() {
   const id = params?.id;
 
   // Mock contact data - in a real app this would come from an API/store
-  const contact = {
+  const [contact, setContact] = useState({
     id: id || "1",
     name: "Alice Johnson",
     initials: "AJ",
@@ -228,6 +229,11 @@ export default function ContactDetailPage() {
       inboundCall: false,
       inboundSms: true
     }
+  });
+
+  const handleSaveContact = () => {
+    // In a real app, this would call an API
+    console.log("Saving contact:", contact);
   };
 
   // Mock activity data
@@ -656,96 +662,164 @@ export default function ContactDetailPage() {
                   {/* Details Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                      <CardHeader>
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-base font-medium flex items-center gap-2">
                           <Building className="h-4 w-4 text-slate-400" />
                           Company Details
                         </CardTitle>
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleSaveContact}>
+                          <Save className="h-4 w-4 text-slate-500" />
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-1">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Company Name</span>
-                          <p className="text-sm font-medium">{contact.company}</p>
+                          <Label htmlFor="company" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Company Name</Label>
+                          <Input 
+                            id="company" 
+                            value={contact.company} 
+                            onChange={(e) => setContact({...contact, company: e.target.value})}
+                            className="h-8"
+                          />
                         </div>
                         <div className="space-y-1">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Role</span>
-                          <p className="text-sm font-medium">{contact.role}</p>
+                          <Label htmlFor="role" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Role</Label>
+                          <Input 
+                            id="role" 
+                            value={contact.role} 
+                            onChange={(e) => setContact({...contact, role: e.target.value})}
+                            className="h-8"
+                          />
                         </div>
                         <div className="space-y-1">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Address</span>
-                          <p className="text-sm font-medium">{contact.address}</p>
+                          <Label htmlFor="address" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Address</Label>
+                          <Input 
+                            id="address" 
+                            value={contact.address} 
+                            onChange={(e) => setContact({...contact, address: e.target.value})}
+                            className="h-8"
+                          />
                         </div>
                       </CardContent>
                     </Card>
 
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                      <CardHeader>
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-base font-medium">Contact Information</CardTitle>
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleSaveContact}>
+                          <Save className="h-4 w-4 text-slate-500" />
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md shrink-0">
                             <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                           </div>
-                          <div className="overflow-hidden">
-                            <p className="text-xs text-slate-500 uppercase font-medium">Email</p>
-                            <p className="text-sm font-medium truncate">{contact.email}</p>
+                          <div className="flex-1 space-y-1">
+                            <Label htmlFor="email" className="text-xs text-slate-500 uppercase font-medium">Email</Label>
+                            <Input 
+                              id="email" 
+                              value={contact.email} 
+                              onChange={(e) => setContact({...contact, email: e.target.value})}
+                              className="h-8"
+                            />
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md shrink-0">
                             <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                           </div>
-                          <div>
-                            <p className="text-xs text-slate-500 uppercase font-medium">Phone</p>
-                            <p className="text-sm font-medium">{contact.phone}</p>
+                          <div className="flex-1 space-y-1">
+                            <Label htmlFor="phone" className="text-xs text-slate-500 uppercase font-medium">Phone</Label>
+                            <Input 
+                              id="phone" 
+                              value={contact.phone} 
+                              onChange={(e) => setContact({...contact, phone: e.target.value})}
+                              className="h-8"
+                            />
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md shrink-0">
                             <MapPin className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                           </div>
-                          <div>
-                            <p className="text-xs text-slate-500 uppercase font-medium">Location</p>
-                            <p className="text-sm font-medium">San Francisco, CA</p>
+                          <div className="flex-1 space-y-1">
+                            <Label htmlFor="location" className="text-xs text-slate-500 uppercase font-medium">Location</Label>
+                            <Input 
+                              id="location" 
+                              defaultValue="San Francisco, CA"
+                              className="h-8"
+                            />
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                          <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-md shrink-0">
                             <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                           </div>
-                          <div>
-                            <p className="text-xs text-slate-500 uppercase font-medium">Date of Birth</p>
-                            <p className="text-sm font-medium">{format(contact.dob, 'MMM d, yyyy')}</p>
+                          <div className="flex-1 space-y-1">
+                            <Label htmlFor="dob" className="text-xs text-slate-500 uppercase font-medium">Date of Birth</Label>
+                            <Input 
+                              id="dob" 
+                              type="date"
+                              value={format(contact.dob, 'yyyy-MM-dd')}
+                              onChange={(e) => setContact({...contact, dob: new Date(e.target.value)})}
+                              className="h-8"
+                            />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                      <CardHeader>
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-base font-medium flex items-center gap-2">
                           <Tag className="h-4 w-4 text-slate-400" />
                           Segmentation
                         </CardTitle>
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleSaveContact}>
+                          <Save className="h-4 w-4 text-slate-500" />
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-1">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Type</span>
-                          <p className="text-sm font-medium">{contact.type}</p>
+                          <Label htmlFor="type" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Type</Label>
+                          <Select 
+                            value={contact.type} 
+                            onValueChange={(value) => setContact({...contact, type: value})}
+                          >
+                            <SelectTrigger id="type" className="h-8">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Customer">Customer</SelectItem>
+                              <SelectItem value="Lead">Lead</SelectItem>
+                              <SelectItem value="Partner">Partner</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="space-y-1">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Source</span>
-                          <p className="text-sm font-medium">{contact.source}</p>
+                          <Label htmlFor="source" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Source</Label>
+                          <Input 
+                            id="source" 
+                            value={contact.source} 
+                            onChange={(e) => setContact({...contact, source: e.target.value})}
+                            className="h-8"
+                          />
                         </div>
                         <div className="space-y-2">
-                          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Tags</span>
-                          <div className="flex flex-wrap gap-2">
-                            {contact.tags.map(tag => (
-                              <Badge key={tag} variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700">
+                          <Label htmlFor="tags" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Tags</Label>
+                          <Input 
+                            id="tags" 
+                            value={contact.tags.join(", ")} 
+                            onChange={(e) => setContact({...contact, tags: e.target.value.split(",").map(t => t.trim())})}
+                            className="h-8"
+                            placeholder="Comma separated tags"
+                          />
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {contact.tags.map((tag, i) => (
+                              <Badge key={i} variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700">
                                 {tag}
                               </Badge>
                             ))}
@@ -755,33 +829,56 @@ export default function ContactDetailPage() {
                     </Card>
 
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                      <CardHeader>
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-base font-medium flex items-center gap-2">
                           <Ban className="h-4 w-4 text-slate-400" />
                           Do Not Disturb (DND)
                         </CardTitle>
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleSaveContact}>
+                          <Save className="h-4 w-4 text-slate-500" />
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="dnd-email" className="text-sm font-medium">Email</Label>
-                          <Switch id="dnd-email" checked={contact.dnd.email} />
+                          <Switch 
+                            id="dnd-email" 
+                            checked={contact.dnd.email} 
+                            onCheckedChange={(checked) => setContact({...contact, dnd: {...contact.dnd, email: checked}})}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="dnd-sms" className="text-sm font-medium">SMS</Label>
-                          <Switch id="dnd-sms" checked={contact.dnd.sms} />
+                          <Switch 
+                            id="dnd-sms" 
+                            checked={contact.dnd.sms} 
+                            onCheckedChange={(checked) => setContact({...contact, dnd: {...contact.dnd, sms: checked}})}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="dnd-call" className="text-sm font-medium">Calls</Label>
-                          <Switch id="dnd-call" checked={contact.dnd.call} />
+                          <Switch 
+                            id="dnd-call" 
+                            checked={contact.dnd.call} 
+                            onCheckedChange={(checked) => setContact({...contact, dnd: {...contact.dnd, call: checked}})}
+                          />
                         </div>
                         <Separator />
                         <div className="flex items-center justify-between">
                           <Label htmlFor="dnd-inbound-call" className="text-sm font-medium">Inbound Calls</Label>
-                          <Switch id="dnd-inbound-call" checked={contact.dnd.inboundCall} />
+                          <Switch 
+                            id="dnd-inbound-call" 
+                            checked={contact.dnd.inboundCall} 
+                            onCheckedChange={(checked) => setContact({...contact, dnd: {...contact.dnd, inboundCall: checked}})}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="dnd-inbound-sms" className="text-sm font-medium">Inbound SMS</Label>
-                          <Switch id="dnd-inbound-sms" checked={contact.dnd.inboundSms} />
+                          <Switch 
+                            id="dnd-inbound-sms" 
+                            checked={contact.dnd.inboundSms} 
+                            onCheckedChange={(checked) => setContact({...contact, dnd: {...contact.dnd, inboundSms: checked}})}
+                          />
                         </div>
                       </CardContent>
                     </Card>
