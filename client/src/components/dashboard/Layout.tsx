@@ -30,6 +30,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       setLocation("/");
     } else if (toolId === "users") {
       setLocation("/contacts");
+    } else if (toolId === "media") {
+      setLocation("/media");
     }
     // Add other routes as needed
   };
@@ -67,8 +69,16 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
             <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300`}>
               {/* Page Header */}
               <DashboardPageHeader
-                description={activeTool === "users" ? "Manage your team and contacts." : "Here's what's happening with your projects today."}
-                title={activeTool === "users" ? "Contacts" : "Dashboard"}
+                description={
+                  activeTool === "users" ? "Manage your team and contacts." : 
+                  activeTool === "media" ? "Manage and organize your media assets." :
+                  "Here's what's happening with your projects today."
+                }
+                title={
+                  activeTool === "users" ? "Contacts" : 
+                  activeTool === "media" ? "Media Storage" :
+                  "Dashboard"
+                }
                 isBorderVisible={true}
               />
 

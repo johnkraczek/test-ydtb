@@ -9,7 +9,8 @@ import {
   Users,
   Zap,
   Layers,
-  MessageSquare
+  MessageSquare,
+  Image
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,12 @@ const mainTools = [
     id: "users",
     icon: Users,
     label: "Contacts",
+    active: false,
+  },
+  {
+    id: "media",
+    icon: Image,
+    label: "Media Storage",
     active: false,
   },
   {

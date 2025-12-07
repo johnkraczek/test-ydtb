@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import DashboardPage from "@/pages/dashboard";
 import ContactsPage from "@/pages/contacts";
 import ContactDetailPage from "@/pages/contact-detail";
+import MediaPage from "@/pages/media";
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={DashboardPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
+      <Route path="/media" component={MediaPage} />
       <Route component={NotFound} />
     </Switch>
   );

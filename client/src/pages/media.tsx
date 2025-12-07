@@ -1,0 +1,664 @@
+
+import { useState } from "react";
+import DashboardLayout from "@/components/dashboard/Layout";
+import { 
+  Folder, 
+  File, 
+  MoreHorizontal, 
+  Grid, 
+  List, 
+  Columns, 
+  Search, 
+  Plus,
+  Upload,
+  ChevronRight,
+  Home,
+  Image as ImageIcon,
+  FileText,
+  MoreVertical,
+  Copy,
+  Trash,
+  Move,
+  Info,
+  Download,
+  ExternalLink,
+  Scissors
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuShortcut,
+} from "@/components/ui/context-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
+
+// Mock Data Types
+type FileType = 'folder' | 'image' | 'document';
+
+interface FileSystemItem {
+  id: string;
+  name: string;
+  type: FileType;
+  parentId: string | null;
+  size?: string;
+  modified: string;
+  url?: string;
+  items?: string[]; // For mock columns view
+}
+
+// Mock Data
+const initialFiles: FileSystemItem[] = [
+  // Root Folders
+  { id: '1', name: 'Marketing Assets', type: 'folder', parentId: null, modified: '2023-10-15', items: ['11', '12', '13'] },
+  { id: '2', name: 'Product Images', type: 'folder', parentId: null, modified: '2023-11-02', items: ['21', '22', '23', '24'] },
+  { id: '3', name: 'Documents', type: 'folder', parentId: null, modified: '2023-09-20', items: ['31', '32'] },
+  
+  // Marketing Assets
+  { id: '11', name: 'Social Media', type: 'folder', parentId: '1', modified: '2023-10-15', items: ['111', '112'] },
+  { id: '12', name: 'Campaign Q4', type: 'folder', parentId: '1', modified: '2023-10-18', items: ['121', '122', '123'] },
+  { id: '13', name: 'Banner_Main.jpg', type: 'image', parentId: '1', size: '2.4 MB', modified: '2023-10-20', url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=500&auto=format&fit=crop&q=60' },
+
+  // Product Images
+  { id: '21', name: 'Summer Collection', type: 'folder', parentId: '2', modified: '2023-11-02', items: ['211', '212', '213'] },
+  { id: '22', name: 'Winter Collection', type: 'folder', parentId: '2', modified: '2023-11-05', items: [] },
+  { id: '23', name: 'Shoes_Sport_v1.png', type: 'image', parentId: '2', size: '1.8 MB', modified: '2023-11-10', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=60' },
+  { id: '24', name: 'TShirt_White.png', type: 'image', parentId: '2', size: '1.2 MB', modified: '2023-11-12', url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
+
+  // Documents
+  { id: '31', name: 'Brand_Guidelines.pdf', type: 'document', parentId: '3', size: '4.5 MB', modified: '2023-09-20' },
+  { id: '32', name: 'Contracts', type: 'folder', parentId: '3', modified: '2023-09-22', items: [] },
+
+  // Deep Nested Items (Social Media)
+  { id: '111', name: 'Instagram_Post.jpg', type: 'image', parentId: '11', size: '3.2 MB', modified: '2023-10-16', url: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=60' },
+  { id: '112', name: 'Stories_Template.psd', type: 'document', parentId: '11', size: '15 MB', modified: '2023-10-16' },
+
+  // Deep Nested Items (Campaign Q4)
+  { id: '121', name: 'Email_Header.png', type: 'image', parentId: '12', size: '0.8 MB', modified: '2023-10-18', url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=500&auto=format&fit=crop&q=60' },
+  { id: '122', name: 'Ad_Copy.docx', type: 'document', parentId: '12', size: '0.1 MB', modified: '2023-10-19' },
+  { id: '123', name: 'Budget.xlsx', type: 'document', parentId: '12', size: '0.2 MB', modified: '2023-10-19' },
+  
+  // Deep Nested Items (Summer Collection)
+  { id: '211', name: 'Beach_Shoot_01.jpg', type: 'image', parentId: '21', size: '5.6 MB', modified: '2023-11-03', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=60' },
+  { id: '212', name: 'Beach_Shoot_02.jpg', type: 'image', parentId: '21', size: '5.1 MB', modified: '2023-11-03', url: 'https://images.unsplash.com/photo-1520942702018-0862200e6873?w=500&auto=format&fit=crop&q=60' },
+  { id: '213', name: 'Model_Release.pdf', type: 'document', parentId: '21', size: '0.5 MB', modified: '2023-11-03' },
+];
+
+export default function MediaPage() {
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'columns'>('grid');
+  const [currentPath, setCurrentPath] = useState<FileSystemItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [items, setItems] = useState<FileSystemItem[]>(initialFiles);
+  const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
+
+  const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
+  const currentItems = items.filter(item => item.parentId === currentFolderId);
+
+  // File Tree Component
+  const FileTreeItem = ({ item, level = 0 }: { item: FileSystemItem, level?: number }) => {
+    const hasChildren = items.some(i => i.parentId === item.id);
+    const isExpanded = currentPath.some(p => p.id === item.id) || (currentPath.length > 0 && currentPath[0].id === item.id && level === 0);
+    
+    return (
+      <div className="select-none">
+        <div 
+          className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+            currentFolderId === item.id 
+              ? 'bg-primary/10 text-primary font-medium' 
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+          }`}
+          style={{ paddingLeft: `${level * 12 + 8}px` }}
+          onClick={() => navigateToFolder(item)}
+        >
+          {item.type === 'folder' ? (
+            <Folder className={`h-4 w-4 ${currentFolderId === item.id ? 'fill-primary/20' : 'text-slate-400'}`} />
+          ) : (
+            <File className="h-4 w-4 text-slate-400" />
+          )}
+          <span className="text-sm truncate">{item.name}</span>
+        </div>
+        
+        {hasChildren && isExpanded && (
+          <div>
+            {items
+              .filter(i => i.parentId === item.id && i.type === 'folder')
+              .map(child => (
+                <FileTreeItem key={child.id} item={child} level={level + 1} />
+              ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const navigateToFolder = (folder: FileSystemItem) => {
+    // Build path to this folder
+    const path: FileSystemItem[] = [];
+    let current: FileSystemItem | undefined = folder;
+    
+    while (current) {
+      path.unshift(current);
+      if (current.parentId) {
+        const pid = current.parentId;
+        current = items.find(i => i.id === pid);
+      } else {
+        current = undefined;
+      }
+    }
+    
+    setCurrentPath(path);
+    setSelectedItems([]);
+  };
+
+  const navigateUp = () => {
+    if (currentPath.length > 0) {
+      setCurrentPath(currentPath.slice(0, -1));
+    }
+  };
+
+  const handleDragStart = (event: any) => {
+    const item = items.find(i => i.id === event.active.id);
+    if (item) setDraggedItem(item);
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const activeItem = items.find(i => i.id === active.id);
+      const overItem = items.find(i => i.id === over.id);
+      
+      if (activeItem && overItem && overItem.type === 'folder') {
+        // Move item logic
+        setItems(items.map(i => {
+          if (i.id === activeItem.id) {
+            return { ...i, parentId: overItem.id };
+          }
+          return i;
+        }));
+      }
+    }
+    setDraggedItem(null);
+  };
+
+  const DraggableItem = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+      id: item.id,
+      data: item
+    });
+
+    return (
+      <div 
+        ref={setNodeRef} 
+        {...listeners} 
+        {...attributes} 
+        className={`${isDragging ? 'opacity-50' : ''}`}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  const DroppableFolder = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: item.id,
+      data: item
+    });
+
+    return (
+      <div 
+        ref={setNodeRef}
+        className={`${isOver ? 'bg-primary/10 ring-2 ring-primary ring-inset rounded-lg' : ''}`}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  const ContextMenuWrapper = ({ item, children }: { item: FileSystemItem, children: React.ReactNode }) => {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuContent className="w-64">
+          <DropdownMenuLabel className="truncate max-w-[200px]">{item.name}</DropdownMenuLabel>
+          <ContextMenuSeparator />
+          <ContextMenuItem inset>
+            <ExternalLink className="mr-2 h-4 w-4" /> Open
+          </ContextMenuItem>
+          <ContextMenuItem inset>
+            <Info className="mr-2 h-4 w-4" /> Get Info
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem inset>
+            <Copy className="mr-2 h-4 w-4" /> Copy
+            <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem inset>
+            <Scissors className="mr-2 h-4 w-4" /> Cut
+            <ContextMenuShortcut>⌘X</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem inset>
+            <Move className="mr-2 h-4 w-4" /> Move to...
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem inset className="text-red-600">
+            <Trash className="mr-2 h-4 w-4" /> Delete
+            <ContextMenuShortcut>⌫</ContextMenuShortcut>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  };
+
+  // Render content based on view mode
+  const renderContent = () => {
+    if (viewMode === 'list') {
+      return (
+        <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium w-[40%]">Name</th>
+                <th className="px-4 py-3 text-left font-medium">Date Modified</th>
+                <th className="px-4 py-3 text-left font-medium">Size</th>
+                <th className="px-4 py-3 text-left font-medium">Kind</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {currentItems.map(item => (
+                <ContextMenuWrapper key={item.id} item={item}>
+                  <tr 
+                    className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
+                    onClick={() => {
+                      if (item.type === 'folder') navigateToFolder(item);
+                      setSelectedItems([item.id]);
+                    }}
+                  >
+                    <td className="px-4 py-2">
+                      <DraggableItem item={item}>
+                        <div className="flex items-center gap-3">
+                          {item.type === 'folder' ? (
+                            <DroppableFolder item={item}>
+                              <Folder className="h-5 w-5 text-blue-500 fill-blue-500/20" />
+                            </DroppableFolder>
+                          ) : item.type === 'image' ? (
+                            <div className="h-8 w-8 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                                {item.url ? <img src={item.url} className="h-full w-full object-cover" /> : <ImageIcon className="h-5 w-5 m-1.5 text-purple-500" />}
+                            </div>
+                          ) : (
+                            <FileText className="h-5 w-5 text-slate-400" />
+                          )}
+                          <span className="font-medium text-slate-700 dark:text-slate-200">{item.name}</span>
+                        </div>
+                      </DraggableItem>
+                    </td>
+                    <td className="px-4 py-2 text-slate-500">{item.modified}</td>
+                    <td className="px-4 py-2 text-slate-500">{item.size || '--'}</td>
+                    <td className="px-4 py-2 text-slate-500 capitalize">{item.type}</td>
+                  </tr>
+                </ContextMenuWrapper>
+              ))}
+              {currentItems.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-12 text-center text-slate-400">
+                    This folder is empty
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    if (viewMode === 'columns') {
+      // For columns view, we need to show the full path hierarchy in columns
+      // Start with root, then subsequent path items
+      const columns = [
+        { id: 'root', items: items.filter(i => i.parentId === null) },
+        ...currentPath.map(folder => ({
+          id: folder.id,
+          items: items.filter(i => i.parentId === folder.id)
+        }))
+      ];
+
+      return (
+        <div className="flex h-full overflow-x-auto border rounded-lg bg-white dark:bg-slate-900 shadow-sm divide-x divide-slate-200 dark:divide-slate-800">
+          {columns.map((column, index) => (
+            <div key={column.id} className="min-w-[250px] w-[250px] flex-shrink-0 flex flex-col h-full bg-slate-50/30 dark:bg-slate-900/30">
+              <ScrollArea className="h-full">
+                <div className="p-2 space-y-0.5">
+                  {column.items.map(item => {
+                    const isSelected = currentPath[index] && currentPath[index].id === item.id;
+                    const isLeafSelected = selectedItems.includes(item.id);
+                    
+                    return (
+                      <ContextMenuWrapper key={item.id} item={item}>
+                         <div
+                          className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${
+                            isSelected || isLeafSelected
+                              ? 'bg-blue-500 text-white' 
+                              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+                          }`}
+                          onClick={() => {
+                            if (item.type === 'folder') {
+                                // If clicking a folder at current level, truncate path after this level and add new folder
+                                const newPath = currentPath.slice(0, index);
+                                newPath.push(item);
+                                setCurrentPath(newPath);
+                            } else {
+                                setSelectedItems([item.id]);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            {item.type === 'folder' ? (
+                              <Folder className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white fill-white/20' : 'text-blue-500 fill-blue-500/20'}`} />
+                            ) : item.type === 'image' ? (
+                              <ImageIcon className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white' : 'text-purple-500'}`} />
+                            ) : (
+                              <FileText className={`h-4 w-4 ${isSelected || isLeafSelected ? 'text-white' : 'text-slate-400'}`} />
+                            )}
+                            <span className="truncate">{item.name}</span>
+                          </div>
+                          {item.type === 'folder' && (
+                            <ChevronRight className={`h-3.5 w-3.5 ${isSelected || isLeafSelected ? 'text-white/70' : 'text-slate-400'}`} />
+                          )}
+                        </div>
+                      </ContextMenuWrapper>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
+          ))}
+          {/* Preview Column */}
+           <div className="min-w-[300px] flex-1 bg-white dark:bg-slate-950 p-6 flex flex-col items-center justify-center text-center border-l border-slate-200 dark:border-slate-800">
+              {selectedItems.length > 0 ? (
+                  (() => {
+                      const selectedItem = items.find(i => i.id === selectedItems[0]);
+                      if (!selectedItem) return null;
+                      return (
+                          <div className="space-y-6 w-full max-w-sm animate-in fade-in zoom-in-95 duration-200">
+                              <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-center relative group">
+                                  {selectedItem.url ? (
+                                      <img src={selectedItem.url} className="w-full h-full object-cover" />
+                                  ) : (
+                                      <div className="p-12">
+                                          {selectedItem.type === 'folder' ? (
+                                              <Folder className="h-24 w-24 text-blue-500/50" />
+                                          ) : (
+                                              <FileText className="h-24 w-24 text-slate-300" />
+                                          )}
+                                      </div>
+                                  )}
+                              </div>
+                              <div className="space-y-2">
+                                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{selectedItem.name}</h3>
+                                  <div className="flex items-center justify-center gap-4 text-sm text-slate-500">
+                                      <span>{selectedItem.size || 'Folder'}</span>
+                                      <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                      <span>{selectedItem.modified}</span>
+                                  </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 pt-4">
+                                  <Button variant="outline" className="w-full">Open</Button>
+                                  <Button className="w-full">Download</Button>
+                              </div>
+                          </div>
+                      );
+                  })()
+              ) : (
+                  <div className="text-slate-400 flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
+                          <Columns className="h-8 w-8 opacity-50" />
+                      </div>
+                      <p>Select an item to view details</p>
+                  </div>
+              )}
+          </div>
+        </div>
+      );
+    }
+
+    // Default Grid View
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {currentItems.map(item => (
+          <ContextMenuWrapper key={item.id} item={item}>
+            <DraggableItem item={item}>
+              <div 
+                className={`group relative flex flex-col gap-2 p-3 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${
+                  selectedItems.includes(item.id)
+                    ? 'bg-blue-50/50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 ring-1 ring-blue-200 dark:ring-blue-800'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800'
+                }`}
+                onClick={() => {
+                  if (item.type === 'folder') {
+                    if (item.type === 'folder') return; // Double click handled separately ideally
+                  }
+                  setSelectedItems([item.id]);
+                }}
+                onDoubleClick={() => {
+                   if (item.type === 'folder') navigateToFolder(item);
+                }}
+              >
+                <div className="aspect-square w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center relative">
+                  {item.type === 'folder' ? (
+                    <DroppableFolder item={item}>
+                      <Folder className="h-12 w-12 text-blue-500 fill-blue-500/20 transition-transform group-hover:scale-110 duration-300" />
+                    </DroppableFolder>
+                  ) : item.type === 'image' ? (
+                    item.url ? (
+                      <img src={item.url} alt={item.name} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
+                    ) : (
+                      <ImageIcon className="h-10 w-10 text-purple-500" />
+                    )
+                  ) : (
+                    <FileText className="h-10 w-10 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                  )}
+                  
+                  {/* Selection Checkbox (visible on hover or selected) */}
+                  <div className={`absolute top-2 right-2 h-5 w-5 rounded-full border bg-white flex items-center justify-center transition-opacity ${
+                      selectedItems.includes(item.id) ? 'opacity-100 border-blue-500 bg-blue-500 text-white' : 'opacity-0 group-hover:opacity-100 border-slate-200 text-transparent'
+                  }`}>
+                    <div className="h-2 w-2 rounded-full bg-current" />
+                  </div>
+                </div>
+                
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate" title={item.name}>
+                    {item.name}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">
+                    {item.size || (item.items ? `${item.items.length} items` : '')}
+                  </p>
+                </div>
+              </div>
+            </DraggableItem>
+          </ContextMenuWrapper>
+        ))}
+        
+        {/* Empty State for Grid */}
+        {currentItems.length === 0 && (
+            <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
+                <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+                    <Upload className="h-6 w-6 text-slate-400" />
+                </div>
+                <p className="font-medium">Drag files here to upload</p>
+                <p className="text-sm mt-1">or click "Upload" button</p>
+            </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DashboardLayout activeTool="media">
+        <div className="flex h-[calc(100vh-140px)] gap-6">
+          {/* Left Sidebar - File Tree */}
+          <div className="w-64 flex-shrink-0 flex flex-col gap-4">
+            <Card className="flex-1 p-3 overflow-y-auto bg-white/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800 shadow-sm backdrop-blur-sm">
+                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">Folders</div>
+                <div className="space-y-0.5">
+                    {/* Root - All Files */}
+                    <div 
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                            currentPath.length === 0 
+                            ? 'bg-primary/10 text-primary font-medium' 
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                        onClick={() => {
+                            setCurrentPath([]);
+                            setSelectedItems([]);
+                        }}
+                    >
+                        <Home className="h-4 w-4" />
+                        <span className="text-sm">All Files</span>
+                    </div>
+                    
+                    {/* Tree Structure */}
+                    {items.filter(i => i.parentId === null).map(item => (
+                        <FileTreeItem key={item.id} item={item} />
+                    ))}
+                </div>
+            </Card>
+            
+            <Card className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-none shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium opacity-80">Storage</span>
+                    <span className="text-xs font-bold">75%</span>
+                </div>
+                <div className="h-1.5 bg-black/20 rounded-full overflow-hidden mb-3">
+                    <div className="h-full bg-white w-[75%]" />
+                </div>
+                <p className="text-xs opacity-80 mb-4">7.5 GB of 10 GB used</p>
+                <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-white/20 hover:bg-white/30 border-none text-white">
+                    Upgrade Plan
+                </Button>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/50 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800 backdrop-blur-sm shadow-sm">
+              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
+                 <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-9 w-9 shrink-0" 
+                    disabled={currentPath.length === 0}
+                    onClick={navigateUp}
+                 >
+                    <ChevronRight className="h-4 w-4 rotate-180" />
+                 </Button>
+                 
+                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+                 
+                 {/* Breadcrumbs */}
+                 <div className="flex items-center text-sm text-slate-500 whitespace-nowrap px-1">
+                    <span 
+                        className="cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
+                        onClick={() => setCurrentPath([])}
+                    >
+                        <Home className="h-3.5 w-3.5" />
+                    </span>
+                    {currentPath.map((folder, index) => (
+                        <div key={folder.id} className="flex items-center">
+                            <ChevronRight className="h-4 w-4 mx-1 opacity-50" />
+                            <span 
+                                className={`cursor-pointer hover:text-primary transition-colors ${index === currentPath.length - 1 ? 'font-medium text-slate-900 dark:text-slate-100' : ''}`}
+                                onClick={() => {
+                                    setCurrentPath(currentPath.slice(0, index + 1));
+                                }}
+                            >
+                                {folder.name}
+                            </span>
+                        </div>
+                    ))}
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {/* View Toggles */}
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 shrink-0">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={`h-7 w-7 rounded-md ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                        onClick={() => setViewMode('grid')}
+                    >
+                        <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={`h-7 w-7 rounded-md ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                        onClick={() => setViewMode('list')}
+                    >
+                        <List className="h-4 w-4" />
+                    </Button>
+                     <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={`h-7 w-7 rounded-md ${viewMode === 'columns' ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-slate-500'}`}
+                        onClick={() => setViewMode('columns')}
+                    >
+                        <Columns className="h-4 w-4" />
+                    </Button>
+                </div>
+                
+                <div className="relative hidden sm:block">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input placeholder="Search files..." className="pl-9 h-9 w-[200px] bg-white dark:bg-slate-900" />
+                </div>
+                
+                <Button className="h-9 gap-2 shadow-md shadow-primary/20">
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">New Folder</span>
+                </Button>
+                <Button variant="outline" className="h-9 gap-2">
+                    <Upload className="h-4 w-4" />
+                    <span className="hidden sm:inline">Upload</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto">
+               {renderContent()}
+            </div>
+          </div>
+        </div>
+        <DragOverlay>
+            {draggedItem ? (
+                <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-xl border border-blue-500 opacity-90 flex items-center gap-2 w-48">
+                    {draggedItem.type === 'folder' ? <Folder className="h-5 w-5 text-blue-500" /> : <FileText className="h-5 w-5 text-slate-500" />}
+                    <span className="truncate font-medium text-sm">{draggedItem.name}</span>
+                </div>
+            ) : null}
+        </DragOverlay>
+      </DashboardLayout>
+    </DndContext>
+  );
+}
