@@ -661,46 +661,6 @@ export default function ContactDetailPage() {
                 <TabsContent value="overview" className="space-y-6">
                   {/* Details Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-                      <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-base font-medium flex items-center gap-2">
-                          <Building className="h-4 w-4 text-slate-400" />
-                          Company Details
-                        </CardTitle>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleSaveContact}>
-                          <Save className="h-4 w-4 text-slate-500" />
-                        </Button>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-1">
-                          <Label htmlFor="company" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Company Name</Label>
-                          <Input 
-                            id="company" 
-                            value={contact.company} 
-                            onChange={(e) => setContact({...contact, company: e.target.value})}
-                            className="h-8"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label htmlFor="role" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Role</Label>
-                          <Input 
-                            id="role" 
-                            value={contact.role} 
-                            onChange={(e) => setContact({...contact, role: e.target.value})}
-                            className="h-8"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label htmlFor="address" className="text-xs text-slate-500 font-medium uppercase tracking-wider">Address</Label>
-                          <Input 
-                            id="address" 
-                            value={contact.address} 
-                            onChange={(e) => setContact({...contact, address: e.target.value})}
-                            className="h-8"
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
 
                     <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                       <CardHeader className="flex flex-row items-center justify-between pb-2">
