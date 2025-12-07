@@ -736,23 +736,23 @@ export default function ContactDetailPage() {
                         <TabsTrigger value="sms">SMS</TabsTrigger>
                       </TabsList>
                       
-                      <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                        <TabsContent value="email" className="mt-0 space-y-3">
+                      <div className="space-y-4">
+                        <TabsContent value="email" className="mt-0 space-y-4">
                           <Input 
                             placeholder="Subject line..." 
                             value={messageSubject}
                             onChange={(e) => setMessageSubject(e.target.value)}
-                            className="border-0 border-b border-zinc-100 dark:border-zinc-800 rounded-none px-0 focus-visible:ring-0 font-medium bg-transparent shrink-0"
+                            className="font-medium"
                           />
                           <Textarea 
                             placeholder={`Hi ${customer.firstName}, ...`}
-                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent min-h-[150px]"
+                            className="min-h-[150px] resize-none text-base"
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
                           />
                         </TabsContent>
                         
-                        <TabsContent value="sms" className="mt-0 space-y-3">
+                        <TabsContent value="sms" className="mt-0 space-y-4">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 shrink-0">
                             <MessageSquare className="h-3 w-3" />
                             <span>SMS to {customer.phone}</span>
@@ -762,11 +762,11 @@ export default function ContactDetailPage() {
                             maxLength={160}
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
-                            className="border-0 p-0 resize-none focus-visible:ring-0 text-base bg-transparent min-h-[150px]"
+                            className="min-h-[150px] resize-none text-base"
                           />
                         </TabsContent>
 
-                        <div className="flex justify-between items-center pt-2 mt-2 border-t border-zinc-50 dark:border-zinc-800 shrink-0">
+                        <div className="flex justify-between items-center pt-2 mt-2">
                           <div className="text-xs text-muted-foreground">
                             {messageType === 'sms' && `${messageBody.length}/160 chars`}
                           </div>
