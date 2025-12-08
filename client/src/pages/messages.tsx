@@ -338,46 +338,57 @@ export default function MessagesPage() {
               {/* Response Section */}
               <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
                  <div className="flex items-center gap-4 mb-3 px-1">
-                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                       <span>Response via:</span>
-                       <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                             <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs">
-                                <PlatformIcon platform={responsePlatform} className="h-3.5 w-3.5" />
-                                <span className="capitalize">{responsePlatform} DM</span>
-                                <ChevronDown className="h-3 w-3 opacity-50" />
-                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start">
-                             <DropdownMenuItem onClick={() => setResponsePlatform('instagram')}>
-                                <Instagram className="mr-2 h-4 w-4 text-pink-600" /> Instagram DM
-                             </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => setResponsePlatform('email')}>
-                                <Mail className="mr-2 h-4 w-4 text-slate-600" /> Email
-                             </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => setResponsePlatform('sms')}>
-                                <MessageSquare className="mr-2 h-4 w-4 text-green-600" /> SMS
-                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                       </DropdownMenu>
-                    </div>
-                    
-                    <div className="ml-auto text-xs text-slate-400 italic">
-                       Internal Comment
-                    </div>
-                 </div>
-                 
-                 <div className="mb-3 px-1">
-                    <p className="text-xs text-slate-500 mb-1">Page: Your Digital Toolbox</p>
-                 </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium w-full">
+                       <Tabs value={responsePlatform} onValueChange={setResponsePlatform} className="w-full">
+                         <div className="flex items-center justify-between mb-2">
+                           <TabsList className="bg-slate-100 dark:bg-slate-800 h-8 p-0.5">
+                             <TabsTrigger 
+                               value="instagram" 
+                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                             >
+                               <Instagram className="h-3 w-3 mr-1.5 text-pink-600" /> Instagram
+                             </TabsTrigger>
+                             <TabsTrigger 
+                               value="sms" 
+                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                             >
+                               <MessageSquare className="h-3 w-3 mr-1.5 text-green-600" /> SMS
+                             </TabsTrigger>
+                             <TabsTrigger 
+                               value="email" 
+                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                             >
+                               <Mail className="h-3 w-3 mr-1.5 text-slate-600" /> Email
+                             </TabsTrigger>
+                           </TabsList>
+                           <div className="text-xs text-slate-400 italic">
+                             Internal Comment
+                           </div>
+                         </div>
+                         
+                         <div className="mb-3 px-1">
+                            <p className="text-xs text-slate-500 mb-1">Page: Your Digital Toolbox</p>
+                         </div>
 
-                 <div className="relative">
-                    <Textarea 
-                       placeholder="Type a message..." 
-                       className="min-h-[100px] resize-none pr-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
-                       value={messageInput}
-                       onChange={(e) => setMessageInput(e.target.value)}
-                    />
+                         {responsePlatform === 'email' && (
+                           <div className="mb-3">
+                             <Input 
+                               placeholder="Subject" 
+                               className="h-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500 mb-2"
+                             />
+                           </div>
+                         )}
+
+                         <div className="relative">
+                            <Textarea 
+                               placeholder={`Type a ${responsePlatform === 'email' ? 'email' : 'message'}...`}
+                               className="min-h-[100px] resize-none pr-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
+                               value={messageInput}
+                               onChange={(e) => setMessageInput(e.target.value)}
+                            />
+                         </div>
+                       </Tabs>
+                    </div>
                  </div>
 
                  <div className="flex items-center justify-between mt-3">
