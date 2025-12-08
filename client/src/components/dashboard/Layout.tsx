@@ -69,7 +69,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
             />
 
             {/* Main Content Area */}
-            <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300`}>
+            <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300 ${activeTool === "messages" ? "bg-white/0 border-none shadow-none backdrop-blur-none" : ""}`}>
               {/* Page Header */}
               {header ? header : (
                 <DashboardPageHeader
@@ -88,12 +88,12 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
               )}
 
               {/* Main content scrollable area */}
-              <div className="flex-1 overflow-auto p-8">
+              <div className={`flex-1 overflow-auto ${activeTool === "messages" ? "p-0" : "p-8"}`}>
                   {children}
               </div>
               
               {/* Footer */}
-              <DashboardFooter />
+              {activeTool !== "messages" && <DashboardFooter />}
             </div>
         </div>
       </div>
