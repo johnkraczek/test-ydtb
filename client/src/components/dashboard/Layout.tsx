@@ -33,6 +33,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       setLocation("/contacts");
     } else if (toolId === "media") {
       setLocation("/media");
+    } else if (toolId === "messages") {
+      setLocation("/messages");
     }
     // Add other routes as needed
   };

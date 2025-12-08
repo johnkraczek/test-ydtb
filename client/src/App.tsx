@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/dashboard";
 import ContactsPage from "@/pages/contacts";
 import ContactDetailPage from "@/pages/contact-detail";
 import MediaPage from "@/pages/media";
+import MessagesPage from "@/pages/messages";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/media" component={MediaPage} />
+      <Route path="/messages" component={MessagesPage} />
       <Route component={NotFound} />
     </Switch>
   );

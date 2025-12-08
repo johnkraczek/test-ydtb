@@ -15,7 +15,11 @@ import {
   CreditCard,
   FileText,
   File,
-  Home
+  Home,
+  MessageSquare,
+  Instagram,
+  Facebook,
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -45,6 +49,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <HomeSidebarContent />;
       case "users":
         return <ContactsSidebarContent />;
+      case "messages":
+        return <MessagesSidebarContent />;
       case "media":
         return <MediaSidebarContent />;
       case "settings":
@@ -291,6 +297,27 @@ function HomeSidebarContent() {
   );
 }
 
+
+function MessagesSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Inboxes">
+        <SidebarItem icon={LayoutGrid} label="All Inboxes" active />
+        <SidebarItem icon={MessageSquare} label="SMS Messages" />
+        <SidebarItem icon={Mail} label="Email Messages" />
+        <SidebarItem icon={Instagram} label="Instagram" />
+        <SidebarItem icon={Facebook} label="Facebook" />
+      </SidebarSection>
+      
+      <SidebarSection title="Folders">
+        <SidebarItem icon={Folder} label="Leads" />
+        <SidebarItem icon={Folder} label="Customers" />
+        <SidebarItem icon={Folder} label="Support" />
+        <SidebarItem icon={Folder} label="Archived" />
+      </SidebarSection>
+    </div>
+  );
+}
 
 function ContactsSidebarContent() {
   return (
