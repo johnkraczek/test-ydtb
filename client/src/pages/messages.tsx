@@ -179,8 +179,27 @@ export default function MessagesPage() {
   const [selectedThreadId, setSelectedThreadId] = useState("1");
   const [messageInput, setMessageInput] = useState("");
   const [responsePlatform, setResponsePlatform] = useState("instagram");
+  const [messages, setMessages] = useState(MOCK_MESSAGES);
 
   const selectedThread = MOCK_THREADS.find(t => t.id === selectedThreadId);
+
+  const handleSend = () => {
+    if (!messageInput.trim()) return;
+
+    const newMessage = {
+      id: `m${Date.now()}`,
+      sender: "Me",
+      content: messageInput,
+      isFile: false,
+      fileType: "",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isMe: true,
+      platform: responsePlatform
+    };
+
+    setMessages([...messages, newMessage]);
+    setMessageInput("");
+  };
 
   return (
     <DashboardLayout activeTool="messages" header={<div className="hidden" />}>
@@ -300,7 +319,7 @@ export default function MessagesPage() {
                     </span>
                   </div>
                   
-                  {MOCK_MESSAGES.map((msg) => (
+                  {messages.map((msg) => (
                     <div key={msg.id} className={`flex gap-3 max-w-[80%] ${msg.isMe ? 'ml-auto flex-row-reverse' : ''}`}>
                       {!msg.isMe && (
                          <Avatar className="h-8 w-8 mt-1 border border-slate-200">
@@ -326,9 +345,16 @@ export default function MessagesPage() {
                              msg.content
                            )}
                          </div>
-                         <span className="text-[10px] text-slate-400 px-1">
-                           {msg.timestamp}
-                         </span>
+                         <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-slate-400 px-1">
+                              {msg.timestamp}
+                            </span>
+                            {msg.isMe && (
+                              <span className="text-[10px] text-slate-400 capitalize">
+                                • via {msg.platform || 'instagram'}
+                              </span>
+                            )}
+                         </div>
                       </div>
                     </div>
                   ))}
@@ -360,10 +386,13 @@ export default function MessagesPage() {
                              >
                                <Mail className="h-3 w-3 mr-1.5 text-slate-600" /> Email
                              </TabsTrigger>
+                             <TabsTrigger 
+                               value="internal" 
+                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                             >
+                               <MessageSquare className="h-3 w-3 mr-1.5 text-orange-500" /> Internal
+                             </TabsTrigger>
                            </TabsList>
-                           <div className="text-xs text-slate-400 italic">
-                             Internal Comment
-                           </div>
                          </div>
                          
                          <div className="mb-3 px-1">
@@ -421,7 +450,7 @@ export default function MessagesPage() {
                        <Button variant="outline" size="sm" onClick={() => setMessageInput("")}>
                           Clear
                        </Button>
-                       <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700">
+                       <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={handleSend}>
                           Send <Send className="h-3.5 w-3.5" />
                        </Button>
                     </div>
