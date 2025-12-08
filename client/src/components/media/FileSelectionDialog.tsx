@@ -25,8 +25,10 @@ export function FileSelectionDialog({ trigger, onSelect, onCancel }: FileSelecti
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
 
-  const handleToggleFolder = (folderId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleFolder = (folderId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     setExpandedFolders(prev => 
       prev.includes(folderId) 
         ? prev.filter(id => id !== folderId) 
@@ -71,7 +73,7 @@ export function FileSelectionDialog({ trigger, onSelect, onCancel }: FileSelecti
             item.type === 'folder' ? "font-medium" : ""
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onClick={() => item.type === 'folder' ? handleToggleFolder(item.id, {} as any) : handleSelectFile(item)}
+          onClick={(e) => item.type === 'folder' ? handleToggleFolder(item.id, e) : handleSelectFile(item)}
         >
           {item.type === 'folder' && (
             <div 
