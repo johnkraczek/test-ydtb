@@ -399,7 +399,7 @@ export default function MessagesPage() {
                          </div>
                          
                          <div className="mb-3 px-1">
-                            <p className="text-xs text-slate-500 mb-1">Page: Your Digital Toolbox</p>
+                            {/* Removed Page text */}
                          </div>
 
                          {responsePlatform === 'email' && (
