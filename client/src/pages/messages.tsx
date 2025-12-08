@@ -403,11 +403,30 @@ export default function MessagesPage() {
                          </div>
 
                          {responsePlatform === 'email' && (
-                           <div className="mb-3">
-                             <Input 
-                               placeholder="Subject" 
-                               className="h-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500 mb-2"
-                             />
+                           <div className="mb-3 space-y-2">
+                             <div className="grid grid-cols-2 gap-2">
+                               <div className="relative">
+                                 <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">From:</span>
+                                 <Input 
+                                   defaultValue="support@yourdigitaltoolbox.com" 
+                                   className="h-9 pl-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
+                                 />
+                               </div>
+                               <div className="relative">
+                                 <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">CC:</span>
+                                 <Input 
+                                   placeholder="" 
+                                   className="h-9 pl-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
+                                 />
+                               </div>
+                             </div>
+                             <div className="relative">
+                               <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">Subject:</span>
+                               <Input 
+                                 placeholder="" 
+                                 className="h-9 pl-16 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
+                               />
+                             </div>
                            </div>
                          )}
 
