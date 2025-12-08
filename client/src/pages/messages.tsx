@@ -38,6 +38,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -406,11 +413,17 @@ export default function MessagesPage() {
                            <div className="mb-3 space-y-2">
                              <div className="grid grid-cols-2 gap-2">
                                <div className="relative">
-                                 <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">From:</span>
-                                 <Input 
-                                   defaultValue="support@yourdigitaltoolbox.com" 
-                                   className="h-9 pl-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500"
-                                 />
+                                 <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium z-10">From:</span>
+                                 <Select defaultValue="support">
+                                   <SelectTrigger className="h-9 pl-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-blue-500 w-full">
+                                     <SelectValue placeholder="Select email" />
+                                   </SelectTrigger>
+                                   <SelectContent>
+                                     <SelectItem value="support">support@yourdigitaltoolbox.com</SelectItem>
+                                     <SelectItem value="info">info@yourdigitaltoolbox.com</SelectItem>
+                                     <SelectItem value="john">john@yourdigitaltoolbox.com</SelectItem>
+                                   </SelectContent>
+                                 </Select>
                                </div>
                                <div className="relative">
                                  <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">CC:</span>
