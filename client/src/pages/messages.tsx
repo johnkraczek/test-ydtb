@@ -386,9 +386,12 @@ export default function MessagesPage() {
                              >
                                <Mail className="h-3 w-3 mr-1.5 text-slate-600" /> Email
                              </TabsTrigger>
+                           </TabsList>
+
+                           <TabsList className="bg-slate-100 dark:bg-slate-800 h-8 p-0.5">
                              <TabsTrigger 
                                value="internal" 
-                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                               className="h-7 text-xs px-3 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-orange-600"
                              >
                                <MessageSquare className="h-3 w-3 mr-1.5 text-orange-500" /> Internal
                              </TabsTrigger>
