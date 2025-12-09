@@ -210,7 +210,7 @@ export default function MessagesPage() {
 
   return (
     <DashboardLayout activeTool="messages" header={<div className="hidden" />}>
-      <div className="flex h-full w-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex h-full w-full bg-white dark:bg-slate-900 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
         
         {/* Column 1: Message List (25%) */}
         <div className="w-1/4 min-w-[300px] border-r border-slate-200 dark:border-slate-800 flex flex-col bg-slate-50/30">
