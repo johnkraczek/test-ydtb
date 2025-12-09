@@ -134,6 +134,14 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                         </div>
                         <Progress value={50} className="h-2 bg-indigo-200 dark:bg-indigo-900/50 [&>div]:bg-indigo-600" />
                       </div>
+                      
+                      <div className="py-1">
+                        <p className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Next: Connect Payments</p>
+                        <p className="text-[10px] text-indigo-700 dark:text-indigo-300 leading-snug mt-0.5">
+                          Set up your payment processor to start accepting orders.
+                        </p>
+                      </div>
+
                       <Button className="w-full justify-between bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm h-9">
                         <span className="font-medium text-xs">Next Step</span>
                         <ArrowRight className="h-3.5 w-3.5" />
