@@ -13,11 +13,13 @@ import AutomationPage from "@/pages/automation";
 import AutomationEditor from "@/pages/automation-editor";
 import PagesPage from "@/pages/pages";
 import PageEditor from "@/pages/page-editor";
+import LaunchpadPage from "@/pages/launchpad";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={DashboardPage} />
+      <Route path="/launchpad" component={LaunchpadPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/media" component={MediaPage} />

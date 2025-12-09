@@ -21,7 +21,9 @@ import {
   Facebook,
   Mail,
   Zap,
-  LayoutTemplate
+  LayoutTemplate,
+  Rocket,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,6 +49,8 @@ interface ToolSidebarProps {
 export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
   const renderToolContent = () => {
     switch (toolId) {
+      case "launchpad":
+        return <LaunchpadSidebarContent />;
       case "home":
         return <HomeSidebarContent />;
       case "users":
@@ -279,6 +283,30 @@ function SidebarItem({ icon: Icon, label, badge, active }: { icon: any, label: s
             )}
         </Button>
     )
+}
+
+function LaunchpadSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Getting Started">
+        <SidebarItem icon={Rocket} label="Launch Checklist" active />
+        <SidebarItem icon={FileText} label="Setup Guide" />
+      </SidebarSection>
+      
+      <SidebarSection title="Resources">
+        <SidebarItem icon={MessageSquare} label="Community Support" />
+        <SidebarItem icon={ArrowUpRight} label="Video Tutorials" />
+      </SidebarSection>
+
+      <div className="px-2 mt-8">
+        <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30">
+           <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 text-sm mb-1">Need help?</h4>
+           <p className="text-xs text-indigo-700 dark:text-indigo-300 mb-3">Our support team is ready to assist you with setup.</p>
+           <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-7 text-xs">Contact Support</Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function HomeSidebarContent() {

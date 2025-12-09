@@ -29,6 +29,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
     // Simple routing based on tool ID
     if (toolId === "home") {
       setLocation("/");
+    } else if (toolId === "launchpad") {
+      setLocation("/launchpad");
     } else if (toolId === "users") {
       setLocation("/contacts");
     } else if (toolId === "media") {

@@ -11,7 +11,8 @@ import {
   Image,
   Grid3X3,
   LayoutTemplate,
-  File
+  File,
+  Rocket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,12 @@ import {
 import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
 
 const INITIAL_TOOLS: ToolItem[] = [
+  {
+    id: "launchpad",
+    icon: Rocket,
+    label: "Launchpad",
+    visible: true,
+  },
   {
     id: "home",
     icon: Home,
