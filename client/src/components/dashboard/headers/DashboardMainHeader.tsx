@@ -1,5 +1,5 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon, Palette } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon, Palette, HelpCircle, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -25,6 +25,12 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function DashboardMainHeader() {
   const [workspaces] = useState([
