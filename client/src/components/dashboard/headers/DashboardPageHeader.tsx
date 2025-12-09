@@ -8,6 +8,7 @@ interface DashboardPageHeaderProps {
   description?: string;
   actions?: React.ReactNode;
   isBorderVisible?: boolean;
+  breadcrumbs?: React.ReactNode;
 }
 
 export function DashboardPageHeader({
@@ -15,11 +16,12 @@ export function DashboardPageHeader({
   description,
   actions,
   isBorderVisible = true,
+  breadcrumbs,
 }: DashboardPageHeaderProps) {
   return (
     <div className={`flex items-center justify-between ${isBorderVisible ? "border-b" : ""} bg-white/50 backdrop-blur-sm px-8 py-4 transition-all duration-300`}>
       <div className="flex items-center gap-4">
-        <DashboardBreadcrumb />
+        {breadcrumbs || <DashboardBreadcrumb />}
       </div>
       <div className="flex items-center gap-3">
         {actions || (

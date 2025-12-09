@@ -1,4 +1,4 @@
-import { ArrowLeft, Play, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle2, Home, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
@@ -20,6 +20,24 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
   return (
     <DashboardLayout
       activeTool="launchpad"
+      header={
+        <DashboardPageHeader 
+          actions={<></>}
+          breadcrumbs={
+            <nav className="flex items-center text-sm text-muted-foreground">
+              <div 
+                className="flex items-center hover:text-slate-900 cursor-pointer transition-colors" 
+                onClick={() => setLocation("/launchpad")}
+              >
+                <Home className="h-4 w-4 mr-2" />
+                <span className="font-medium">Launchpad</span>
+              </div>
+              <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground/50" />
+              <span className="font-medium text-foreground">{title}</span>
+            </nav>
+          }
+        />
+      }
     >
       <div className="max-w-6xl mx-auto pb-12">
         <div className="flex flex-col gap-2 mb-8">
