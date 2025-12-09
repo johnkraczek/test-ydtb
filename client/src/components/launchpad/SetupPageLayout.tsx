@@ -22,7 +22,7 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
       activeTool="launchpad"
     >
       <div className="max-w-6xl mx-auto pb-12">
-        <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col gap-2 mb-8">
           <Button 
             variant="ghost" 
             className="w-fit text-slate-500 hover:text-slate-900 pl-0 gap-2"
@@ -31,11 +31,10 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
             <ArrowLeft className="h-4 w-4" />
             Back to Launchpad
           </Button>
-          <DashboardPageHeader
-            title={title}
-            description={description}
-            isBorderVisible={false}
-          />
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">{title}</h1>
+            <p className="text-slate-500 mt-1">{description}</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
