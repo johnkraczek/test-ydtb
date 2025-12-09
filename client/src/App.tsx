@@ -14,12 +14,16 @@ import AutomationEditor from "@/pages/automation-editor";
 import PagesPage from "@/pages/pages";
 import PageEditor from "@/pages/page-editor";
 import LaunchpadPage from "@/pages/launchpad";
+import EmailSetupPage from "@/pages/launchpad-setup/email";
+import PaymentSetupPage from "@/pages/launchpad-setup/payment";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={DashboardPage} />
       <Route path="/launchpad" component={LaunchpadPage} />
+      <Route path="/launchpad/email" component={EmailSetupPage} />
+      <Route path="/launchpad/payment" component={PaymentSetupPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/media" component={MediaPage} />

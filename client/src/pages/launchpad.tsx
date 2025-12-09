@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ interface SetupTask {
 
 export default function LaunchpadPage() {
   const { themeColor, setThemeColor } = useThemeColor();
+  const [, setLocation] = useLocation();
   
   // Mock state for completed tasks
   const [tasks, setTasks] = useState<SetupTask[]>([
@@ -42,6 +44,7 @@ export default function LaunchpadPage() {
       icon: CreditCard,
       completed: false,
       actionLabel: "Connect Payments",
+      actionUrl: "/launchpad/payment",
       type: "integration"
     },
     {
@@ -51,6 +54,7 @@ export default function LaunchpadPage() {
       icon: Mail,
       completed: true,
       actionLabel: "Manage Email",
+      actionUrl: "/launchpad/email",
       type: "integration"
     },
     {
@@ -78,6 +82,16 @@ export default function LaunchpadPage() {
 
   const toggleTask = (id: string) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const handleAction = (task: SetupTask) => {
+    if (task.type === "color-picker") {
+        toggleTask(task.id);
+    } else if (task.actionUrl) {
+        setLocation(task.actionUrl);
+    } else {
+        toggleTask(task.id);
+    }
   };
 
   return (
@@ -172,7 +186,7 @@ export default function LaunchpadPage() {
                   {task.type === "color-picker" ? (
                     <Button 
                       variant={task.completed ? "outline" : "default"}
-                      onClick={() => toggleTask(task.id)}
+                      onClick={() => handleAction(task)}
                       className={task.completed ? "bg-white" : "bg-indigo-600 hover:bg-indigo-700"}
                     >
                       {task.completed ? "Change Color" : "Save Color"}
@@ -181,7 +195,7 @@ export default function LaunchpadPage() {
                     <Button 
                       variant={task.completed ? "outline" : "default"}
                       className={`gap-2 min-w-[140px] ${task.completed ? 'bg-white text-slate-600' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
-                      onClick={() => toggleTask(task.id)} // Toggle for demo purposes
+                      onClick={() => handleAction(task)}
                     >
                       {task.completed ? (
                          <>Manage <Settings className="h-3.5 w-3.5" /></>
