@@ -10,6 +10,7 @@ import ContactDetailPage from "@/pages/contact-detail";
 import MediaPage from "@/pages/media";
 import MessagesPage from "@/pages/messages";
 import AutomationPage from "@/pages/automation";
+import AutomationEditor from "@/pages/automation-editor";
 import PagesPage from "@/pages/pages";
 import PageEditor from "@/pages/page-editor";
 
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/media" component={MediaPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/automation" component={AutomationPage} />
+      <Route path="/automation/:id/edit" component={AutomationEditor} />
       <Route path="/pages" component={PagesPage} />
       <Route path="/pages/:id/edit" component={PageEditor} />
       <Route component={NotFound} />
