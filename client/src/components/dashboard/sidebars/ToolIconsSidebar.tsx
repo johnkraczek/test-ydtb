@@ -104,8 +104,9 @@ export function ToolIconsSidebar({
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   // Filter visible and hidden tools
-  const visibleTools = tools.filter(tool => tool.visible);
-  const hiddenTools = tools.filter(tool => !tool.visible);
+  // If a tool is active, it should be visible even if it's hidden in settings
+  const visibleTools = tools.filter(tool => tool.visible || tool.id === activeTool);
+  const hiddenTools = tools.filter(tool => !tool.visible && tool.id !== activeTool);
 
   return (
     <TooltipProvider delayDuration={0}>
