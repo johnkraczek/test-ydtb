@@ -73,7 +73,7 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         {/* Right Help Panel */}
         <div 
             className={cn(
-                "fixed top-24 right-0 bottom-24 border-l border-slate-200 shadow-xl transition-all duration-300 ease-in-out z-20 flex flex-col rounded-l-2xl",
+                "absolute top-0 right-0 bottom-0 border-l border-slate-200 shadow-xl transition-all duration-300 ease-in-out z-20 flex flex-col rounded-l-2xl",
                 isHelpOpen ? "w-[400px] translate-x-0 bg-slate-50" : "w-[400px] translate-x-[360px] cursor-pointer hover:bg-indigo-700 bg-indigo-600 border-none"
             )}
             onClick={() => !isHelpOpen && setIsHelpOpen(true)}
