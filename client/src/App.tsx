@@ -9,6 +9,7 @@ import ContactsPage from "@/pages/contacts";
 import ContactDetailPage from "@/pages/contact-detail";
 import MediaPage from "@/pages/media";
 import MessagesPage from "@/pages/messages";
+import AutomationPage from "@/pages/automation";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/media" component={MediaPage} />
       <Route path="/messages" component={MessagesPage} />
+      <Route path="/automation" component={AutomationPage} />
       <Route component={NotFound} />
     </Switch>
   );
