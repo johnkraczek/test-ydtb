@@ -20,7 +20,8 @@ import {
   Instagram,
   Facebook,
   Mail,
-  Zap
+  Zap,
+  LayoutTemplate
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -54,6 +55,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <MessagesSidebarContent />;
       case "media":
         return <MediaSidebarContent />;
+      case "pages":
+        return <PagesSidebarContent />;
       case "automation":
         return <AutomationSidebarContent />;
       case "settings":
@@ -335,6 +338,30 @@ function ContactsSidebarContent() {
         <SidebarItem icon={Folder} label="Customers" />
         <SidebarItem icon={Folder} label="Partners" />
         <SidebarItem icon={Folder} label="Vendors" />
+      </SidebarSection>
+    </div>
+  );
+}
+
+function PagesSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Site Structure">
+        <SidebarItem icon={LayoutTemplate} label="All Pages" active />
+        <SidebarItem icon={Star} label="Favorites" />
+        <SidebarItem icon={Clock} label="Recent" />
+      </SidebarSection>
+      
+      <SidebarSection title="Folders">
+        <SidebarItem icon={Folder} label="Landing Pages" />
+        <SidebarItem icon={Folder} label="Blog Posts" />
+        <SidebarItem icon={Folder} label="Utility Pages" />
+        <SidebarItem icon={Folder} label="Legal" />
+      </SidebarSection>
+
+      <SidebarSection title="Templates">
+        <SidebarItem icon={File} label="Standard Layout" />
+        <SidebarItem icon={File} label="Full Width" />
       </SidebarSection>
     </div>
   );

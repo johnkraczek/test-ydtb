@@ -9,7 +9,8 @@ import {
   Layers,
   MessageSquare,
   Image,
-  Grid3X3
+  Grid3X3,
+  LayoutTemplate
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,12 @@ const INITIAL_TOOLS: ToolItem[] = [
     id: "automation",
     icon: Zap,
     label: "Automation",
+    visible: true,
+  },
+  {
+    id: "pages",
+    icon: LayoutTemplate,
+    label: "Pages",
     visible: true,
   },
   {
