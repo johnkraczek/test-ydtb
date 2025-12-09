@@ -23,7 +23,10 @@ import {
   Zap,
   LayoutTemplate,
   Rocket,
-  CheckCircle2
+  CheckCircle2,
+  Circle,
+  Palette,
+  Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -288,12 +291,15 @@ function SidebarItem({ icon: Icon, label, badge, active }: { icon: any, label: s
 function LaunchpadSidebarContent() {
   return (
     <div className="space-y-1">
-      <SidebarSection title="Getting Started">
-        <SidebarItem icon={Rocket} label="Launch Checklist" active />
-        <SidebarItem icon={FileText} label="Setup Guide" />
+      <SidebarSection title="Setup Checklist">
+        <SidebarItem icon={CheckCircle2} label="Connect Email" badge="Done" />
+        <SidebarItem icon={CheckCircle2} label="Customize Theme" badge="Done" />
+        <SidebarItem icon={CreditCard} label="Connect Payments" />
+        <SidebarItem icon={Bot} label="Connect AI Provider" />
       </SidebarSection>
       
       <SidebarSection title="Resources">
+        <SidebarItem icon={FileText} label="Setup Guide" />
         <SidebarItem icon={MessageSquare} label="Community Support" />
         <SidebarItem icon={ArrowUpRight} label="Video Tutorials" />
       </SidebarSection>

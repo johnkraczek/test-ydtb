@@ -114,7 +114,7 @@ export default function LaunchpadPage() {
               <div className="flex justify-between text-sm font-medium">
                 <span>{Math.round(progress)}% Complete</span>
               </div>
-              <Progress value={progress} className="h-3 bg-indigo-900/30" indicatorClassName="bg-white" />
+              <Progress value={progress} className="h-3 bg-indigo-900/30 [&>div]:bg-white" />
             </div>
           </div>
           
