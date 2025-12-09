@@ -26,7 +26,8 @@ import {
   CheckCircle2,
   Circle,
   Palette,
-  Bot
+  Bot,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { useMedia, FileSystemItem } from "@/context/media-context";
 import { Card } from "@/components/ui/card";
 import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
+import { Progress } from "@/components/ui/progress";
 
 import {
   ContextMenu,
@@ -121,12 +123,30 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                     />
                 </div>
             )}
-            <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
-                <Plus className="h-4 w-4" />
-                <span className="font-medium">
-                  {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
-                </span>
-            </Button>
+            
+            {toolId === "launchpad" ? (
+                <div className="space-y-3">
+                   <div className="space-y-1">
+                      <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
+                        <span>Setup Progress</span>
+                        <span>50%</span>
+                      </div>
+                      <Progress value={50} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                   </div>
+                   <Button className="w-full justify-between bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+                      <span className="font-medium">Next Step</span>
+                      <ArrowRight className="h-4 w-4" />
+                   </Button>
+                </div>
+            ) : (
+                <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
+                    <Plus className="h-4 w-4" />
+                    <span className="font-medium">
+                    {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
+                    </span>
+                </Button>
+            )}
+
             {toolId === "media" && (
               <Card className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-none shadow-lg mt-4">
                   <div className="flex items-center justify-between mb-2">
@@ -303,14 +323,6 @@ function LaunchpadSidebarContent() {
         <SidebarItem icon={MessageSquare} label="Community Support" />
         <SidebarItem icon={ArrowUpRight} label="Video Tutorials" />
       </SidebarSection>
-
-      <div className="px-2 mt-8">
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30">
-           <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 text-sm mb-1">Need help?</h4>
-           <p className="text-xs text-indigo-700 dark:text-indigo-300 mb-3">Our support team is ready to assist you with setup.</p>
-           <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-7 text-xs">Contact Support</Button>
-        </div>
-      </div>
     </div>
   );
 }
