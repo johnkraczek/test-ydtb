@@ -204,50 +204,6 @@ export function CustomizeNavigationDialog({
                 </SortableContext>
               </DndContext>
             </div>
-            
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30">
-              <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Appearance</h4>
-              <div className="flex gap-4">
-                <div className="flex flex-col gap-2 cursor-pointer group">
-                  <div className="w-24 h-16 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg flex overflow-hidden group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors">
-                    <div className="w-6 bg-slate-100 dark:bg-slate-800 h-full flex flex-col items-center gap-1.5 py-2 border-r border-slate-100 dark:border-slate-700">
-                       <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                       <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                       <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                    </div>
-                    <div className="flex-1 p-2">
-                       <div className="w-10 h-1.5 bg-slate-200 dark:bg-slate-700 rounded mb-1.5" />
-                       <div className="w-12 h-1.5 bg-slate-100 dark:bg-slate-800 rounded" />
-                    </div>
-                  </div>
-                  <span className="text-xs text-center text-slate-500">Icons only</span>
-                </div>
-
-                <div className="flex flex-col gap-2 cursor-pointer">
-                  <div className="w-24 h-16 bg-white dark:bg-slate-800 border-2 border-blue-600 rounded-lg flex overflow-hidden">
-                    <div className="w-10 bg-slate-100 dark:bg-slate-800 h-full flex flex-col gap-1.5 py-2 px-1 border-r border-slate-100 dark:border-slate-700">
-                       <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                          <div className="w-4 h-1 bg-slate-300 dark:bg-slate-600 rounded-[1px]" />
-                       </div>
-                       <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                          <div className="w-4 h-1 bg-slate-300 dark:bg-slate-600 rounded-[1px]" />
-                       </div>
-                       <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-sm" />
-                          <div className="w-4 h-1 bg-slate-300 dark:bg-slate-600 rounded-[1px]" />
-                       </div>
-                    </div>
-                    <div className="flex-1 p-2">
-                       <div className="w-8 h-1.5 bg-slate-200 dark:bg-slate-700 rounded mb-1.5" />
-                       <div className="w-10 h-1.5 bg-slate-100 dark:bg-slate-800 rounded" />
-                    </div>
-                  </div>
-                  <span className="text-xs text-center font-medium text-slate-900 dark:text-slate-100">Icons & Labels</span>
-                </div>
-              </div>
-            </div>
           </TabsContent>
 
           <TabsContent value="themes" className="p-4 m-0 h-[400px]">
