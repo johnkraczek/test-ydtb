@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Instagram,
   Facebook,
-  Mail
+  Mail,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -53,6 +54,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <MessagesSidebarContent />;
       case "media":
         return <MediaSidebarContent />;
+      case "automation":
+        return <AutomationSidebarContent />;
       case "settings":
         return <SettingsSidebarContent />;
       default:
@@ -332,6 +335,29 @@ function ContactsSidebarContent() {
         <SidebarItem icon={Folder} label="Customers" />
         <SidebarItem icon={Folder} label="Partners" />
         <SidebarItem icon={Folder} label="Vendors" />
+      </SidebarSection>
+    </div>
+  );
+}
+
+function AutomationSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Workflows">
+        <SidebarItem icon={Zap} label="All Automations" active />
+        <SidebarItem icon={Clock} label="Scheduled" />
+        <SidebarItem icon={Star} label="Favorites" />
+      </SidebarSection>
+      
+      <SidebarSection title="Active">
+        <SidebarItem icon={Zap} label="New User Onboarding" />
+        <SidebarItem icon={Zap} label="Order Processing" />
+        <SidebarItem icon={Zap} label="Lead Enrichment" />
+      </SidebarSection>
+
+      <SidebarSection title="Drafts">
+        <SidebarItem icon={FileText} label="Support Routing" />
+        <SidebarItem icon={FileText} label="Daily Summary" />
       </SidebarSection>
     </div>
   );
