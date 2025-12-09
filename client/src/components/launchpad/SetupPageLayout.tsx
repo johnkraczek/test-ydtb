@@ -37,53 +37,64 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         </div>
       }
     >
-      <div className="max-w-4xl mx-auto space-y-8 pb-12">
-        {/* Video Section */}
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-xl bg-slate-900 group cursor-pointer">
-          <img 
-            src={videoThumbnail} 
-            alt="Setup Guide Video" 
-            className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-20 w-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-lg pl-1">
-                <Play className="h-6 w-6 text-indigo-600 fill-indigo-600" />
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-             <h3 className="text-white font-semibold text-lg">{title} Walkthrough</h3>
-             <p className="text-white/80 text-sm">Learn how to configure this feature in 2 minutes</p>
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Main Content (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+             {/* Video Section */}
+             <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 group cursor-pointer ring-1 ring-slate-900/5">
+               <img 
+                 src={videoThumbnail} 
+                 alt="Setup Guide Video" 
+                 className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
+               />
+               <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                   <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-lg pl-1">
+                     <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+                   </div>
+                 </div>
+               </div>
+               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                  <h3 className="text-white font-semibold text-lg">{title} Walkthrough</h3>
+                  <p className="text-white/80 text-sm">Learn how to configure this feature in 2 minutes</p>
+               </div>
+             </div>
 
-        {/* Configuration Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-6">
-             <Card>
+             {/* Configuration Form */}
+             <Card className="border-slate-200 shadow-sm">
                 <CardContent className="p-6">
                    {children}
                 </CardContent>
              </Card>
           </div>
 
-          <div className="space-y-6">
-             <Card className="bg-slate-50 border-slate-200">
+          {/* Instructions / Sidebar (1/3) */}
+          <div className="space-y-6 sticky top-6">
+             <Card className="bg-slate-50 border-slate-200 shadow-sm">
                 <CardContent className="p-6 space-y-4">
                    <h3 className="font-semibold text-slate-900">Next Steps</h3>
-                   <div className="space-y-3">
+                   <div className="space-y-4">
                       <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">1</div>
-                         <p className="text-sm text-slate-600">Watch the tutorial video above</p>
+                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-white">1</div>
+                         <div>
+                            <p className="text-sm font-medium text-slate-900">Watch Tutorial</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Review the video guide to understand the requirements.</p>
+                         </div>
                       </div>
                       <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">2</div>
-                         <p className="text-sm text-slate-600">Enter your configuration details</p>
+                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-white">2</div>
+                         <div>
+                            <p className="text-sm font-medium text-slate-900">Configure Settings</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Fill out the form on the left with your provider details.</p>
+                         </div>
                       </div>
                       <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">3</div>
-                         <p className="text-sm text-slate-600">Verify the connection</p>
+                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-white">3</div>
+                         <div>
+                            <p className="text-sm font-medium text-slate-900">Verify Connection</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Test the integration to ensure everything is working.</p>
+                         </div>
                       </div>
                    </div>
                    
@@ -102,6 +113,14 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
                        )}
                      </Button>
                    )}
+                </CardContent>
+             </Card>
+
+             <Card className="border-slate-200 shadow-sm">
+                <CardContent className="p-5">
+                    <h4 className="font-medium text-sm text-slate-900 mb-2">Need Assistance?</h4>
+                    <p className="text-xs text-slate-500 mb-3">Our support team is available 24/7 to help you with integrations.</p>
+                    <Button variant="outline" size="sm" className="w-full text-xs">Contact Support</Button>
                 </CardContent>
              </Card>
           </div>
