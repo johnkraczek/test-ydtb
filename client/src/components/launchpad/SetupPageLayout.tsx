@@ -1,10 +1,12 @@
-import { ArrowLeft, Play, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import videoThumbnail from '@assets/generated_images/video_thumbnail_for_setup_guide.png';
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SetupPageLayoutProps {
   title: string;
@@ -16,6 +18,7 @@ interface SetupPageLayoutProps {
 
 export function SetupPageLayout({ title, description, children, onComplete, isCompleted }: SetupPageLayoutProps) {
   const [, setLocation] = useLocation();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   return (
     <DashboardLayout
@@ -37,74 +40,125 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         </div>
       }
     >
-      <div className="max-w-4xl mx-auto space-y-8 pb-12">
-        {/* Video Section */}
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-xl bg-slate-900 group cursor-pointer">
-          <img 
-            src={videoThumbnail} 
-            alt="Setup Guide Video" 
-            className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-20 w-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-lg pl-1">
-                <Play className="h-6 w-6 text-indigo-600 fill-indigo-600" />
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-             <h3 className="text-white font-semibold text-lg">{title} Walkthrough</h3>
-             <p className="text-white/80 text-sm">Learn how to configure this feature in 2 minutes</p>
-          </div>
+      <div className="flex h-[calc(100vh-200px)] gap-6 relative overflow-hidden">
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto pr-2 pb-12">
+           <Card>
+              <CardContent className="p-6">
+                 {children}
+              </CardContent>
+           </Card>
+
+           {/* Completion Action (Main Area) */}
+           {onComplete && (
+             <div className="mt-6 flex justify-end">
+                <Button 
+                  size="lg"
+                  className={isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'}
+                  onClick={onComplete}
+                >
+                  {isCompleted ? (
+                    <>
+                      <CheckCircle2 className="mr-2 h-5 w-5" />
+                      Setup Complete
+                    </>
+                  ) : (
+                    "Mark as Complete"
+                  )}
+                </Button>
+             </div>
+           )}
         </div>
 
-        {/* Configuration Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-6">
-             <Card>
-                <CardContent className="p-6">
-                   {children}
-                </CardContent>
-             </Card>
-          </div>
+        {/* Right Help Panel */}
+        <div 
+            className={cn(
+                "fixed top-24 right-0 bottom-6 bg-slate-50 border-l border-slate-200 shadow-xl transition-all duration-500 ease-in-out z-20 flex flex-col",
+                isHelpOpen ? "w-[400px] translate-x-0" : "w-[400px] translate-x-[360px] cursor-pointer hover:bg-slate-100"
+            )}
+            onClick={() => !isHelpOpen && setIsHelpOpen(true)}
+        >
+            {/* Toggle Handle */}
+            <div 
+                className="absolute top-1/2 -left-3 -mt-6 bg-white border border-slate-200 shadow-md rounded-full p-1 cursor-pointer hover:bg-slate-50 z-30"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setIsHelpOpen(!isHelpOpen);
+                }}
+            >
+                {isHelpOpen ? <ChevronRight className="h-4 w-4 text-slate-600" /> : <ChevronLeft className="h-4 w-4 text-slate-600" />}
+            </div>
 
-          <div className="space-y-6">
-             <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-6 space-y-4">
-                   <h3 className="font-semibold text-slate-900">Next Steps</h3>
-                   <div className="space-y-3">
-                      <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">1</div>
-                         <p className="text-sm text-slate-600">Watch the tutorial video above</p>
+            {/* Collapsed State Indicator (Peek) */}
+            <div className={cn(
+                "absolute left-0 top-0 bottom-0 w-10 flex flex-col items-center pt-8 transition-opacity duration-300",
+                isHelpOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}>
+                 <div className="rotate-90 origin-center whitespace-nowrap font-medium text-slate-500 text-sm tracking-wide flex items-center gap-2 mt-12">
+                    <HelpCircle className="h-4 w-4" />
+                    Video Guide & Instructions
+                 </div>
+            </div>
+
+            {/* Expanded Content */}
+            <div className={cn(
+                "flex-1 overflow-y-auto p-6 space-y-6 transition-opacity duration-300",
+                isHelpOpen ? "opacity-100" : "opacity-20 pointer-events-none"
+            )}>
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg text-slate-900">Setup Guide</h3>
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setIsHelpOpen(false); }}>Close</Button>
+                </div>
+
+                {/* Video */}
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-lg bg-slate-900 group cursor-pointer">
+                  <img 
+                    src={videoThumbnail} 
+                    alt="Setup Guide Video" 
+                    className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-14 w-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-lg pl-0.5">
+                        <Play className="h-4 w-4 text-indigo-600 fill-indigo-600" />
                       </div>
-                      <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">2</div>
-                         <p className="text-sm text-slate-600">Enter your configuration details</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Steps */}
+                <div className="space-y-4">
+                   <h4 className="font-medium text-slate-900">Step-by-Step Instructions</h4>
+                   <div className="space-y-4 relative">
+                      {/* Connector Line */}
+                      <div className="absolute left-3 top-2 bottom-4 w-0.5 bg-slate-200"></div>
+
+                      <div className="flex gap-4 relative">
+                         <div className="h-6 w-6 rounded-full bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-slate-50 z-10">1</div>
+                         <div className="pt-0.5">
+                            <p className="font-medium text-sm text-slate-900">Watch the tutorial</p>
+                            <p className="text-sm text-slate-500 mt-1">Review the video guide above to understand the requirements.</p>
+                         </div>
                       </div>
-                      <div className="flex gap-3">
-                         <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">3</div>
-                         <p className="text-sm text-slate-600">Verify the connection</p>
+                      
+                      <div className="flex gap-4 relative">
+                         <div className="h-6 w-6 rounded-full bg-white border-2 border-slate-300 text-slate-500 flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-slate-50 z-10">2</div>
+                         <div className="pt-0.5">
+                            <p className="font-medium text-sm text-slate-900">Configure settings</p>
+                            <p className="text-sm text-slate-500 mt-1">Enter your API keys or credentials in the form on the left.</p>
+                         </div>
+                      </div>
+
+                      <div className="flex gap-4 relative">
+                         <div className="h-6 w-6 rounded-full bg-white border-2 border-slate-300 text-slate-500 flex items-center justify-center flex-shrink-0 text-xs font-bold ring-4 ring-slate-50 z-10">3</div>
+                         <div className="pt-0.5">
+                            <p className="font-medium text-sm text-slate-900">Verify connection</p>
+                            <p className="text-sm text-slate-500 mt-1">Click the connect button to test your integration.</p>
+                         </div>
                       </div>
                    </div>
-                   
-                   {onComplete && (
-                     <Button 
-                       className={`w-full mt-4 ${isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}
-                       onClick={onComplete}
-                     >
-                       {isCompleted ? (
-                         <>
-                           <CheckCircle2 className="mr-2 h-4 w-4" />
-                           Setup Complete
-                         </>
-                       ) : (
-                         "Mark as Complete"
-                       )}
-                     </Button>
-                   )}
-                </CardContent>
-             </Card>
-          </div>
+                </div>
+            </div>
         </div>
       </div>
     </DashboardLayout>
