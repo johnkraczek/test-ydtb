@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useLocation } from "wouter";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,7 @@ export default function PagesPage() {
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
 
   const handleRowClick = (page: Page) => {
     setSelectedPage(page);
@@ -186,8 +188,11 @@ export default function PagesPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setLocation(`/pages/${page.id}/edit`)}>
+                           <LayoutTemplate className="mr-2 h-4 w-4" /> Edit Page
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleRowClick(page)}>
-                          Edit Details
+                          <FileText className="mr-2 h-4 w-4" /> Edit Details
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Eye className="mr-2 h-4 w-4" /> Preview

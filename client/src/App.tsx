@@ -11,6 +11,7 @@ import MediaPage from "@/pages/media";
 import MessagesPage from "@/pages/messages";
 import AutomationPage from "@/pages/automation";
 import PagesPage from "@/pages/pages";
+import PageEditor from "@/pages/page-editor";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/messages" component={MessagesPage} />
       <Route path="/automation" component={AutomationPage} />
       <Route path="/pages" component={PagesPage} />
+      <Route path="/pages/:id/edit" component={PageEditor} />
       <Route component={NotFound} />
     </Switch>
   );
