@@ -41,6 +41,16 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Main Content (2/3) */}
           <div className="lg:col-span-2 space-y-6">
+             {/* Configuration Form */}
+             <Card className="border-slate-200 shadow-sm">
+                <CardContent className="p-6">
+                   {children}
+                </CardContent>
+             </Card>
+          </div>
+
+          {/* Instructions / Sidebar (1/3) */}
+          <div className="space-y-6 sticky top-6">
              {/* Video Section */}
              <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 group cursor-pointer ring-1 ring-slate-900/5">
                <img 
@@ -61,16 +71,6 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
                </div>
              </div>
 
-             {/* Configuration Form */}
-             <Card className="border-slate-200 shadow-sm">
-                <CardContent className="p-6">
-                   {children}
-                </CardContent>
-             </Card>
-          </div>
-
-          {/* Instructions / Sidebar (1/3) */}
-          <div className="space-y-6 sticky top-6">
              <Card className="bg-slate-50 border-slate-200 shadow-sm">
                 <CardContent className="p-6 space-y-4">
                    <h3 className="font-semibold text-slate-900">Next Steps</h3>
