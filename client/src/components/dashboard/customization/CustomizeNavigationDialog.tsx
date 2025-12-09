@@ -167,22 +167,16 @@ export function CustomizeNavigationDialog({
                 Navigation
               </TabsTrigger>
               <TabsTrigger 
-                value="home" 
-                className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
-              >
-                Home
-              </TabsTrigger>
-              <TabsTrigger 
-                value="sections" 
-                className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
-              >
-                Sections
-              </TabsTrigger>
-              <TabsTrigger 
                 value="themes" 
                 className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
               >
                 Themes
+              </TabsTrigger>
+              <TabsTrigger 
+                value="general" 
+                className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
+              >
+                General
               </TabsTrigger>
             </TabsList>
           </div>
@@ -253,18 +247,6 @@ export function CustomizeNavigationDialog({
                   <span className="text-xs text-center font-medium text-slate-900 dark:text-slate-100">Icons & Labels</span>
                 </div>
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="home" className="p-4 m-0 h-[400px]">
-            <div className="text-center text-slate-400 mt-20">
-              Home customization options
-            </div>
-          </TabsContent>
-
-          <TabsContent value="sections" className="p-4 m-0 h-[400px]">
-             <div className="text-center text-slate-400 mt-20">
-              Section customization options
             </div>
           </TabsContent>
 
@@ -355,6 +337,12 @@ export function CustomizeNavigationDialog({
                   ))}
                 </div>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="general" className="p-4 m-0 h-[400px]">
+            <div className="text-center text-slate-400 mt-20">
+              General settings coming soon.
             </div>
           </TabsContent>
         </Tabs>
