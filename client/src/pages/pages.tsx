@@ -36,7 +36,8 @@ import {
   Filter,
   Plus,
   Calendar,
-  BarChart3
+  BarChart3,
+  FileDown
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -138,16 +139,22 @@ export default function PagesPage() {
                   onClick={() => handleRowClick(page)}
                 >
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                    <div 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/pages/${page.id}/edit`);
+                      }}
+                    >
+                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
                         page.status === 'published' 
-                          ? 'bg-indigo-50 text-indigo-600' 
-                          : 'bg-slate-100 text-slate-500'
+                          ? 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100' 
+                          : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
                       }`}>
                         <LayoutTemplate className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-medium text-slate-900 dark:text-slate-100">{page.title}</span>
+                        <span className="font-medium text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">{page.title}</span>
                       </div>
                     </div>
                   </TableCell>
@@ -197,6 +204,15 @@ export default function PagesPage() {
                         <DropdownMenuItem>
                           <Eye className="mr-2 h-4 w-4" /> Preview
                         </DropdownMenuItem>
+                        {page.status === "draft" ? (
+                          <DropdownMenuItem className="text-green-600">
+                            <CheckCircle2 className="mr-2 h-4 w-4" /> Publish
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem className="text-amber-600">
+                            <FileDown className="mr-2 h-4 w-4" /> Revert to Draft
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem className="text-red-600">
                           Delete
                         </DropdownMenuItem>
