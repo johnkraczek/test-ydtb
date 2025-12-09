@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import {
   BarChart3,
   ChevronsRight,
@@ -10,7 +11,10 @@ import {
   Zap,
   Layers,
   MessageSquare,
-  Image
+  Image,
+  GripHorizontal,
+  MoreHorizontal,
+  Grid3X3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,52 +23,50 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
 
-const mainTools = [
+const INITIAL_TOOLS: ToolItem[] = [
   {
     id: "home",
     icon: Home,
     label: "Dashboard",
-    active: true,
+    visible: true,
   },
   {
     id: "users",
     icon: Users,
     label: "Contacts",
-    active: false,
+    visible: true,
   },
   {
     id: "media",
     icon: Image,
     label: "Media Storage",
-    active: false,
+    visible: true,
   },
   {
     id: "automation",
     icon: Zap,
     label: "Automation",
-    active: false,
+    visible: true,
   },
   {
     id: "messages",
     icon: MessageSquare,
     label: "Messages",
-    active: false,
+    visible: true,
   },
-];
-
-const bottomTools = [
   {
     id: "layers",
     icon: Layers,
     label: "Integrations",
-    active: false,
+    visible: false,
   },
   {
     id: "settings",
     icon: Settings,
     label: "Settings",
-    active: false,
+    visible: false,
   },
 ];
 
@@ -81,6 +83,12 @@ export function ToolIconsSidebar({
   isToolSidebarOpen = true,
   onToggleSidebar,
 }: ToolIconsSidebarProps) {
+  const [tools, setTools] = useState<ToolItem[]>(INITIAL_TOOLS);
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+
+  // Filter visible tools for display
+  const visibleTools = tools.filter(tool => tool.visible);
+
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full py-2 pl-2">
@@ -106,8 +114,8 @@ export function ToolIconsSidebar({
             </div>
           )}
 
-          {/* Main Tools */}
-          {mainTools.map((tool) => {
+          {/* Dynamic Tools */}
+          {visibleTools.map((tool) => {
             const Icon = tool.icon;
             const isActive = tool.id === activeTool;
 
@@ -138,32 +146,32 @@ export function ToolIconsSidebar({
           
           <div className="w-6 h-px bg-slate-200 mx-auto mb-2" />
 
-          {/* Bottom Tools */}
-          {bottomTools.map((tool) => {
-            const Icon = tool.icon;
-            const isActive = tool.id === activeTool;
+          {/* More/Customize Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
+                  isCustomizeOpen
+                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                }`}
+                onClick={() => setIsCustomizeOpen(true)}
+                variant="ghost"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-slate-900 text-white border-0 font-medium ml-2">
+              <p>More</p>
+            </TooltipContent>
+          </Tooltip>
 
-            return (
-              <Tooltip key={tool.id}>
-                <TooltipTrigger asChild>
-                  <Button
-                    className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
-                      isActive 
-                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
-                        : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
-                    }`}
-                    onClick={() => onToolSelect?.(tool.id)}
-                    variant="ghost"
-                  >
-                    <Icon className="h-4 w-4" strokeWidth={isActive ? 2.5 : 2} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-slate-900 text-white border-0 font-medium ml-2">
-                  <p>{tool.label}</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
+          <CustomizeNavigationDialog 
+            open={isCustomizeOpen} 
+            onOpenChange={setIsCustomizeOpen}
+            tools={tools}
+            onToolsChange={setTools}
+          />
         </div>
       </div>
     </TooltipProvider>
