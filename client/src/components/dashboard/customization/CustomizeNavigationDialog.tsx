@@ -155,9 +155,6 @@ export function CustomizeNavigationDialog({
             <DialogTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Customize</DialogTitle>
             <p className="text-xs text-slate-500 mt-0.5">Personalize and organize your interface</p>
           </div>
-          <DialogClose className="h-6 w-6 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400">
-            <X className="h-4 w-4" />
-          </DialogClose>
         </div>
 
         <Tabs defaultValue="navigation" className="w-full">
