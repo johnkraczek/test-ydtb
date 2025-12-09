@@ -93,7 +93,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
               </div>
               
               {/* Footer */}
-              {activeTool !== "messages" && <DashboardFooter />}
+              <DashboardFooter />
             </div>
         </div>
       </div>
