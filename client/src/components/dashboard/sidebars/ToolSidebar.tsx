@@ -125,18 +125,20 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
             )}
             
             {toolId === "launchpad" ? (
-                <div className="space-y-3">
-                   <div className="space-y-1">
-                      <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                        <span>Setup Progress</span>
-                        <span>50%</span>
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30">
+                   <div className="space-y-3">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs font-medium text-indigo-900 dark:text-indigo-100">
+                          <span>Setup Progress</span>
+                          <span>50%</span>
+                        </div>
+                        <Progress value={50} className="h-2 bg-indigo-200 dark:bg-indigo-900/50 [&>div]:bg-indigo-600" />
                       </div>
-                      <Progress value={50} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                      <Button className="w-full justify-between bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm h-9">
+                        <span className="font-medium text-xs">Next Step</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
                    </div>
-                   <Button className="w-full justify-between bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-                      <span className="font-medium">Next Step</span>
-                      <ArrowRight className="h-4 w-4" />
-                   </Button>
                 </div>
             ) : (
                 <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
