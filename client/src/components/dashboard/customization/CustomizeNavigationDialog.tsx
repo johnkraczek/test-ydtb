@@ -35,6 +35,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTheme } from "next-themes";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { cn } from "@/lib/utils";
 
 export interface ToolItem {
   id: string;
@@ -97,6 +99,21 @@ function SortableToolItem({ tool, onToggle }: { tool: ToolItem; onToggle: (id: s
   );
 }
 
+const availableThemeColors = [
+  { name: "Zinc", value: "zinc", color: "bg-zinc-950" },
+  { name: "Slate", value: "slate", color: "bg-slate-500" },
+  { name: "Stone", value: "stone", color: "bg-stone-500" },
+  { name: "Gray", value: "gray", color: "bg-gray-500" },
+  { name: "Neutral", value: "neutral", color: "bg-neutral-500" },
+  { name: "Red", value: "red", color: "bg-red-500" },
+  { name: "Rose", value: "rose", color: "bg-rose-500" },
+  { name: "Orange", value: "orange", color: "bg-orange-500" },
+  { name: "Green", value: "green", color: "bg-green-500" },
+  { name: "Blue", value: "blue", color: "bg-blue-500" },
+  { name: "Yellow", value: "yellow", color: "bg-yellow-500" },
+  { name: "Violet", value: "violet", color: "bg-violet-500" },
+] as const;
+
 export function CustomizeNavigationDialog({
   open,
   onOpenChange,
@@ -104,6 +121,7 @@ export function CustomizeNavigationDialog({
   onToolsChange,
 }: CustomizeNavigationDialogProps) {
   const { theme, setTheme } = useTheme();
+  const { themeColor, setThemeColor } = useThemeColor();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -322,26 +340,21 @@ export function CustomizeNavigationDialog({
               <div>
                 <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Theme Color</h4>
                 <div className="grid grid-cols-3 gap-2">
-                  {['Black', 'Purple', 'Blue', 'Pink', 'Violet', 'Indigo', 'Orange', 'Teal', 'Bronze', 'Mint'].map((color) => (
-                    <div 
-                      key={color} 
-                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 ${color === 'Indigo' ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-slate-200 dark:border-slate-800'}`}
+                  {availableThemeColors.map((color) => (
+                    <button 
+                      key={color.value}
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-lg border bg-white dark:bg-slate-900 text-left transition-all",
+                        themeColor === color.value 
+                          ? "border-primary ring-1 ring-primary" 
+                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      )}
+                      onClick={() => setThemeColor(color.value)}
                     >
-                      <div className={`w-4 h-4 rounded-sm ${
-                        color === 'Black' ? 'bg-slate-900' :
-                        color === 'Purple' ? 'bg-purple-500' :
-                        color === 'Blue' ? 'bg-blue-500' :
-                        color === 'Pink' ? 'bg-pink-500' :
-                        color === 'Violet' ? 'bg-violet-500' :
-                        color === 'Indigo' ? 'bg-indigo-500' :
-                        color === 'Orange' ? 'bg-orange-500' :
-                        color === 'Teal' ? 'bg-teal-500' :
-                        color === 'Bronze' ? 'bg-amber-700' :
-                        'bg-emerald-500'
-                      }`} />
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{color}</span>
-                      {color === 'Indigo' && <Check className="h-3 w-3 text-blue-600 ml-auto" />}
-                    </div>
+                      <div className={`h-6 w-6 rounded-full ${color.color}`} />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{color.name}</span>
+                      {themeColor === color.value && <Check className="ml-auto h-4 w-4 text-primary" />}
+                    </button>
                   ))}
                 </div>
               </div>
