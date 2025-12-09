@@ -5,6 +5,12 @@ import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import videoThumbnail from '@assets/generated_images/video_thumbnail_for_setup_guide.png';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface SetupPageLayoutProps {
   title: string;
@@ -69,24 +75,48 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
           {/* Instructions / Sidebar (1/3) */}
           <div className="space-y-6 sticky top-6">
              {/* Video Section */}
-             <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 group cursor-pointer ring-1 ring-slate-900/5">
-               <img 
-                 src={videoThumbnail} 
-                 alt="Setup Guide Video" 
-                 className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
-               />
-               <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                   <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-lg pl-1">
-                     <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+             <Dialog>
+               <DialogTrigger asChild>
+                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 group cursor-pointer ring-1 ring-slate-900/5 transition-transform hover:scale-[1.02] duration-300">
+                   <img 
+                     src={videoThumbnail} 
+                     alt="Setup Guide Video" 
+                     className="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
+                   />
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                       <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-lg pl-1">
+                         <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+                       </div>
+                     </div>
+                   </div>
+                   <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                      <h3 className="text-white font-semibold text-lg">{title} Walkthrough</h3>
+                      <p className="text-white/80 text-sm">Learn how to configure this feature in 2 minutes</p>
                    </div>
                  </div>
-               </div>
-               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-                  <h3 className="text-white font-semibold text-lg">{title} Walkthrough</h3>
-                  <p className="text-white/80 text-sm">Learn how to configure this feature in 2 minutes</p>
-               </div>
-             </div>
+               </DialogTrigger>
+               <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black border-none">
+                 <DialogTitle className="sr-only">{title} Video Walkthrough</DialogTitle>
+                 <div className="aspect-video w-full bg-slate-900 relative flex items-center justify-center">
+                   {/* In a real app, this would be a video player like ReactPlayer */}
+                   <img 
+                     src={videoThumbnail} 
+                     alt="Video Player Placeholder" 
+                     className="w-full h-full object-contain opacity-50"
+                   />
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="h-20 w-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center">
+                       <Play className="h-8 w-8 text-white fill-white ml-1" />
+                     </div>
+                   </div>
+                   <div className="absolute bottom-8 left-8 right-8 text-white">
+                      <h2 className="text-2xl font-bold mb-2">{title} Walkthrough</h2>
+                      <p className="text-white/80">Full screen video player would load here</p>
+                   </div>
+                 </div>
+               </DialogContent>
+             </Dialog>
 
              <Card className="bg-slate-50 border-slate-200 shadow-sm">
                 <CardContent className="p-6 space-y-4">
