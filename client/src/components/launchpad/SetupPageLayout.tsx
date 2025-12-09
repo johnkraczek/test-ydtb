@@ -73,37 +73,40 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         {/* Right Help Panel */}
         <div 
             className={cn(
-                "fixed top-24 right-0 bottom-6 bg-slate-50 border-l border-slate-200 shadow-xl transition-all duration-500 ease-in-out z-20 flex flex-col",
-                isHelpOpen ? "w-[400px] translate-x-0" : "w-[400px] translate-x-[360px] cursor-pointer hover:bg-slate-100"
+                "fixed top-24 right-0 bottom-24 border-l border-slate-200 shadow-xl transition-all duration-300 ease-in-out z-20 flex flex-col rounded-l-2xl",
+                isHelpOpen ? "w-[400px] translate-x-0 bg-slate-50" : "w-[400px] translate-x-[360px] cursor-pointer hover:bg-indigo-700 bg-indigo-600 border-none"
             )}
             onClick={() => !isHelpOpen && setIsHelpOpen(true)}
         >
             {/* Toggle Handle */}
             <div 
-                className="absolute top-1/2 -left-3 -mt-6 bg-white border border-slate-200 shadow-md rounded-full p-1 cursor-pointer hover:bg-slate-50 z-30"
+                className={cn(
+                    "absolute top-1/2 -left-3 -mt-6 border shadow-md rounded-full p-1 cursor-pointer z-30 transition-colors",
+                    isHelpOpen ? "bg-white border-slate-200 hover:bg-slate-50" : "bg-white border-indigo-500 text-indigo-600"
+                )}
                 onClick={(e) => {
                     e.stopPropagation();
                     setIsHelpOpen(!isHelpOpen);
                 }}
             >
-                {isHelpOpen ? <ChevronRight className="h-4 w-4 text-slate-600" /> : <ChevronLeft className="h-4 w-4 text-slate-600" />}
+                {isHelpOpen ? <ChevronRight className="h-4 w-4 text-slate-600" /> : <ChevronLeft className="h-4 w-4 text-indigo-600" />}
             </div>
 
             {/* Collapsed State Indicator (Peek) */}
             <div className={cn(
-                "absolute left-0 top-0 bottom-0 w-10 flex flex-col items-center pt-8 transition-opacity duration-300",
+                "absolute left-0 top-0 bottom-0 w-10 flex flex-col items-center pt-8 transition-opacity duration-200",
                 isHelpOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                 <div className="rotate-90 origin-center whitespace-nowrap font-medium text-slate-500 text-sm tracking-wide flex items-center gap-2 mt-12">
-                    <HelpCircle className="h-4 w-4" />
+                 <div className="rotate-90 origin-center whitespace-nowrap font-medium text-white text-sm tracking-wide flex items-center gap-2 mt-12">
+                    <HelpCircle className="h-4 w-4 text-white/80" />
                     Video Guide & Instructions
                  </div>
             </div>
 
             {/* Expanded Content */}
             <div className={cn(
-                "flex-1 overflow-y-auto p-6 space-y-6 transition-opacity duration-300",
-                isHelpOpen ? "opacity-100" : "opacity-20 pointer-events-none"
+                "flex-1 overflow-y-auto p-6 space-y-6 transition-all duration-200",
+                isHelpOpen ? "opacity-100 visible" : "opacity-0 invisible"
             )}>
                 <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-lg text-slate-900">Setup Guide</h3>
