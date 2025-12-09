@@ -347,7 +347,7 @@ function PagesSidebarContent() {
   return (
     <div className="space-y-1">
       <SidebarSection title="Site Structure">
-        <SidebarItem icon={LayoutTemplate} label="All Pages" active />
+        <SidebarItem icon={File} label="All Pages" active />
         <SidebarItem icon={Star} label="Favorites" />
         <SidebarItem icon={Clock} label="Recent" />
       </SidebarSection>

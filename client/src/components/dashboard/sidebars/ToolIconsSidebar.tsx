@@ -10,7 +10,8 @@ import {
   MessageSquare,
   Image,
   Grid3X3,
-  LayoutTemplate
+  LayoutTemplate,
+  File
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +54,7 @@ const INITIAL_TOOLS: ToolItem[] = [
   },
   {
     id: "pages",
-    icon: LayoutTemplate,
+    icon: File,
     label: "Pages",
     visible: true,
   },
