@@ -1,10 +1,24 @@
-import { ArrowLeft, Play, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle2, HelpCircle, MessageSquare, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import videoThumbnail from '@assets/generated_images/video_thumbnail_for_setup_guide.png';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SetupPageLayoutProps {
   title: string;
@@ -33,6 +47,41 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
           <DashboardPageHeader
             title={title}
             description={description}
+            actions={
+              <TooltipProvider>
+                <DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon" className="h-9 w-9 rounded-full bg-white">
+                          <HelpCircle className="h-5 w-5 text-slate-500" />
+                          <span className="sr-only">Need assistance?</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Need assistance?</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>Contact Support</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      <span>Live Chat</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Mail className="mr-2 h-4 w-4" />
+                      <span>Email Support</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Phone className="mr-2 h-4 w-4" />
+                      <span>Schedule Call</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TooltipProvider>
+            }
           />
         </div>
       }
@@ -113,14 +162,6 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
                        )}
                      </Button>
                    )}
-                </CardContent>
-             </Card>
-
-             <Card className="border-slate-200 shadow-sm">
-                <CardContent className="p-5">
-                    <h4 className="font-medium text-sm text-slate-900 mb-2">Need Assistance?</h4>
-                    <p className="text-xs text-slate-500 mb-3">Our support team is available 24/7 to help you with integrations.</p>
-                    <Button variant="outline" size="sm" className="w-full text-xs">Contact Support</Button>
                 </CardContent>
              </Card>
           </div>
