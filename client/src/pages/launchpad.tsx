@@ -166,15 +166,23 @@ export default function LaunchpadPage() {
                   {/* Specific controls for Color Picker */}
                   {task.type === "color-picker" && !task.completed && (
                     <div className="flex gap-2 mt-3 pt-2">
-                      {['zinc', 'red', 'rose', 'orange', 'green', 'blue', 'yellow', 'violet'].map((color) => (
+                      {[
+                        { name: 'zinc', class: 'bg-zinc-900' },
+                        { name: 'red', class: 'bg-red-600' },
+                        { name: 'rose', class: 'bg-rose-600' },
+                        { name: 'orange', class: 'bg-orange-500' },
+                        { name: 'green', class: 'bg-green-600' },
+                        { name: 'blue', class: 'bg-blue-600' },
+                        { name: 'yellow', class: 'bg-yellow-500' },
+                        { name: 'violet', class: 'bg-violet-600' }
+                      ].map((color) => (
                         <button
-                          key={color}
-                          onClick={() => setThemeColor(color as any)}
-                          className={`h-6 w-6 rounded-full border border-slate-200 transition-transform hover:scale-110 ${
-                            themeColor === color ? 'ring-2 ring-offset-2 ring-slate-400 scale-110' : ''
+                          key={color.name}
+                          onClick={() => setThemeColor(color.name as any)}
+                          className={`h-6 w-6 rounded-full border border-slate-200 transition-transform hover:scale-110 ${color.class} ${
+                            themeColor === color.name ? 'ring-2 ring-offset-2 ring-slate-400 scale-110' : ''
                           }`}
-                          style={{ backgroundColor: `var(--theme-${color})` }}
-                          title={color}
+                          title={color.name}
                         />
                       ))}
                     </div>
