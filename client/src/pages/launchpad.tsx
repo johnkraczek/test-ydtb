@@ -107,17 +107,17 @@ export default function LaunchpadPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Progress Section */}
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-8 text-primary-foreground shadow-lg relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-indigo-100 font-medium text-sm uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-primary-foreground/80 font-medium text-sm uppercase tracking-wider">
                 <Rocket className="h-4 w-4" />
                 Setup Progress
               </div>
               <h2 className="text-3xl font-bold">
                 {progress === 100 ? "All Systems Go!" : `${completedCount} of ${tasks.length} tasks completed`}
               </h2>
-              <p className="text-indigo-100 max-w-md">
+              <p className="text-primary-foreground/80 max-w-md">
                 {progress === 100 
                   ? "Your workspace is fully configured and ready to scale." 
                   : "Complete these steps to unlock the full potential of your dashboard."}
@@ -128,7 +128,7 @@ export default function LaunchpadPage() {
               <div className="flex justify-between text-sm font-medium">
                 <span>{Math.round(progress)}% Complete</span>
               </div>
-              <Progress value={progress} className="h-3 bg-indigo-900/30 [&>div]:bg-white" />
+              <Progress value={progress} className="h-3 bg-primary-foreground/20 [&>div]:bg-primary-foreground" />
             </div>
           </div>
           
@@ -140,7 +140,7 @@ export default function LaunchpadPage() {
         {/* Tasks Grid */}
         <div className="grid gap-4">
           {tasks.map((task) => (
-            <Card key={task.id} className={`border transition-all duration-300 ${task.completed ? 'bg-slate-50/50 border-slate-200/60' : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm'}`}>
+            <Card key={task.id} className={`border transition-all duration-300 ${task.completed ? 'bg-slate-50/50 border-slate-200/60' : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-sm'}`}>
               <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 
                 {/* Icon & Status */}
@@ -195,14 +195,14 @@ export default function LaunchpadPage() {
                     <Button 
                       variant={task.completed ? "outline" : "default"}
                       onClick={() => handleAction(task)}
-                      className={task.completed ? "bg-white" : "bg-indigo-600 hover:bg-indigo-700"}
+                      className={task.completed ? "bg-white" : "bg-primary hover:bg-primary/90"}
                     >
                       {task.completed ? "Change Color" : "Save Color"}
                     </Button>
                   ) : (
                     <Button 
                       variant={task.completed ? "outline" : "default"}
-                      className={`gap-2 min-w-[140px] ${task.completed ? 'bg-white text-slate-600' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                      className={`gap-2 min-w-[140px] ${task.completed ? 'bg-white text-slate-600' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
                       onClick={() => handleAction(task)}
                     >
                       {task.completed ? (
@@ -222,7 +222,7 @@ export default function LaunchpadPage() {
         {/* Help / Support Link */}
         <div className="text-center pt-8 pb-4">
             <p className="text-sm text-slate-500">
-                Need help getting set up? <a href="#" className="text-indigo-600 font-medium hover:underline inline-flex items-center gap-1">Read the setup guide <ExternalLink className="h-3 w-3" /></a>
+                Need help getting set up? <a href="#" className="text-primary font-medium hover:underline inline-flex items-center gap-1">Read the setup guide <ExternalLink className="h-3 w-3" /></a>
             </p>
         </div>
       </div>

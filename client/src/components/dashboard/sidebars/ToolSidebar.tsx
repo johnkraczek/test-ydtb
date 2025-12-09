@@ -125,24 +125,24 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
             )}
             
             {toolId === "launchpad" ? (
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/30">
+                <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/10 dark:border-primary/20">
                    <div className="space-y-3">
                       <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-medium text-indigo-900 dark:text-indigo-100">
+                        <div className="flex justify-between text-xs font-medium text-primary dark:text-primary">
                           <span>Setup Progress</span>
                           <span>50%</span>
                         </div>
-                        <Progress value={50} className="h-2 bg-indigo-200 dark:bg-indigo-900/50 [&>div]:bg-indigo-600" />
+                        <Progress value={50} className="h-2 bg-primary/20 dark:bg-primary/30 [&>div]:bg-primary" />
                       </div>
                       
                       <div className="py-1">
-                        <p className="text-xs font-medium text-indigo-900 dark:text-indigo-100">Next: Connect Payments</p>
-                        <p className="text-[10px] text-indigo-700 dark:text-indigo-300 leading-snug mt-0.5">
+                        <p className="text-xs font-medium text-primary dark:text-primary-foreground">Next: Connect Payments</p>
+                        <p className="text-[10px] text-primary/80 dark:text-primary/70 leading-snug mt-0.5">
                           Set up your payment processor to start accepting orders.
                         </p>
                       </div>
 
-                      <Button className="w-full justify-between bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm h-9">
+                      <Button className="w-full justify-between bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-9">
                         <span className="font-medium text-xs">Next Step</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </Button>
