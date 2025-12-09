@@ -1,10 +1,7 @@
 
 import { useState } from "react";
 import {
-  BarChart3,
   ChevronsRight,
-  Database,
-  FileText,
   Home,
   Settings,
   Users,
@@ -12,8 +9,6 @@ import {
   Layers,
   MessageSquare,
   Image,
-  GripHorizontal,
-  MoreHorizontal,
   Grid3X3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +18,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
 
 const INITIAL_TOOLS: ToolItem[] = [
@@ -57,18 +57,34 @@ const INITIAL_TOOLS: ToolItem[] = [
     visible: true,
   },
   {
-    id: "layers",
+    id: "spaces",
+    icon: Layers, // Placeholder icon
+    label: "Spaces",
+    visible: false,
+  },
+  {
+    id: "docs",
+    icon: FileText, // Need to import
+    label: "Docs",
+    visible: false,
+  },
+];
+
+// Always fixed at the bottom
+const BOTTOM_TOOLS = [
+  {
+    id: "integrations",
     icon: Layers,
     label: "Integrations",
-    visible: false,
   },
   {
     id: "settings",
     icon: Settings,
     label: "Settings",
-    visible: false,
   },
 ];
+
+import { FileText } from "lucide-react"; // Import missing icon
 
 interface ToolIconsSidebarProps {
   activeTool?: string;
@@ -85,9 +101,11 @@ export function ToolIconsSidebar({
 }: ToolIconsSidebarProps) {
   const [tools, setTools] = useState<ToolItem[]>(INITIAL_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-  // Filter visible tools for display
+  // Filter visible and hidden tools
   const visibleTools = tools.filter(tool => tool.visible);
+  const hiddenTools = tools.filter(tool => !tool.visible);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -114,7 +132,7 @@ export function ToolIconsSidebar({
             </div>
           )}
 
-          {/* Dynamic Tools */}
+          {/* Dynamic Visible Tools */}
           {visibleTools.map((tool) => {
             const Icon = tool.icon;
             const isActive = tool.id === activeTool;
@@ -141,30 +159,99 @@ export function ToolIconsSidebar({
             );
           })}
 
+          {/* More Button (Popover) */}
+          <Popover open={isMoreOpen} onOpenChange={setIsMoreOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
+                      isMoreOpen
+                        ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                        : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                    }`}
+                    variant="ghost"
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-slate-900 text-white border-0 font-medium ml-2">
+                <p>More</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <PopoverContent side="right" align="start" className="w-64 p-2 ml-2">
+              <div className="grid grid-cols-3 gap-2 p-2">
+                {hiddenTools.map((tool) => {
+                   const Icon = tool.icon;
+                   return (
+                     <button
+                       key={tool.id}
+                       className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                       onClick={() => {
+                         onToolSelect?.(tool.id);
+                         setIsMoreOpen(false);
+                       }}
+                     >
+                       <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 shadow-sm">
+                         <Icon className="h-4 w-4" />
+                       </div>
+                       <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 text-center leading-tight">
+                         {tool.label}
+                       </span>
+                     </button>
+                   );
+                })}
+              </div>
+              
+              <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-center text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 h-8 gap-2"
+                  onClick={() => {
+                    setIsMoreOpen(false);
+                    setIsCustomizeOpen(true);
+                  }}
+                >
+                  <Settings className="h-3 w-3" />
+                  Customize navigation
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           {/* Spacer */}
           <div className="flex-1" />
           
           <div className="w-6 h-px bg-slate-200 mx-auto mb-2" />
 
-          {/* More/Customize Button */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
-                  isCustomizeOpen
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                    : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
-                }`}
-                onClick={() => setIsCustomizeOpen(true)}
-                variant="ghost"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="bg-slate-900 text-white border-0 font-medium ml-2">
-              <p>More</p>
-            </TooltipContent>
-          </Tooltip>
+          {/* Bottom Tools (Fixed) */}
+          {BOTTOM_TOOLS.map((tool) => {
+            const Icon = tool.icon;
+            const isActive = tool.id === activeTool;
+
+            return (
+              <Tooltip key={tool.id}>
+                <TooltipTrigger asChild>
+                  <Button
+                    className={`h-9 w-9 p-0 rounded-sm transition-all duration-300 ${
+                      isActive 
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                        : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                    }`}
+                    onClick={() => onToolSelect?.(tool.id)}
+                    variant="ghost"
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={isActive ? 2.5 : 2} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-slate-900 text-white border-0 font-medium ml-2">
+                  <p>{tool.label}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
 
           <CustomizeNavigationDialog 
             open={isCustomizeOpen} 
