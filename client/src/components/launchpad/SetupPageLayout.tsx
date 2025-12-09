@@ -43,10 +43,10 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
       <div className="flex h-full gap-0 relative overflow-hidden">
         {/* Main Content */}
         <div className={cn(
-            "flex-1 overflow-y-auto pr-2 pb-12 transition-all duration-300",
+            "flex-1 overflow-y-auto pb-12 transition-all duration-300",
             isHelpOpen ? "mr-[400px]" : "mr-[40px]"
         )}>
-           <Card>
+           <Card className="h-full border-r-0 rounded-r-none">
               <CardContent className="p-6">
                  {children}
               </CardContent>
@@ -77,7 +77,7 @@ export function SetupPageLayout({ title, description, children, onComplete, isCo
         <div 
             className={cn(
                 "absolute top-0 right-0 bottom-0 border-l border-slate-200 shadow-xl transition-all duration-300 ease-in-out z-20 flex flex-col",
-                isHelpOpen ? "w-[400px] bg-slate-50" : "w-[40px] cursor-pointer hover:bg-indigo-700 bg-indigo-600 border-none"
+                isHelpOpen ? "w-[400px] bg-slate-50 rounded-l-2xl" : "w-[40px] cursor-pointer hover:bg-indigo-700 bg-indigo-600 border-none rounded-l-md"
             )}
             onClick={() => !isHelpOpen && setIsHelpOpen(true)}
         >
