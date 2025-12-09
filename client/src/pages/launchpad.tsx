@@ -38,6 +38,15 @@ export default function LaunchpadPage() {
   // Mock state for completed tasks
   const [tasks, setTasks] = useState<SetupTask[]>([
     {
+      id: "theme",
+      title: "Customize Theme",
+      description: "Choose a primary color for your workspace to match your brand.",
+      icon: Palette,
+      completed: true, // Considered completed if they interacted, but for now just static
+      actionLabel: "Customize",
+      type: "color-picker"
+    },
+    {
       id: "payment",
       title: "Connect Payment Processor",
       description: "Set up Stripe or PayPal to start accepting payments from your customers.",
@@ -65,15 +74,6 @@ export default function LaunchpadPage() {
       completed: false,
       actionLabel: "Setup AI",
       type: "integration"
-    },
-    {
-      id: "theme",
-      title: "Customize Theme",
-      description: "Choose a primary color for your workspace to match your brand.",
-      icon: Palette,
-      completed: true, // Considered completed if they interacted, but for now just static
-      actionLabel: "Customize",
-      type: "color-picker"
     }
   ]);
 
