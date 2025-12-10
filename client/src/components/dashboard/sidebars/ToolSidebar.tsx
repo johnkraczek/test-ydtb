@@ -160,16 +160,16 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
             )}
 
             {toolId === "media" && (
-              <Card className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-none shadow-lg mt-4">
+              <Card className="p-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-none shadow-lg mt-4">
                   <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-medium opacity-80">Storage</span>
                       <span className="text-xs font-bold">75%</span>
                   </div>
-                  <div className="h-1.5 bg-black/20 rounded-full overflow-hidden mb-3">
-                      <div className="h-full bg-white w-[75%]" />
+                  <div className="h-1.5 bg-primary-foreground/20 rounded-full overflow-hidden mb-3">
+                      <div className="h-full bg-primary-foreground w-[75%]" />
                   </div>
                   <p className="text-xs opacity-80 mb-4">7.5 GB of 10 GB used</p>
-                  <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-white/20 hover:bg-white/30 border-none text-white">
+                  <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-primary-foreground/20 hover:bg-primary-foreground/30 border-none text-primary-foreground">
                       Upgrade Plan
                   </Button>
               </Card>
