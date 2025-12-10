@@ -35,7 +35,7 @@ interface ViewSettingsProps {
 export function ViewSettings({ open, onOpenChange, onOpenFields, onOpenFilter }: ViewSettingsProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[300px] sm:w-[300px] p-0">
+      <SheetContent className="w-[360px] sm:w-[360px] p-0">
         <SheetHeader className="px-4 py-3 border-b">
           <SheetTitle className="text-base font-medium">Customize view</SheetTitle>
         </SheetHeader>
