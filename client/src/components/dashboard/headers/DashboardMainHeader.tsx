@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import {
   CommandDialog,
@@ -58,6 +59,7 @@ const availableThemePatterns = [
 ] as const;
 
 export function DashboardMainHeader() {
+  const [, setLocation] = useLocation();
   const [workspaces] = useState([
     { id: "1", name: "Acme Corp", plan: "Free Plan", initials: "AC", active: true },
     { id: "2", name: "Stark Industries", plan: "Pro Plan", initials: "SI", active: false },
@@ -628,7 +630,12 @@ export function DashboardMainHeader() {
           <DropdownMenuContent align="start" className="w-[300px] p-0" sideOffset={8}>
             {/* Back to Agency View */}
             <div className="p-2 border-b border-slate-100 dark:border-slate-800">
-              <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-slate-500 hover:text-slate-900 h-9 font-medium">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start gap-2 text-slate-500 hover:text-slate-900 h-9 font-medium"
+                onClick={() => setLocation("/agency")}
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Agency View
               </Button>
