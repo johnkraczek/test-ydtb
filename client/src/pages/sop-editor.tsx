@@ -144,6 +144,8 @@ export default function SopEditorPage() {
   const [steps, setSteps] = useState<SopStep[]>(isEditing ? MOCK_SOP_DATA.steps : [
     { id: "new-1", title: "", content: "" }
   ]);
+  
+  const [activeStepIdForImage, setActiveStepIdForImage] = useState<string | null>(null);
 
   const addStep = () => {
     setSteps([...steps, { id: `new-${Date.now()}`, title: "", content: "" }]);
@@ -333,6 +335,18 @@ export default function SopEditorPage() {
 
         {/* Steps Editor */}
         <div className="space-y-4">
+          <FileSelectionDialog 
+            open={!!activeStepIdForImage}
+            onOpenChange={(open) => {
+              if (!open) setActiveStepIdForImage(null);
+            }}
+            onSelect={(file) => {
+              if (activeStepIdForImage && file.url) {
+                updateStepImage(activeStepIdForImage, 'url', file.url);
+              }
+            }}
+          />
+
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Procedure Steps</h2>
             <Button onClick={addStep} variant="outline" className="gap-2 border-dashed">
@@ -376,20 +390,6 @@ export default function SopEditorPage() {
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Bold className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Italic className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><List className="h-3.5 w-3.5" /></Button>
-                        <Separator orientation="vertical" className="h-4 mx-1" />
-                        
-                        <FileSelectionDialog 
-                          trigger={
-                            <Button variant={step.image?.url ? "secondary" : "ghost"} size="icon" className={`h-7 w-7 ${step.image?.url ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>
-                              <ImageIcon className="h-3.5 w-3.5" />
-                            </Button>
-                          }
-                          onSelect={(file) => {
-                            if (file.url) {
-                              updateStepImage(step.id, 'url', file.url);
-                            }
-                          }}
-                        />
                       </div>
 
                       <DropdownMenu>
@@ -399,6 +399,9 @@ export default function SopEditorPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setActiveStepIdForImage(step.id)}>
+                            <ImageIcon className="h-4 w-4 mr-2" /> Add Image
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => addDetailToStep(step.id, 'note')} disabled={!!step.note}>
                             <Info className="h-4 w-4 mr-2" /> Add Note
                           </DropdownMenuItem>

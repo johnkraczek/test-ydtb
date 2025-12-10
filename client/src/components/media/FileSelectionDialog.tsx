@@ -17,13 +17,27 @@ interface FileSelectionDialogProps {
   trigger?: React.ReactNode;
   onSelect?: (file: FileSystemItem) => void;
   onCancel?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function FileSelectionDialog({ trigger, onSelect, onCancel }: FileSelectionDialogProps) {
+export function FileSelectionDialog({ trigger, onSelect, onCancel, open: controlledOpen, onOpenChange }: FileSelectionDialogProps) {
   const { items } = useMedia();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  
+  const setOpen = (newOpen: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(newOpen);
+    }
+    if (onOpenChange) {
+      onOpenChange(newOpen);
+    }
+  };
 
   const handleToggleFolder = (folderId: string, e?: React.MouseEvent) => {
     if (e) {
