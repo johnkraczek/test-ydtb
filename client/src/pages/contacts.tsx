@@ -345,12 +345,32 @@ export default function ContactsPage() {
   };
 
   const handleCreateColumn = () => {
-    // Here we would actually create the column
-    // For mockup, we just close the sheet and reset
+    if (!newColumnConfig.name) return;
+    
+    const newId = newColumnConfig.name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.random().toString(36).substr(2, 5);
+    const newColumn = {
+      id: newId,
+      label: newColumnConfig.name,
+      type: selectedColumnType?.type || 'text'
+    };
+    
+    setColumns([...columns, newColumn]);
+    setVisibleColumns(prev => ({
+      ...prev,
+      [newId]: true
+    }));
+    
     setIsColumnCreatorOpen(false);
     setColumnCreatorStep('type-selection');
     setSelectedColumnType(null);
-    // Maybe add a toast here
+    setNewColumnConfig({
+      name: "",
+      description: "",
+      defaultValue: "",
+      isRequired: false,
+      isPinned: false,
+      isVisibleToGuests: true
+    });
   };
 
   const handleCloseCreator = () => {
@@ -1027,134 +1047,174 @@ export default function ContactsPage() {
                         onCheckedChange={() => toggleSelectContact(contact.id)}
                       />
                     </TableCell>
-                    {visibleColumns.name && (
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
-                            {contact.image && <AvatarImage src={contact.image} />}
-                            <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
-                        </div>
-                      </TableCell>
-                    )}
-                    {visibleColumns.phone && (
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">{contact.phone}</span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.email && (
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">{contact.email}</span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.created && (
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                          <span>{format(contact.created, 'MMM d, yyyy')}</span>
-                        </div>
-                      </TableCell>
-                    )}
-                    {visibleColumns.lastActive && (
-                      <TableCell>
-                        <span className="text-sm text-slate-500 dark:text-slate-500">
-                          {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dob && (
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {format(contact.dob, 'MMM d, yyyy')}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.source && (
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {contact.source}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.type && (
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {contact.type}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dndEmail && (
-                      <TableCell>
-                        <span className={`text-sm ${contact.dndEmail ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
-                          {contact.dndEmail ? 'Yes' : 'No'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dndSms && (
-                      <TableCell>
-                        <span className={`text-sm ${contact.dndSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
-                          {contact.dndSms ? 'Yes' : 'No'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dndCall && (
-                      <TableCell>
-                        <span className={`text-sm ${contact.dndCall ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
-                          {contact.dndCall ? 'Yes' : 'No'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dndInboundCalls && (
-                      <TableCell>
-                        <span className={`text-sm ${contact.dndInboundCalls ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
-                          {contact.dndInboundCalls ? 'Yes' : 'No'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dndInboundSms && (
-                      <TableCell>
-                        <span className={`text-sm ${contact.dndInboundSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
-                          {contact.dndInboundSms ? 'Yes' : 'No'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.tags && (
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
-                          {contact.tags.slice(0, 2).map(tag => (
-                            <Badge 
-                              key={tag} 
-                              variant="secondary" 
-                              className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                          {contact.tags.length > 2 && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Badge 
-                                    variant="secondary" 
-                                    className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-help"
-                                  >
-                                    +{contact.tags.length - 2}
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <div className="flex flex-col gap-1">
-                                    {contact.tags.slice(2).map(tag => (
-                                      <span key={tag} className="text-xs">{tag}</span>
-                                    ))}
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </div>
-                      </TableCell>
-                    )}
+                    {columns.filter(col => visibleColumns[col.id]).map(col => {
+                      if (col.id === 'name') {
+                        return (
+                          <TableCell key={col.id}>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
+                                {contact.image && <AvatarImage src={contact.image} />}
+                                <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
+                            </div>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'phone') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">{contact.phone}</span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'email') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">{contact.email}</span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'created') {
+                        return (
+                          <TableCell key={col.id}>
+                            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                              <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                              <span>{format(contact.created, 'MMM d, yyyy')}</span>
+                            </div>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'lastActive') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-500 dark:text-slate-500">
+                              {formatDistanceToNow(contact.lastActive, { addSuffix: true })}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dob') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                              {format(contact.dob, 'MMM d, yyyy')}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'source') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                              {contact.source}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'type') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                              {contact.type}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dndEmail') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className={`text-sm ${contact.dndEmail ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                              {contact.dndEmail ? 'Yes' : 'No'}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dndSms') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className={`text-sm ${contact.dndSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                              {contact.dndSms ? 'Yes' : 'No'}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dndCall') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className={`text-sm ${contact.dndCall ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                              {contact.dndCall ? 'Yes' : 'No'}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dndInboundCalls') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className={`text-sm ${contact.dndInboundCalls ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                              {contact.dndInboundCalls ? 'Yes' : 'No'}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'dndInboundSms') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className={`text-sm ${contact.dndInboundSms ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                              {contact.dndInboundSms ? 'Yes' : 'No'}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'contactId') {
+                        return (
+                          <TableCell key={col.id}>
+                            <span className="text-sm text-slate-600 dark:text-slate-400 font-mono text-xs">
+                              {contact.id}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+                      if (col.id === 'tags') {
+                        return (
+                          <TableCell key={col.id}>
+                            <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+                              {contact.tags.slice(0, 2).map(tag => (
+                                <Badge 
+                                  key={tag} 
+                                  variant="secondary" 
+                                  className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {contact.tags.length > 2 && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge 
+                                        variant="secondary" 
+                                        className="px-1.5 py-0 text-[10px] font-medium border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-help"
+                                      >
+                                        +{contact.tags.length - 2}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="flex flex-col gap-1">
+                                        {contact.tags.slice(2).map(tag => (
+                                          <span key={tag} className="text-xs">{tag}</span>
+                                        ))}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
+                          </TableCell>
+                        );
+                      }
+                      return <TableCell key={col.id} />;
+                    })}
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
                         <MoreHorizontal className="h-4 w-4" />
