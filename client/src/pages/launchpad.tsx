@@ -19,7 +19,8 @@ import {
   Rocket,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  EyeOff
 } from "lucide-react";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ interface SetupTask {
   completed: boolean;
   actionLabel: string;
   actionUrl?: string; // In a real app this would link to settings
-  type: "link" | "color-picker" | "mode-picker" | "integration";
+  type: "link" | "color-picker" | "mode-picker" | "integration" | "instruction";
 }
 
 export default function LaunchpadPage() {
@@ -88,6 +89,15 @@ export default function LaunchpadPage() {
       completed: false,
       actionLabel: "Setup AI",
       type: "integration"
+    },
+    {
+      id: "hide",
+      title: "Hide Launchpad",
+      description: "Done with setup? You can hide this launchpad from your sidebar to keep your workspace clean.",
+      icon: EyeOff,
+      completed: false,
+      actionLabel: "Got it",
+      type: "instruction"
     }
   ]);
 
@@ -99,7 +109,7 @@ export default function LaunchpadPage() {
   };
 
   const handleAction = (task: SetupTask) => {
-    if (task.type === "color-picker" || task.type === "mode-picker") {
+    if (task.type === "color-picker" || task.type === "mode-picker" || task.type === "instruction") {
         toggleTask(task.id);
     } else if (task.actionUrl) {
         setLocation(task.actionUrl);
@@ -265,17 +275,29 @@ export default function LaunchpadPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Instructions for hiding launchpad */}
+                  {task.type === "instruction" && !task.completed && (
+                    <div className="mt-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 text-sm text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800">
+                        <p className="mb-2 font-medium text-slate-900 dark:text-slate-200">How to hide the Launchpad:</p>
+                        <ol className="list-decimal list-inside space-y-1 ml-1">
+                            <li>Click the <span className="font-semibold text-slate-900 dark:text-slate-200">Customize</span> (•••) button at the bottom of the sidebar icon rail.</li>
+                            <li>In the dialog that appears, go to the <span className="font-semibold text-slate-900 dark:text-slate-200">Navigation</span> tab.</li>
+                            <li>Uncheck <span className="font-semibold text-slate-900 dark:text-slate-200">Launchpad</span> to hide it from your view.</li>
+                        </ol>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action */}
                 <div className="flex-shrink-0">
-                  {task.type === "color-picker" || task.type === "mode-picker" ? (
+                  {task.type === "color-picker" || task.type === "mode-picker" || task.type === "instruction" ? (
                     <Button 
                       variant={task.completed ? "outline" : "default"}
                       onClick={() => handleAction(task)}
                       className={task.completed ? "bg-white" : "bg-primary hover:bg-primary/90"}
                     >
-                      {task.completed ? (task.type === "color-picker" ? "Change Color" : "Change Mode") : "Save Changes"}
+                      {task.completed ? (task.type === "color-picker" ? "Change Color" : task.type === "mode-picker" ? "Change Mode" : "Show Instructions") : task.type === "instruction" ? "Got it" : "Save Changes"}
                     </Button>
                   ) : (
                     <Button 

@@ -28,7 +28,8 @@ import {
   Palette,
   Bot,
   ArrowRight,
-  Monitor
+  Monitor,
+  EyeOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -328,6 +329,7 @@ function LaunchpadSidebarContent() {
         <SidebarItem icon={CreditCard} label="Connect Payments" />
         <SidebarItem icon={Mail} label="Connect Email" />
         <SidebarItem icon={Bot} label="Connect AI Provider" />
+        <SidebarItem icon={EyeOff} label="Hide Launchpad" />
       </SidebarSection>
       
       <SidebarSection title="Resources">
