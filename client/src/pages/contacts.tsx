@@ -263,6 +263,7 @@ export default function ContactsPage() {
   const [, setLocation] = useLocation();
   const [isViewSettingsOpen, setIsViewSettingsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [showAvatar, setShowAvatar] = useState(true);
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
@@ -641,6 +642,8 @@ export default function ContactsPage() {
         onOpenChange={setIsViewSettingsOpen} 
         onOpenFields={() => setIsColumnCreatorOpen(true)}
         onOpenFilter={() => setIsFilterOpen(true)}
+        showAvatar={showAvatar}
+        onShowAvatarChange={setShowAvatar}
       />
     </div>
   );
@@ -670,7 +673,22 @@ export default function ContactsPage() {
                   />
                 </TableHead>
                 {columns.filter(col => visibleColumns[col.id]).map(col => {
-                  if (col.id === 'name') return visibleColumns.name && <SortableHeader key={col.id} column="name" label="Name" />;
+                  if (col.id === 'name') return visibleColumns.name && (
+                    <TableHead 
+                      key={col.id} 
+                      className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none" 
+                      onClick={() => handleSort('name')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Name
+                        {sortColumn === 'name' ? (
+                          sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                        ) : (
+                          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                  );
                   if (col.id === 'tags') return visibleColumns.tags && <TableHead key={col.id}>Tags</TableHead>;
                   return <SortableHeader key={col.id} column={col.id} label={col.label} />;
                 })}
@@ -1144,10 +1162,12 @@ export default function ContactsPage() {
                         return (
                           <TableCell key={col.id}>
                             <div className="flex items-center gap-3">
-                              <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
-                                {contact.image && <AvatarImage src={contact.image} />}
-                                <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
-                              </Avatar>
+                              {showAvatar && (
+                                <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-primary/10 text-primary">
+                                  {contact.image && <AvatarImage src={contact.image} />}
+                                  <AvatarFallback className="font-semibold text-xs">{contact.initials}</AvatarFallback>
+                                </Avatar>
+                              )}
                               <span className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</span>
                             </div>
                           </TableCell>

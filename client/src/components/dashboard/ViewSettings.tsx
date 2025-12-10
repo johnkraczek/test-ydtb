@@ -30,9 +30,11 @@ interface ViewSettingsProps {
   onOpenChange: (open: boolean) => void;
   onOpenFields: () => void;
   onOpenFilter: () => void;
+  showAvatar?: boolean;
+  onShowAvatarChange?: (show: boolean) => void;
 }
 
-export function ViewSettings({ open, onOpenChange, onOpenFields, onOpenFilter }: ViewSettingsProps) {
+export function ViewSettings({ open, onOpenChange, onOpenFields, onOpenFilter, showAvatar = true, onShowAvatarChange }: ViewSettingsProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[360px] sm:w-[360px] p-0">
@@ -50,6 +52,10 @@ export function ViewSettings({ open, onOpenChange, onOpenFields, onOpenFilter }:
           </div>
 
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-700 dark:text-slate-300">Show avatars</span>
+              <Switch checked={showAvatar} onCheckedChange={onShowAvatarChange} />
+            </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-slate-700 dark:text-slate-300">Show empty statuses</span>
               <Switch />
