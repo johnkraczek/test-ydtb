@@ -619,6 +619,15 @@ export default function CustomFieldsPage() {
                                         onClick={() => !editingFolderId && toggleFolder(folder.id)}
                                     >
                                         <div className="flex items-center gap-2 flex-1">
+                                            {!editingFolderId && (
+                                                <div onClick={(e) => e.stopPropagation()} className="flex items-center">
+                                                    <Checkbox 
+                                                        checked={groupedFields[folder.id]?.length > 0 && groupedFields[folder.id].every(f => selectedFields.includes(f.id))}
+                                                        onCheckedChange={(checked) => toggleSelectGroup(groupedFields[folder.id] || [], !!checked)}
+                                                        className="mr-2 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                                                    />
+                                                </div>
+                                            )}
                                             {editingFolderId === folder.id ? (
                                                 <div className="flex items-center gap-2 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
                                                     <Input 
