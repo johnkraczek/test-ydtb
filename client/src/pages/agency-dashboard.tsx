@@ -1,5 +1,6 @@
 
 import DashboardLayout from "@/components/dashboard/Layout";
+import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, Activity, ArrowUpRight } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -16,7 +17,18 @@ const data = [
 
 export default function AgencyDashboardPage() {
   return (
-    <DashboardLayout mode="agency" activeTool="agency-home">
+    <DashboardLayout 
+      mode="agency" 
+      activeTool="agency-home"
+      header={
+        <DashboardPageHeader 
+          title="Agency Dashboard" 
+          description="Overview of your agency's performance and client activity."
+          hideBreadcrumbs={true}
+          actions={<div />} // Empty div to remove default actions
+        />
+      }
+    >
       <div className="space-y-8">
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
