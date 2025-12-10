@@ -59,6 +59,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       }
     } else if (toolId === "agency-settings") {
       setLocation("/agency/settings/profile"); // Default to profile if someone clicks settings
+    } else if (toolId === "agency-workspaces") {
+      setLocation("/agency/workspaces");
     }
     // Add other routes as needed
   };

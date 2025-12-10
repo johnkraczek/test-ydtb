@@ -134,6 +134,12 @@ const AGENCY_TOOLS: ToolItem[] = [
     label: "Agency Dashboard",
     visible: true,
   },
+  {
+    id: "agency-workspaces",
+    icon: LayoutGrid,
+    label: "Workspaces",
+    visible: true,
+  },
 ];
 
 export function ToolIconsSidebar({
