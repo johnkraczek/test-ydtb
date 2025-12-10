@@ -18,7 +18,8 @@ import {
   Bell,
   Globe,
   Shield,
-  Smartphone
+  Smartphone,
+  Fingerprint
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -211,6 +212,26 @@ export default function AccountSettingsPage() {
                   </div>
                 </div>
                 <Button variant="outline">Setup</Button>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <Fingerprint className="h-4 w-4 text-slate-500" /> Passkey Authentication
+              </h3>
+              <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-lg">
+                <div className="flex items-start gap-4">
+                  <div className="h-10 w-10 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0">
+                    <Fingerprint className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">Biometric Login</div>
+                    <p className="text-sm text-slate-500">Log in securely using your device's fingerprint or face recognition.</p>
+                  </div>
+                </div>
+                <Button variant="outline">Add Passkey</Button>
               </div>
             </div>
           </CardContent>
