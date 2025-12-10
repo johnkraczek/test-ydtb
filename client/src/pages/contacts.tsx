@@ -104,7 +104,7 @@ import {
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
-import { 
+import {
   Type, 
   Hash, 
   Calendar as CalendarIcon, 
@@ -120,6 +120,7 @@ import {
   Sparkles,
   ArrowLeft
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
