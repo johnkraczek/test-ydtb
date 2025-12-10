@@ -24,6 +24,7 @@ import SopEditorPage from "@/pages/sop-editor";
 import DomainSettingsPage from "@/pages/settings/domain";
 import AccountSettingsPage from "@/pages/settings/account";
 import BillingSettingsPage from "@/pages/settings/billing";
+import CustomFieldsPage from "@/pages/custom-fields";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/settings/domain" component={DomainSettingsPage} />
       <Route path="/settings/account" component={AccountSettingsPage} />
       <Route path="/settings/billing" component={BillingSettingsPage} />
+      <Route path="/custom-fields" component={CustomFieldsPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/team" component={TeamPage} />

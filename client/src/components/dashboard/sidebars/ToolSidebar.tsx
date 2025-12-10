@@ -1,4 +1,3 @@
-
 import {
   ChevronsLeft,
   ChevronRight,
@@ -79,6 +78,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 
 interface ToolSidebarProps {
   isOpen: boolean;
@@ -704,6 +704,7 @@ function ContactsSidebarContent() {
   };
 
   return (
+    <div className="flex flex-col h-full">
     <div className="space-y-1">
       <SidebarSection title="Contacts">
         <SidebarItem icon={User} label="All Contacts" active />
@@ -722,175 +723,195 @@ function ContactsSidebarContent() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>
-                          {dialogMode === 'create' ? 'Create New Group' : 
-                           dialogMode === 'rename' ? 'Rename Group' : 'Edit Group'}
-                        </DialogTitle>
+                        <DialogTitle>{dialogMode === 'create' ? 'Create New Group' : dialogMode === 'rename' ? 'Rename Group' : 'Edit Smart Group'}</DialogTitle>
                     </DialogHeader>
                     
-                    {dialogMode === 'rename' ? (
-                      <div className="py-4 space-y-4">
-                         <div className="space-y-2">
-                              <Label htmlFor="name">Group Name</Label>
-                              <Input 
-                                  id="name" 
-                                  placeholder="e.g. VIP Clients" 
-                                  value={newGroupName}
-                                  onChange={(e) => setNewGroupName(e.target.value)}
-                              />
-                          </div>
-                      </div>
-                    ) : (
-                      <Tabs defaultValue="fixed" value={activeTab} onValueChange={setActiveTab} className="w-full mt-2">
-                          <TabsList className="grid w-full grid-cols-2">
-                              <TabsTrigger value="fixed" disabled={dialogMode === 'edit' && activeTab === 'smart'}>Fixed Group</TabsTrigger>
-                              <TabsTrigger value="smart" disabled={dialogMode === 'edit' && activeTab === 'fixed'}>Smart Group</TabsTrigger>
-                          </TabsList>
-                          
-                          <div className="py-4 space-y-4">
-                              <div className="space-y-2">
-                                  <Label htmlFor="name">Group Name</Label>
-                                  <Input 
-                                      id="name" 
-                                      placeholder={activeTab === 'fixed' ? "e.g. VIP Clients" : "e.g. High Value Leads"} 
-                                      value={newGroupName}
-                                      onChange={(e) => setNewGroupName(e.target.value)}
-                                  />
-                              </div>
-                              
-                              {activeTab === 'smart' && (
-                                  <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                                      <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                                          <Filter className="h-4 w-4" />
-                                          <span>Filters</span>
-                                      </div>
-                                      <div className="grid gap-2">
-                                          {filters.map((filter, index) => (
-                                              <div key={filter.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
-                                                  <Select value={filter.field} onValueChange={(v) => updateFilter(filter.id, 'field', v)}>
-                                                      <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                          <SelectValue placeholder="Field" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                          <SelectItem value="status">Status</SelectItem>
-                                                          <SelectItem value="tags">Tags</SelectItem>
-                                                          <SelectItem value="location">Location</SelectItem>
-                                                      </SelectContent>
-                                                  </Select>
-                                                  <Select value={filter.operator} onValueChange={(v) => updateFilter(filter.id, 'operator', v)}>
-                                                      <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                          <SelectValue placeholder="Operator" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                          <SelectItem value="is">is</SelectItem>
-                                                          <SelectItem value="is_not">is not</SelectItem>
-                                                          <SelectItem value="contains">contains</SelectItem>
-                                                      </SelectContent>
-                                                  </Select>
-                                                  <Input 
-                                                      className="h-8 text-xs bg-white dark:bg-slate-900" 
-                                                      placeholder="Value..." 
-                                                      value={filter.value}
-                                                      onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
-                                                  />
-                                                  {filters.length > 1 && (
-                                                      <Button 
-                                                          variant="ghost" 
-                                                          size="icon" 
-                                                          className="h-8 w-8 text-slate-400 hover:text-red-500"
-                                                          onClick={() => handleRemoveFilter(filter.id)}
-                                                      >
-                                                          <X className="h-4 w-4" />
-                                                      </Button>
-                                                  )}
-                                                  {filters.length === 1 && (
-                                                      <div className="w-8" /> 
-                                                  )}
-                                              </div>
-                                          ))}
-                                          <Button 
-                                              variant="ghost" 
-                                              size="sm" 
-                                              className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700 mt-2"
-                                              onClick={handleAddFilter}
-                                          >
-                                              <Plus className="h-3 w-3 mr-1" /> Add Filter
-                                          </Button>
-                                      </div>
-                                  </div>
-                              )}
-                          </div>
-                      </Tabs>
-                    )}
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                        {dialogMode === 'create' && (
+                            <TabsList className="grid w-full grid-cols-2 mb-4">
+                                <TabsTrigger value="fixed">Fixed Group</TabsTrigger>
+                                <TabsTrigger value="smart">Smart Group</TabsTrigger>
+                            </TabsList>
+                        )}
+                        
+                        <div className="space-y-4 py-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Group Name</Label>
+                                <Input 
+                                    id="name" 
+                                    placeholder="e.g. VIP Customers" 
+                                    value={newGroupName}
+                                    onChange={(e) => setNewGroupName(e.target.value)}
+                                />
+                            </div>
+
+                            <TabsContent value="fixed" className="text-sm text-slate-500">
+                                <p>Fixed groups are static lists where you manually add contacts.</p>
+                            </TabsContent>
+
+                            <TabsContent value="smart" className="space-y-4">
+                                <div className="text-sm text-slate-500 mb-2">
+                                    <p>Smart groups automatically update based on rules you define.</p>
+                                </div>
+                                
+                                <div className="space-y-3 border rounded-md p-3 bg-slate-50 dark:bg-slate-900/50">
+                                    <Label className="text-xs font-semibold uppercase text-slate-500">Match contacts where:</Label>
+                                    
+                                    {filters.map((filter, index) => (
+                                        <div key={filter.id} className="flex gap-2 items-start">
+                                            <div className="grid grid-cols-[1fr,1fr,1fr] gap-2 flex-1">
+                                                <Select value={filter.field} onValueChange={(val) => updateFilter(filter.id, 'field', val)}>
+                                                    <SelectTrigger className="h-8">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="status">Status</SelectItem>
+                                                        <SelectItem value="source">Source</SelectItem>
+                                                        <SelectItem value="tags">Tags</SelectItem>
+                                                        <SelectItem value="email">Email</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <Select value={filter.operator} onValueChange={(val) => updateFilter(filter.id, 'operator', val)}>
+                                                    <SelectTrigger className="h-8">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="is">Is</SelectItem>
+                                                        <SelectItem value="is_not">Is not</SelectItem>
+                                                        <SelectItem value="contains">Contains</SelectItem>
+                                                        <SelectItem value="starts_with">Starts with</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <Input 
+                                                    className="h-8" 
+                                                    placeholder="Value..." 
+                                                    value={filter.value}
+                                                    onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
+                                                />
+                                            </div>
+                                            
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-8 w-8 text-slate-400 hover:text-red-500 shrink-0"
+                                                onClick={() => handleRemoveFilter(filter.id)}
+                                                disabled={filters.length === 1}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ))}
+
+                                    <Button variant="outline" size="sm" className="w-full text-xs h-7 border-dashed" onClick={handleAddFilter}>
+                                        <Plus className="mr-2 h-3 w-3" /> Add Condition
+                                    </Button>
+                                </div>
+                            </TabsContent>
+                        </div>
+                    </Tabs>
 
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSaveGroup}>
-                          {dialogMode === 'create' ? 'Create Group' : 'Save Changes'}
+                        <Button onClick={handleSaveGroup} disabled={!newGroupName.trim()}>
+                            {dialogMode === 'create' ? 'Create Group' : 'Save Changes'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
+        
         <div className="space-y-0.5">
             {groups.map(group => (
-                <SidebarItem 
-                    key={group.id} 
-                    icon={group.type === 'smart' ? Zap : Folder} 
-                    label={group.name} 
-                    actions={
-                      <DropdownMenu>
+                <div key={group.id} className="group/item flex items-center w-full h-9 rounded-lg px-2.5 font-normal text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer">
+                        {group.type === 'smart' ? (
+                            <Filter className="h-4 w-4 shrink-0 text-indigo-500" />
+                        ) : (
+                            <Folder className="h-4 w-4 shrink-0 text-slate-400 group-hover/item:text-slate-600 dark:group-hover/item:text-slate-300" />
+                        )}
+                        <span className="truncate">{group.name}</span>
+                    </div>
+                    
+                    <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
-                            <MoreHorizontal className="h-3.5 w-3.5" />
-                          </Button>
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                            >
+                                <MoreHorizontal className="h-3 w-3" />
+                            </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => openEditDialog(group, 'rename')}>
-                            <Pencil className="h-3.5 w-3.5 mr-2" />
-                            Rename
-                          </DropdownMenuItem>
-                          {group.type === 'smart' && (
-                            <DropdownMenuItem onClick={() => openEditDialog(group, 'edit')}>
-                              <Edit className="h-3.5 w-3.5 mr-2" />
-                              Edit Rules
+                            <DropdownMenuItem onClick={() => openEditDialog(group, 'rename')}>
+                                <Pencil className="mr-2 h-3.5 w-3.5 text-slate-500" />
+                                Rename
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleDeleteGroup(group.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10">
-                            <Trash className="h-3.5 w-3.5 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
+                            {group.type === 'smart' && (
+                                <DropdownMenuItem onClick={() => openEditDialog(group, 'edit')}>
+                                    <Filter className="mr-2 h-3.5 w-3.5 text-slate-500" />
+                                    Edit Rules
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteGroup(group.id)}>
+                                <Trash className="mr-2 h-3.5 w-3.5" />
+                                Delete
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
-                    }
-                />
+                    </DropdownMenu>
+                </div>
             ))}
         </div>
       </div>
     </div>
+    
+    <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+        <SidebarSection title="Configuration">
+            <div onClick={() => window.location.href = "/custom-fields"}>
+                <SidebarItem 
+                    icon={LayoutTemplate} 
+                    label="Custom Fields" 
+                    active={window.location.pathname === "/custom-fields"} 
+                />
+            </div>
+        </SidebarSection>
+    </div>
+    </div>
   );
+}
+
+function DefaultSidebarContent() {
+    return (
+        <div className="py-4 text-center text-sm text-slate-500">
+            Select a tool to view options
+        </div>
+    )
 }
 
 function PagesSidebarContent() {
   return (
     <div className="space-y-1">
-      <SidebarSection title="Site Structure">
-        <SidebarItem icon={File} label="All Pages" active />
-        <SidebarItem icon={Star} label="Favorites" />
-        <SidebarItem icon={Clock} label="Recent" />
+      <SidebarSection title="Site Pages">
+        <SidebarItem icon={File} label="Home" active />
+        <SidebarItem icon={File} label="About Us" />
+        <SidebarItem icon={File} label="Services" />
+        <SidebarItem icon={File} label="Contact" />
+        <SidebarItem icon={File} label="Pricing" />
       </SidebarSection>
       
-      <SidebarSection title="Folders">
-        <SidebarItem icon={Folder} label="Landing Pages" />
-        <SidebarItem icon={Folder} label="Blog Posts" />
-        <SidebarItem icon={Folder} label="Utility Pages" />
-        <SidebarItem icon={Folder} label="Legal" />
+      <SidebarSection title="Landing Pages">
+        <SidebarItem icon={Rocket} label="Product Launch" />
+        <SidebarItem icon={Rocket} label="Webinar Signup" />
+        <SidebarItem icon={Rocket} label="E-book Download" />
       </SidebarSection>
-
-      <SidebarSection title="Templates">
-        <SidebarItem icon={File} label="Standard Layout" />
-        <SidebarItem icon={File} label="Full Width" />
+      
+      <SidebarSection title="Blog">
+        <SidebarItem icon={FileText} label="All Posts" />
+        <SidebarItem icon={Folder} label="Categories" />
+        <SidebarItem icon={User} label="Authors" />
       </SidebarSection>
     </div>
   );
@@ -900,20 +921,16 @@ function AutomationSidebarContent() {
   return (
     <div className="space-y-1">
       <SidebarSection title="Workflows">
-        <SidebarItem icon={Zap} label="All Automations" active />
-        <SidebarItem icon={Clock} label="Scheduled" />
-        <SidebarItem icon={Star} label="Favorites" />
+        <SidebarItem icon={Zap} label="All Workflows" active />
+        <SidebarItem icon={CheckCircle2} label="Active" badge="3" />
+        <SidebarItem icon={Circle} label="Drafts" badge="2" />
+        <SidebarItem icon={Clock} label="History" />
       </SidebarSection>
       
-      <SidebarSection title="Active">
-        <SidebarItem icon={Zap} label="New User Onboarding" />
-        <SidebarItem icon={Zap} label="Order Processing" />
-        <SidebarItem icon={Zap} label="Lead Enrichment" />
-      </SidebarSection>
-
-      <SidebarSection title="Drafts">
-        <SidebarItem icon={FileText} label="Support Routing" />
-        <SidebarItem icon={FileText} label="Daily Summary" />
+      <SidebarSection title="Triggers">
+        <SidebarItem icon={LayoutTemplate} label="Form Submissions" />
+        <SidebarItem icon={User} label="Contact Updates" />
+        <SidebarItem icon={Clock} label="Scheduled" />
       </SidebarSection>
     </div>
   );
@@ -923,22 +940,17 @@ function SopSidebarContent() {
   return (
     <div className="space-y-1">
       <SidebarSection title="Library">
-        <SidebarItem icon={FileText} label="All Documents" active />
-        <SidebarItem icon={Star} label="Favorites" />
-        <SidebarItem icon={Clock} label="Recently Updated" />
+        <SidebarItem icon={FileText} label="All SOPs" active />
+        <SidebarItem icon={Star} label="Favorites" badge="3" />
+        <SidebarItem icon={Clock} label="Recently Viewed" />
       </SidebarSection>
       
-      <SidebarSection title="Departments">
-        <SidebarItem icon={Folder} label="Engineering" />
+      <SidebarSection title="Categories">
+        <SidebarItem icon={Folder} label="Onboarding" />
+        <SidebarItem icon={Folder} label="Sales Process" />
+        <SidebarItem icon={Folder} label="Customer Support" />
         <SidebarItem icon={Folder} label="Marketing" />
-        <SidebarItem icon={Folder} label="Sales" />
         <SidebarItem icon={Folder} label="HR & Admin" />
-        <SidebarItem icon={Folder} label="Customer Success" />
-      </SidebarSection>
-
-      <SidebarSection title="Resources">
-        <SidebarItem icon={Circle} label="Templates" />
-        <SidebarItem icon={Circle} label="Archived" />
       </SidebarSection>
     </div>
   );
@@ -949,7 +961,7 @@ function SettingsSidebarContent() {
 
   return (
     <div className="space-y-1">
-      <SidebarSection title="App Settings">
+      <SidebarSection title="General">
         <div onClick={() => setLocation("/settings/account")}>
           <SidebarItem 
             icon={User} 
@@ -957,31 +969,29 @@ function SettingsSidebarContent() {
             active={location === "/settings/account"} 
           />
         </div>
-        <div onClick={() => setLocation("/settings/domain")}>
-          <SidebarItem 
-            icon={Globe} 
-            label="Domains" 
-            active={location === "/settings/domain"} 
-          />
-        </div>
         <div onClick={() => setLocation("/settings/billing")}>
           <SidebarItem 
             icon={CreditCard} 
-            label="Billing" 
+            label="Billing & Plans" 
             active={location === "/settings/billing"} 
           />
         </div>
-        <SidebarItem icon={Settings} label="General" />
-        <SidebarItem icon={Database} label="Data & Privacy" />
+        <div onClick={() => setLocation("/settings/domain")}>
+          <SidebarItem 
+            icon={Globe} 
+            label="Domain Settings" 
+            active={location === "/settings/domain"} 
+          />
+        </div>
+        <SidebarItem icon={Briefcase} label="Workspace" />
+        <SidebarItem icon={LayoutGrid} label="Integrations" />
       </SidebarSection>
-    </div>
-  );
-}
-
-function DefaultSidebarContent() {
-  return (
-    <div className="flex h-40 items-center justify-center">
-      <p className="text-slate-400 text-sm text-center px-4">Select a tool from the sidebar to view options</p>
+      
+      <SidebarSection title="System">
+        <SidebarItem icon={Settings} label="Preferences" />
+        <SidebarItem icon={Bot} label="AI Settings" />
+        <SidebarItem icon={FileText} label="Audit Logs" />
+      </SidebarSection>
     </div>
   );
 }

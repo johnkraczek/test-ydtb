@@ -1,0 +1,465 @@
+import React, { useState } from 'react';
+import { DashboardLayout } from "@/components/dashboard/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { 
+    Search, 
+    Plus, 
+    MoreHorizontal, 
+    Folder, 
+    FileText, 
+    Pencil, 
+    Trash, 
+    ChevronRight, 
+    ChevronDown,
+    FolderPlus,
+    LayoutGrid,
+    List,
+    Type,
+    Hash,
+    Calendar as CalendarIcon,
+    CheckSquare,
+    AlignLeft
+} from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+interface CustomField {
+    id: string;
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'multiselect';
+    folderId: string | null;
+    description?: string;
+    options?: string[]; // For select/multiselect
+    required?: boolean;
+}
+
+interface FieldFolder {
+    id: string;
+    name: string;
+}
+
+const FIELD_TYPES = [
+    { value: 'text', label: 'Text', icon: Type },
+    { value: 'number', label: 'Number', icon: Hash },
+    { value: 'date', label: 'Date', icon: CalendarIcon },
+    { value: 'select', label: 'Single Select', icon: List },
+    { value: 'multiselect', label: 'Multi Select', icon: CheckSquare },
+    { value: 'checkbox', label: 'Checkbox', icon: CheckSquare },
+    { value: 'textarea', label: 'Long Text', icon: AlignLeft },
+];
+
+export default function CustomFieldsPage() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [folders, setFolders] = useState<FieldFolder[]>([
+        { id: '1', name: 'General Info' },
+        { id: '2', name: 'Sales Data' },
+        { id: '3', name: 'Marketing' },
+    ]);
+    
+    const [fields, setFields] = useState<CustomField[]>([
+        { id: '1', name: 'Job Title', type: 'text', folderId: '1', description: 'Current job title' },
+        { id: '2', name: 'Company Size', type: 'select', folderId: '2', options: ['1-10', '11-50', '50+'] },
+        { id: '3', name: 'Annual Revenue', type: 'number', folderId: '2' },
+        { id: '4', name: 'Lead Source Detail', type: 'text', folderId: '3' },
+        { id: '5', name: 'Interests', type: 'multiselect', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
+        { id: '6', name: 'Contract Start Date', type: 'date', folderId: '2' },
+        { id: '7', name: 'Uncategorized Field', type: 'text', folderId: null },
+    ]);
+
+    const [expandedFolders, setExpandedFolders] = useState<string[]>(['1', '2', '3']);
+    const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
+    const [isCreateFieldOpen, setIsCreateFieldOpen] = useState(false);
+    const [newFolderName, setNewFolderName] = useState("");
+    const [newFieldData, setNewFieldData] = useState<Partial<CustomField>>({ type: 'text', folderId: '1' });
+
+    const toggleFolder = (folderId: string) => {
+        if (expandedFolders.includes(folderId)) {
+            setExpandedFolders(expandedFolders.filter(id => id !== folderId));
+        } else {
+            setExpandedFolders([...expandedFolders, folderId]);
+        }
+    };
+
+    const handleCreateFolder = () => {
+        if (newFolderName.trim()) {
+            setFolders([...folders, { id: Math.random().toString(36).substr(2, 9), name: newFolderName }]);
+            setNewFolderName("");
+            setIsCreateFolderOpen(false);
+        }
+    };
+
+    const handleCreateField = () => {
+        if (newFieldData.name) {
+            setFields([...fields, { 
+                id: Math.random().toString(36).substr(2, 9), 
+                name: newFieldData.name,
+                type: newFieldData.type as any || 'text',
+                folderId: newFieldData.folderId || null,
+                description: newFieldData.description,
+                options: newFieldData.options,
+                required: newFieldData.required
+            }]);
+            setNewFieldData({ type: 'text', folderId: '1' });
+            setIsCreateFieldOpen(false);
+        }
+    };
+
+    const deleteFolder = (id: string) => {
+        setFolders(folders.filter(f => f.id !== id));
+        // Move fields to uncategorized (null folder)
+        setFields(fields.map(f => f.folderId === id ? { ...f, folderId: null } : f));
+    };
+
+    const deleteField = (id: string) => {
+        setFields(fields.filter(f => f.id !== id));
+    };
+
+    const getFieldIcon = (type: string) => {
+        const typeObj = FIELD_TYPES.find(t => t.value === type);
+        const Icon = typeObj ? typeObj.icon : Type;
+        return <Icon className="h-4 w-4 text-slate-500" />;
+    };
+
+    const filteredFields = fields.filter(f => 
+        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const groupedFields = {
+        uncategorized: filteredFields.filter(f => !f.folderId),
+        ...folders.reduce((acc, folder) => ({
+            ...acc,
+            [folder.id]: filteredFields.filter(f => f.folderId === folder.id)
+        }), {} as Record<string, CustomField[]>)
+    };
+
+    return (
+        <DashboardLayout>
+            <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Custom Fields</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="gap-2">
+                                    <FolderPlus className="h-4 w-4" />
+                                    New Folder
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create New Folder</DialogTitle>
+                                    <DialogDescription>
+                                        Create a folder to organize your custom fields.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <Label htmlFor="folder-name" className="mb-2 block">Folder Name</Label>
+                                    <Input 
+                                        id="folder-name" 
+                                        placeholder="e.g. Sales Metrics" 
+                                        value={newFolderName}
+                                        onChange={(e) => setNewFolderName(e.target.value)}
+                                    />
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>Cancel</Button>
+                                    <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Create Folder</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={isCreateFieldOpen} onOpenChange={setIsCreateFieldOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    Add Field
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[500px]">
+                                <DialogHeader>
+                                    <DialogTitle>Create Custom Field</DialogTitle>
+                                    <DialogDescription>
+                                        Add a new field to capture specific data about your contacts.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="field-name">Field Name</Label>
+                                        <Input 
+                                            id="field-name" 
+                                            placeholder="e.g. T-Shirt Size" 
+                                            value={newFieldData.name || ''}
+                                            onChange={(e) => setNewFieldData({...newFieldData, name: e.target.value})}
+                                        />
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="field-type">Field Type</Label>
+                                            <Select 
+                                                value={newFieldData.type} 
+                                                onValueChange={(val: any) => setNewFieldData({...newFieldData, type: val})}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {FIELD_TYPES.map(type => (
+                                                        <SelectItem key={type.value} value={type.value}>
+                                                            <div className="flex items-center gap-2">
+                                                                <type.icon className="h-4 w-4" />
+                                                                {type.label}
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        
+                                        <div className="space-y-2">
+                                            <Label htmlFor="field-folder">Folder</Label>
+                                            <Select 
+                                                value={newFieldData.folderId || "uncategorized"} 
+                                                onValueChange={(val) => setNewFieldData({...newFieldData, folderId: val === "uncategorized" ? null : val})}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select folder" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                                    {folders.map(folder => (
+                                                        <SelectItem key={folder.id} value={folder.id}>{folder.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <Label htmlFor="field-desc">Description (Optional)</Label>
+                                        <Input 
+                                            id="field-desc" 
+                                            placeholder="What is this field used for?" 
+                                            value={newFieldData.description || ''}
+                                            onChange={(e) => setNewFieldData({...newFieldData, description: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline" onClick={() => setIsCreateFieldOpen(false)}>Cancel</Button>
+                                    <Button onClick={handleCreateField} disabled={!newFieldData.name}>Create Field</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6">
+                    <div className="max-w-5xl mx-auto space-y-6">
+                        {/* Search */}
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Input 
+                                className="pl-9 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800" 
+                                placeholder="Search fields..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Folders List */}
+                        <div className="space-y-4">
+                            {folders.map(folder => (
+                                <div key={folder.id} className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                    <div 
+                                        className="flex items-center justify-between px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+                                        onClick={() => toggleFolder(folder.id)}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            {expandedFolders.includes(folder.id) ? (
+                                                <ChevronDown className="h-4 w-4 text-slate-500" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4 text-slate-500" />
+                                            )}
+                                            <Folder className="h-4 w-4 text-indigo-500" />
+                                            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{folder.name}</span>
+                                            <Badge variant="secondary" className="ml-2 text-[10px] h-5">
+                                                {groupedFields[folder.id]?.length || 0} fields
+                                            </Badge>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>Rename Folder</DropdownMenuItem>
+                                                <DropdownMenuItem className="text-red-600" onClick={() => deleteFolder(folder.id)}>
+                                                    Delete Folder
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+
+                                    {expandedFolders.includes(folder.id) && (
+                                        <div className="border-t border-slate-100 dark:border-slate-800">
+                                            {groupedFields[folder.id]?.length > 0 ? (
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
+                                                            <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
+                                                            <TableHead className="w-[40%] text-xs font-medium">Description</TableHead>
+                                                            <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {groupedFields[folder.id].map(field => (
+                                                            <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                                                                <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                                    {field.name}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                                                        {getFieldIcon(field.type)}
+                                                                        <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
+                                                                    {field.description || '-'}
+                                                                </TableCell>
+                                                                <TableCell className="text-right">
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                                                <MoreHorizontal className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent align="end">
+                                                                            <DropdownMenuItem>Edit Field</DropdownMenuItem>
+                                                                            <DropdownMenuItem>Move to Folder</DropdownMenuItem>
+                                                                            <DropdownMenuSeparator />
+                                                                            <DropdownMenuItem className="text-red-600" onClick={() => deleteField(field.id)}>
+                                                                                Delete Field
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            ) : (
+                                                <div className="py-8 text-center text-sm text-slate-500 italic">
+                                                    No fields in this folder yet.
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+
+                            {/* Uncategorized Fields */}
+                            {groupedFields.uncategorized?.length > 0 && (
+                                <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
+                                    <div className="px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-slate-400" />
+                                            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">Uncategorized Fields</span>
+                                            <Badge variant="secondary" className="ml-2 text-[10px] h-5">
+                                                {groupedFields.uncategorized.length} fields
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
+                                                <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
+                                                <TableHead className="w-[40%] text-xs font-medium">Description</TableHead>
+                                                <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {groupedFields.uncategorized.map(field => (
+                                                <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                        {field.name}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                                            {getFieldIcon(field.type)}
+                                                            <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
+                                                        {field.description || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem>Edit Field</DropdownMenuItem>
+                                                                <DropdownMenuItem>Move to Folder</DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem className="text-red-600" onClick={() => deleteField(field.id)}>
+                                                                    Delete Field
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </DashboardLayout>
+    );
+}
