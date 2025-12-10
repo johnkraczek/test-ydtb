@@ -72,15 +72,15 @@ const INITIAL_TOOLS: ToolItem[] = [
     visible: true,
   },
   {
+    id: "sop",
+    icon: FileText,
+    label: "SOP Library",
+    visible: true,
+  },
+  {
     id: "spaces",
     icon: Layers, // Placeholder icon
     label: "Spaces",
-    visible: false,
-  },
-  {
-    id: "docs",
-    icon: FileText, // Need to import
-    label: "Docs",
     visible: false,
   },
 ];

@@ -70,6 +70,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <PagesSidebarContent />;
       case "automation":
         return <AutomationSidebarContent />;
+      case "sop":
+        return <SopSidebarContent />;
       case "settings":
         return <SettingsSidebarContent />;
       default:
@@ -93,6 +95,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return "Pages";
       case "automation":
         return "Automation";
+      case "sop":
+        return "SOP Library";
       case "settings":
         return "Settings";
       default:
@@ -468,6 +472,31 @@ function AutomationSidebarContent() {
       <SidebarSection title="Drafts">
         <SidebarItem icon={FileText} label="Support Routing" />
         <SidebarItem icon={FileText} label="Daily Summary" />
+      </SidebarSection>
+    </div>
+  );
+}
+
+function SopSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Library">
+        <SidebarItem icon={FileText} label="All Documents" active />
+        <SidebarItem icon={Star} label="Favorites" />
+        <SidebarItem icon={Clock} label="Recently Updated" />
+      </SidebarSection>
+      
+      <SidebarSection title="Departments">
+        <SidebarItem icon={Folder} label="Engineering" />
+        <SidebarItem icon={Folder} label="Marketing" />
+        <SidebarItem icon={Folder} label="Sales" />
+        <SidebarItem icon={Folder} label="HR & Admin" />
+        <SidebarItem icon={Folder} label="Customer Success" />
+      </SidebarSection>
+
+      <SidebarSection title="Resources">
+        <SidebarItem icon={Circle} label="Templates" />
+        <SidebarItem icon={Circle} label="Archived" />
       </SidebarSection>
     </div>
   );
