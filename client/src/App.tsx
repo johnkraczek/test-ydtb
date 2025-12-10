@@ -28,13 +28,21 @@ import CustomFieldsPage from "@/pages/custom-fields";
 import CustomValuesPage from "@/pages/custom-values";
 import AgencyDashboardPage from "@/pages/agency-dashboard";
 import AgencySettingsPage from "@/pages/agency-settings";
+import AgencyProfilePage from "@/pages/agency-settings/profile";
+import AgencyTeamPage from "@/pages/agency-settings/team";
+import AgencyBillingPage from "@/pages/agency-settings/billing";
+import AgencyWhiteLabelPage from "@/pages/agency-settings/white-label";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={DashboardPage} />
       <Route path="/agency" component={AgencyDashboardPage} />
-      <Route path="/agency/settings" component={AgencySettingsPage} />
+      {/* <Route path="/agency/settings" component={AgencySettingsPage} /> */}
+      <Route path="/agency/settings/profile" component={AgencyProfilePage} />
+      <Route path="/agency/settings/team" component={AgencyTeamPage} />
+      <Route path="/agency/settings/billing" component={AgencyBillingPage} />
+      <Route path="/agency/settings/white-label" component={AgencyWhiteLabelPage} />
       <Route path="/launchpad" component={LaunchpadPage} />
       <Route path="/launchpad/email" component={EmailSetupPage} />
       <Route path="/launchpad/payment" component={PaymentSetupPage} />

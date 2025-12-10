@@ -13,7 +13,10 @@ import {
   LayoutTemplate,
   File,
   Rocket,
-  Briefcase
+  Briefcase,
+  Building,
+  CreditCard,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -129,6 +132,30 @@ const AGENCY_TOOLS: ToolItem[] = [
     id: "agency-home",
     icon: Home,
     label: "Agency Dashboard",
+    visible: true,
+  },
+  {
+    id: "agency-profile",
+    icon: Building,
+    label: "Agency Profile",
+    visible: true,
+  },
+  {
+    id: "agency-team",
+    icon: Users,
+    label: "Team Management",
+    visible: true,
+  },
+  {
+    id: "agency-billing",
+    icon: CreditCard,
+    label: "Billing",
+    visible: true,
+  },
+  {
+    id: "agency-white-label",
+    icon: Globe,
+    label: "White Label",
     visible: true,
   },
 ];
