@@ -167,130 +167,130 @@ export default function CustomFieldsPage() {
     };
 
     return (
-        <DashboardLayout>
-            <div className="h-full flex flex-col">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Custom Fields</h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" className="gap-2">
-                                    <FolderPlus className="h-4 w-4" />
-                                    New Folder
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Create New Folder</DialogTitle>
-                                    <DialogDescription>
-                                        Create a folder to organize your custom fields.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4">
-                                    <Label htmlFor="folder-name" className="mb-2 block">Folder Name</Label>
+        <DashboardLayout header={
+            <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
+                <div>
+                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Custom Fields</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" className="gap-2 bg-white dark:bg-slate-900">
+                                <FolderPlus className="h-4 w-4" />
+                                New Folder
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Create New Folder</DialogTitle>
+                                <DialogDescription>
+                                    Create a folder to organize your custom fields.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                                <Label htmlFor="folder-name" className="mb-2 block">Folder Name</Label>
+                                <Input 
+                                    id="folder-name" 
+                                    placeholder="e.g. Sales Metrics" 
+                                    value={newFolderName}
+                                    onChange={(e) => setNewFolderName(e.target.value)}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>Cancel</Button>
+                                <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Create Folder</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={isCreateFieldOpen} onOpenChange={setIsCreateFieldOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm shadow-indigo-200 dark:shadow-none">
+                                <Plus className="h-4 w-4" />
+                                Add Field
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[500px]">
+                            <DialogHeader>
+                                <DialogTitle>Create Custom Field</DialogTitle>
+                                <DialogDescription>
+                                    Add a new field to capture specific data about your contacts.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4 space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="field-name">Field Name</Label>
                                     <Input 
-                                        id="folder-name" 
-                                        placeholder="e.g. Sales Metrics" 
-                                        value={newFolderName}
-                                        onChange={(e) => setNewFolderName(e.target.value)}
+                                        id="field-name" 
+                                        placeholder="e.g. T-Shirt Size" 
+                                        value={newFieldData.name || ''}
+                                        onChange={(e) => setNewFieldData({...newFieldData, name: e.target.value})}
                                     />
                                 </div>
-                                <DialogFooter>
-                                    <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>Cancel</Button>
-                                    <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Create Folder</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={isCreateFieldOpen} onOpenChange={setIsCreateFieldOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
-                                    <Plus className="h-4 w-4" />
-                                    Add Field
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px]">
-                                <DialogHeader>
-                                    <DialogTitle>Create Custom Field</DialogTitle>
-                                    <DialogDescription>
-                                        Add a new field to capture specific data about your contacts.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4 space-y-4">
+                                
+                                <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="field-name">Field Name</Label>
-                                        <Input 
-                                            id="field-name" 
-                                            placeholder="e.g. T-Shirt Size" 
-                                            value={newFieldData.name || ''}
-                                            onChange={(e) => setNewFieldData({...newFieldData, name: e.target.value})}
-                                        />
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="field-type">Field Type</Label>
-                                            <Select 
-                                                value={newFieldData.type} 
-                                                onValueChange={(val: any) => setNewFieldData({...newFieldData, type: val})}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {FIELD_TYPES.map(type => (
-                                                        <SelectItem key={type.value} value={type.value}>
-                                                            <div className="flex items-center gap-2">
-                                                                <type.icon className="h-4 w-4" />
-                                                                {type.label}
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        
-                                        <div className="space-y-2">
-                                            <Label htmlFor="field-folder">Folder</Label>
-                                            <Select 
-                                                value={newFieldData.folderId || "uncategorized"} 
-                                                onValueChange={(val) => setNewFieldData({...newFieldData, folderId: val === "uncategorized" ? null : val})}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select folder" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="uncategorized">Uncategorized</SelectItem>
-                                                    {folders.map(folder => (
-                                                        <SelectItem key={folder.id} value={folder.id}>{folder.name}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                        <Label htmlFor="field-type">Field Type</Label>
+                                        <Select 
+                                            value={newFieldData.type} 
+                                            onValueChange={(val: any) => setNewFieldData({...newFieldData, type: val})}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {FIELD_TYPES.map(type => (
+                                                    <SelectItem key={type.value} value={type.value}>
+                                                        <div className="flex items-center gap-2">
+                                                            <type.icon className="h-4 w-4" />
+                                                            {type.label}
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     
                                     <div className="space-y-2">
-                                        <Label htmlFor="field-desc">Description (Optional)</Label>
-                                        <Input 
-                                            id="field-desc" 
-                                            placeholder="What is this field used for?" 
-                                            value={newFieldData.description || ''}
-                                            onChange={(e) => setNewFieldData({...newFieldData, description: e.target.value})}
-                                        />
+                                        <Label htmlFor="field-folder">Folder</Label>
+                                        <Select 
+                                            value={newFieldData.folderId || "uncategorized"} 
+                                            onValueChange={(val) => setNewFieldData({...newFieldData, folderId: val === "uncategorized" ? null : val})}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select folder" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                                {folders.map(folder => (
+                                                    <SelectItem key={folder.id} value={folder.id}>{folder.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
-                                <DialogFooter>
-                                    <Button variant="outline" onClick={() => setIsCreateFieldOpen(false)}>Cancel</Button>
-                                    <Button onClick={handleCreateField} disabled={!newFieldData.name}>Create Field</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
+                                
+                                <div className="space-y-2">
+                                    <Label htmlFor="field-desc">Description (Optional)</Label>
+                                    <Input 
+                                        id="field-desc" 
+                                        placeholder="What is this field used for?" 
+                                        value={newFieldData.description || ''}
+                                        onChange={(e) => setNewFieldData({...newFieldData, description: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsCreateFieldOpen(false)}>Cancel</Button>
+                                <Button onClick={handleCreateField} disabled={!newFieldData.name}>Create Field</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-
+            </div>
+        }>
+            <div className="h-full flex flex-col">
                 <div className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6">
                     <div className="max-w-5xl mx-auto space-y-6">
                         {/* Search */}
