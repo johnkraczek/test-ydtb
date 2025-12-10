@@ -454,46 +454,8 @@ function ChatView({ chatId }: { chatId: string }) {
                         }`}>
                           {msg.content}
                         </div>
-                        
-                        {/* Reaction Trigger */}
-                        <div className={`absolute top-0 ${isMe ? '-left-8' : '-right-8'} opacity-100 flex flex-col gap-1`}>
-                           <TooltipProvider>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shadow-sm text-slate-400 hover:text-slate-600"
-                                >
-                                  <Smile className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-full flex items-center gap-1">
-                                {REACTION_OPTIONS.map((option) => (
-                                  <button
-                                    key={option.label}
-                                    className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-lg leading-none"
-                                    onClick={() => addReaction(msg.id, option.emoji)}
-                                    title={option.label}
-                                  >
-                                    {option.emoji}
-                                  </button>
-                                ))}
-                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-0.5" />
-                                <button
-                                  className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                  title="Add Reaction"
-                                >
-                                  <Plus className="h-4 w-4 text-slate-500" />
-                                </button>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </div>
 
-                      {msg.reactions.length > 0 && (
-                        <div className="flex gap-1 mt-0.5 flex-wrap">
+                        <div className="flex gap-1 mt-0.5 flex-wrap min-h-[20px]">
                           {msg.reactions.map((reaction, i) => (
                             <button 
                               key={i} 
@@ -504,16 +466,43 @@ function ChatView({ chatId }: { chatId: string }) {
                               <span className="text-slate-500">{reaction.count}</span>
                             </button>
                           ))}
-                          <Button 
-                             variant="ghost" 
-                             size="sm" 
-                             className="h-5 w-5 rounded-full p-0 text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200 hover:bg-white"
-                             onClick={() => addReaction(msg.id, "❤️")}
-                          >
-                             <Smile className="h-3 w-3" />
-                          </Button>
+                          
+                          <div className={`${msg.reactions.length === 0 ? 'opacity-0 group-hover/message:opacity-100' : 'opacity-100'} transition-opacity`}>
+                            <TooltipProvider>
+                              <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-5 w-5 rounded-full p-0 text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200 hover:bg-white"
+                                  >
+                                    <Smile className="h-3 w-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-full flex items-center gap-1">
+                                  {REACTION_OPTIONS.map((option) => (
+                                    <button
+                                      key={option.label}
+                                      className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-lg leading-none"
+                                      onClick={() => addReaction(msg.id, option.emoji)}
+                                      title={option.label}
+                                    >
+                                      {option.emoji}
+                                    </button>
+                                  ))}
+                                  <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-0.5" />
+                                  <button
+                                    className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                    title="Add Reaction"
+                                  >
+                                    <Plus className="h-4 w-4 text-slate-500" />
+                                  </button>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 );
