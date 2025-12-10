@@ -18,11 +18,15 @@ export function DashboardPageHeader({
   isBorderVisible = true,
   breadcrumbs,
 }: DashboardPageHeaderProps) {
+  const breadcrumbContent = breadcrumbs === undefined ? <DashboardBreadcrumb /> : breadcrumbs;
+
   return (
     <div className={`${isBorderVisible ? "border-b border-slate-200 dark:border-slate-800" : ""} bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-8 py-6 transition-all duration-300`}>
-       <div className="mb-4">
-          {breadcrumbs || <DashboardBreadcrumb />}
-       </div>
+       {breadcrumbContent && (
+         <div className="mb-4">
+            {breadcrumbContent}
+         </div>
+       )}
        
        <div className="flex items-start justify-between gap-4">
          <div className="space-y-1">
