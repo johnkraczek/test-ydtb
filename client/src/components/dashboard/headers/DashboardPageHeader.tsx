@@ -9,6 +9,7 @@ interface DashboardPageHeaderProps {
   actions?: React.ReactNode;
   isBorderVisible?: boolean;
   breadcrumbs?: React.ReactNode;
+  hideBreadcrumbs?: boolean;
 }
 
 export function DashboardPageHeader({
@@ -17,12 +18,15 @@ export function DashboardPageHeader({
   actions,
   isBorderVisible = true,
   breadcrumbs,
+  hideBreadcrumbs,
 }: DashboardPageHeaderProps) {
   return (
     <div className={`${isBorderVisible ? "border-b border-slate-200 dark:border-slate-800" : ""} bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-8 py-6 transition-all duration-300`}>
-       <div className="mb-4">
-          {breadcrumbs || <DashboardBreadcrumb />}
-       </div>
+       {!hideBreadcrumbs && (
+         <div className="mb-4">
+            {breadcrumbs || <DashboardBreadcrumb />}
+         </div>
+       )}
        
        <div className="flex items-start justify-between gap-4">
          <div className="space-y-1">

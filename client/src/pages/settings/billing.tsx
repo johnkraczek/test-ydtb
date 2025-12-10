@@ -133,6 +133,7 @@ export default function BillingSettingsPage() {
           title="Billing & Subscription"
           description="Manage your subscription plan and payment methods."
           actions={<></>}
+          hideBreadcrumbs={true}
         />
       }
     >
