@@ -7,26 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetFooter,
-  SheetClose
-} from "@/components/ui/sheet";
 import {
   Popover,
   PopoverContent,
@@ -71,104 +51,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-// Internal component for the edit form
-function CustomerFormContent({ formData, setFormData }: { formData: any, setFormData: any }) {
-  return (
-    <div className="space-y-6 py-4">
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-muted-foreground">Basic Information</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input 
-              id="firstName" 
-              value={formData.firstName} 
-              onChange={(e) => setFormData({...formData, firstName: e.target.value})} 
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input 
-              id="lastName" 
-              value={formData.lastName} 
-              onChange={(e) => setFormData({...formData, lastName: e.target.value})} 
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            value={formData.email} 
-            onChange={(e) => setFormData({...formData, email: e.target.value})} 
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input 
-            id="phone" 
-            value={formData.phone} 
-            onChange={(e) => setFormData({...formData, phone: e.target.value})} 
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="location">Location</Label>
-          <Input 
-            id="location" 
-            value={formData.location} 
-            onChange={(e) => setFormData({...formData, location: e.target.value})} 
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-muted-foreground">Status & Tier</h3>
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select 
-            value={formData.status} 
-            onValueChange={(val) => setFormData({...formData, status: val})}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="VIP">VIP</SelectItem>
-              <SelectItem value="Inactive">Inactive</SelectItem>
-              <SelectItem value="Lead">Lead</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-muted-foreground">Custom Data</h3>
-        <div className="space-y-3">
-          {Object.entries(formData.customData).map(([key, value]) => (
-            <div key={key} className="space-y-1">
-              <Label className="text-xs uppercase text-slate-500">{key}</Label>
-              <Input 
-                value={value as string} 
-                onChange={(e) => setFormData({
-                  ...formData, 
-                  customData: {
-                    ...formData.customData,
-                    [key]: e.target.value
-                  }
-                })} 
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+import { ContactEditDrawer } from "@/components/dashboard/ContactEditDrawer";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -272,11 +155,10 @@ export default function ContactDetailPage() {
   // Filter state for metrics
   const [metricsFilter, setMetricsFilter] = useState("last_quarter");
 
-  // Edit Form State
-  const [formData, setFormData] = useState({...customer});
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
-  const handleSaveProfile = () => {
-    setCustomer(formData);
+  const handleSaveProfile = (updatedContact: any) => {
+    setCustomer(updatedContact);
     toast({
       title: "Profile Updated",
       description: "Customer details have been saved successfully.",
@@ -470,30 +352,13 @@ export default function ContactDetailPage() {
           }
           actions={
             <div className="flex items-center gap-2 pt-8">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" onClick={() => setFormData({...customer})}>Edit Profile</Button>
-                </SheetTrigger>
-                <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle>Edit Customer Profile</SheetTitle>
-                    <SheetDescription>
-                      Update customer details, contact preferences, and tags.
-                    </SheetDescription>
-                  </SheetHeader>
-                  
-                  <CustomerFormContent formData={formData} setFormData={setFormData} />
-
-                  <SheetFooter className="pt-4 border-t">
-                    <SheetClose asChild>
-                      <Button variant="outline">Cancel</Button>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Button onClick={handleSaveProfile}>Save Changes</Button>
-                    </SheetClose>
-                  </SheetFooter>
-                </SheetContent>
-              </Sheet>
+              <Button variant="outline" onClick={() => setIsEditDrawerOpen(true)}>Edit Profile</Button>
+              <ContactEditDrawer
+                open={isEditDrawerOpen}
+                onOpenChange={setIsEditDrawerOpen}
+                contact={customer}
+                onSave={handleSaveProfile}
+              />
             </div>
           }
         />

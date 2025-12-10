@@ -53,6 +53,7 @@ interface ContactEditDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contact: any; // Using any for mockup simplicity
+  onSave?: (data: any) => void;
 }
 
 interface CustomField {
@@ -105,7 +106,7 @@ const AVAILABLE_TAGS = [
     "Churned"
 ];
 
-export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDrawerProps) {
+export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: ContactEditDrawerProps) {
   const [formData, setFormData] = useState<any>({});
   const [openCombobox, setOpenCombobox] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -534,7 +535,13 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
             </Button>
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+                <Button 
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                    onClick={() => {
+                        onSave?.(formData);
+                        onOpenChange(false);
+                    }}
+                >
                     <Save className="h-4 w-4" />
                     Save Changes
                 </Button>
