@@ -23,6 +23,14 @@ import {
   FileText
 } from "lucide-react";
 import { DashboardBreadcrumb } from "@/components/dashboard/layouts/DashboardBreadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Mock Data for the SOP Detail
 const MOCK_SOP_DETAIL = {
@@ -109,6 +117,7 @@ const MOCK_SOP_DETAIL = {
 export default function SopDetailPage() {
   const [, params] = useRoute("/sop/:id");
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   const toggleStep = (stepId: string) => {
     setCompletedSteps(prev => 
@@ -232,23 +241,50 @@ export default function SopDetailPage() {
           
           {/* Video Card */}
           <Card className="overflow-hidden border-slate-200 dark:border-slate-800 shadow-sm sticky top-24">
-            <div className="aspect-video relative bg-slate-900 group cursor-pointer">
-              <img 
-                src={MOCK_SOP_DETAIL.videoThumbnail} 
-                alt="SOP Walkthrough" 
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-transform group-hover:scale-110">
-                  <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center pl-1 shadow-lg">
-                    <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+            <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+              <DialogTrigger asChild>
+                <div className="aspect-video relative bg-slate-900 group cursor-pointer">
+                  <img 
+                    src={MOCK_SOP_DETAIL.videoThumbnail} 
+                    alt="SOP Walkthrough" 
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-transform group-hover:scale-110">
+                      <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center pl-1 shadow-lg">
+                        <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 rounded text-xs font-medium text-white backdrop-blur-md">
+                    4:32
                   </div>
                 </div>
-              </div>
-              <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 rounded text-xs font-medium text-white backdrop-blur-md">
-                4:32
-              </div>
-            </div>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black border-slate-800">
+                <DialogHeader className="hidden">
+                  <DialogTitle>Video Walkthrough</DialogTitle>
+                  <DialogDescription>Watch the full video guide</DialogDescription>
+                </DialogHeader>
+                <div className="aspect-video w-full bg-black relative flex items-center justify-center">
+                  {/* In a real app, this would be a video player component */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <img 
+                      src={MOCK_SOP_DETAIL.videoThumbnail} 
+                      alt="Video Player Placeholder" 
+                      className="w-full h-full object-contain opacity-50"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-20 w-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center pl-1 shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                          <Play className="h-8 w-8 text-indigo-600 fill-indigo-600" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <CardHeader className="p-4 pb-2">
               <CardTitle className="text-base font-medium">Video Walkthrough</CardTitle>
             </CardHeader>
