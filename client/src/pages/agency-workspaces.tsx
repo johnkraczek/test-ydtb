@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,16 @@ import {
   Star, 
   BarChart2,
   ExternalLink,
-  Wallet
+  Wallet,
+  Check
 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 // Mock data for workspaces
 const WORKSPACES = [
@@ -86,6 +91,23 @@ const WORKSPACES = [
 ];
 
 export default function AgencyWorkspacesPage() {
+  const [visibleMetrics, setVisibleMetrics] = useState({
+    activeUsers: true,
+    calls: true,
+    emails: true,
+    sms: true,
+    contacts: true,
+    appointments: true,
+    reviews: true,
+  });
+
+  const toggleMetric = (key: keyof typeof visibleMetrics) => {
+    setVisibleMetrics(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   return (
     <DashboardLayout 
       mode="agency" 
@@ -111,9 +133,78 @@ export default function AgencyWorkspacesPage() {
                   <SelectItem value="all">All Status</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4 text-slate-500" />
-              </Button>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="icon" className="relative">
+                    <Filter className="h-4 w-4 text-slate-500" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-56 p-2">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm px-2 py-1.5 text-slate-900 dark:text-slate-100">Show Metrics</h4>
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-activeUsers" 
+                          checked={visibleMetrics.activeUsers}
+                          onCheckedChange={() => toggleMetric('activeUsers')}
+                        />
+                        <Label htmlFor="metric-activeUsers" className="flex-1 cursor-pointer">Active Users</Label>
+                      </div>
+                      <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-calls" 
+                          checked={visibleMetrics.calls}
+                          onCheckedChange={() => toggleMetric('calls')}
+                        />
+                        <Label htmlFor="metric-calls" className="flex-1 cursor-pointer">Calls</Label>
+                      </div>
+                      <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-emails" 
+                          checked={visibleMetrics.emails}
+                          onCheckedChange={() => toggleMetric('emails')}
+                        />
+                        <Label htmlFor="metric-emails" className="flex-1 cursor-pointer">Emails</Label>
+                      </div>
+                       <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-sms" 
+                          checked={visibleMetrics.sms}
+                          onCheckedChange={() => toggleMetric('sms')}
+                        />
+                        <Label htmlFor="metric-sms" className="flex-1 cursor-pointer">SMS</Label>
+                      </div>
+                       <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-contacts" 
+                          checked={visibleMetrics.contacts}
+                          onCheckedChange={() => toggleMetric('contacts')}
+                        />
+                        <Label htmlFor="metric-contacts" className="flex-1 cursor-pointer">Contacts</Label>
+                      </div>
+                       <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-appointments" 
+                          checked={visibleMetrics.appointments}
+                          onCheckedChange={() => toggleMetric('appointments')}
+                        />
+                        <Label htmlFor="metric-appointments" className="flex-1 cursor-pointer">Appointments</Label>
+                      </div>
+                       <div className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <Checkbox 
+                          id="metric-reviews" 
+                          checked={visibleMetrics.reviews}
+                          onCheckedChange={() => toggleMetric('reviews')}
+                        />
+                        <Label htmlFor="metric-reviews" className="flex-1 cursor-pointer">Reviews</Label>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
               <Button className="gap-2 ml-2">
                 <Plus className="h-4 w-4" />
                 Create Workspace
@@ -127,7 +218,7 @@ export default function AgencyWorkspacesPage() {
         {/* Workspaces List */}
         <div className="space-y-4">
           {WORKSPACES.map((workspace) => (
-            <WorkspaceCard key={workspace.id} workspace={workspace} />
+            <WorkspaceCard key={workspace.id} workspace={workspace} visibleMetrics={visibleMetrics} />
           ))}
         </div>
       </div>
@@ -135,7 +226,10 @@ export default function AgencyWorkspacesPage() {
   );
 }
 
-function WorkspaceCard({ workspace }: { workspace: any }) {
+function WorkspaceCard({ workspace, visibleMetrics }: { workspace: any, visibleMetrics: any }) {
+  // Count active metrics to adjust grid columns if needed
+  const activeMetricCount = Object.values(visibleMetrics).filter(Boolean).length;
+  
   return (
     <Card className="overflow-hidden border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
       <CardContent className="p-6">
@@ -169,14 +263,28 @@ function WorkspaceCard({ workspace }: { workspace: any }) {
           </div>
 
           {/* Middle Column: Metrics Grid */}
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-8">
-            <MetricItem label="Active Users" value={workspace.metrics.activeUsers.value} change={workspace.metrics.activeUsers.change} icon={Users} />
-            <MetricItem label="Calls" value={workspace.metrics.calls.value} change={workspace.metrics.calls.change} icon={Phone} />
-            <MetricItem label="Emails" value={workspace.metrics.emails.value} change={workspace.metrics.emails.change} icon={Mail} />
-            <MetricItem label="SMS" value={workspace.metrics.texts.value} change={workspace.metrics.texts.change} icon={MessageSquare} />
-            <MetricItem label="Contacts" value={workspace.metrics.contacts.value} change={workspace.metrics.contacts.change} icon={Users} />
-            <MetricItem label="Appointments" value={workspace.metrics.appointments.value} change={workspace.metrics.appointments.change} icon={Calendar} />
-            <MetricItem label="Reviews" value={workspace.metrics.reviews.value} subtext={`(${workspace.metrics.reviews.count})`} icon={Star} />
+          <div className={`flex-1 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-8 ${activeMetricCount === 0 ? 'hidden lg:hidden' : ''}`}>
+            {visibleMetrics.activeUsers && (
+              <MetricItem label="Active Users" value={workspace.metrics.activeUsers.value} change={workspace.metrics.activeUsers.change} icon={Users} />
+            )}
+            {visibleMetrics.calls && (
+              <MetricItem label="Calls" value={workspace.metrics.calls.value} change={workspace.metrics.calls.change} icon={Phone} />
+            )}
+            {visibleMetrics.emails && (
+              <MetricItem label="Emails" value={workspace.metrics.emails.value} change={workspace.metrics.emails.change} icon={Mail} />
+            )}
+            {visibleMetrics.sms && (
+              <MetricItem label="SMS" value={workspace.metrics.texts.value} change={workspace.metrics.texts.change} icon={MessageSquare} />
+            )}
+            {visibleMetrics.contacts && (
+              <MetricItem label="Contacts" value={workspace.metrics.contacts.value} change={workspace.metrics.contacts.change} icon={Users} />
+            )}
+            {visibleMetrics.appointments && (
+              <MetricItem label="Appointments" value={workspace.metrics.appointments.value} change={workspace.metrics.appointments.change} icon={Calendar} />
+            )}
+            {visibleMetrics.reviews && (
+              <MetricItem label="Reviews" value={workspace.metrics.reviews.value} subtext={`(${workspace.metrics.reviews.count})`} icon={Star} />
+            )}
           </div>
         </div>
       </CardContent>
