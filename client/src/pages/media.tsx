@@ -461,8 +461,8 @@ export default function MediaPage() {
               <div 
                 className={`group relative flex flex-col gap-2 p-3 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${
                   selectedItems.includes(item.id)
-                    ? 'bg-blue-50/50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 ring-1 ring-blue-200 dark:ring-blue-800'
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800'
+                    ? 'bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/30 ring-1 ring-primary/20 dark:ring-primary/30'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-primary/20 dark:hover:border-primary/30'
                 }`}
                 onClick={(e) => handleSelection(item, e)}
                 onDoubleClick={(e) => {
@@ -473,22 +473,22 @@ export default function MediaPage() {
                 <div className="aspect-square w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center relative">
                   {item.type === 'folder' ? (
                     <DroppableFolder item={item}>
-                      <Folder className="h-12 w-12 text-blue-500 fill-blue-500/20 transition-transform group-hover:scale-110 duration-300" />
+                      <Folder className="h-12 w-12 text-primary fill-primary/20 transition-transform group-hover:scale-110 duration-300" />
                     </DroppableFolder>
                   ) : item.type === 'image' ? (
                     item.url ? (
                       <img src={item.url} alt={item.name} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
                     ) : (
-                      <ImageIcon className="h-10 w-10 text-purple-500" />
+                      <ImageIcon className="h-10 w-10 text-primary" />
                     )
                   ) : (
-                    <FileText className="h-10 w-10 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                    <FileText className="h-10 w-10 text-slate-400 group-hover:text-primary transition-colors" />
                   )}
                   
                   {/* Selection Checkbox (visible on hover or selected) */}
                   <div className={`absolute top-2 right-2 h-5 w-5 rounded-full border flex items-center justify-center transition-opacity ${
                       selectedItems.includes(item.id) 
-                        ? 'opacity-100 border-blue-500 bg-blue-500 text-white' 
+                        ? 'opacity-100 border-primary bg-primary text-primary-foreground' 
                         : 'opacity-0 group-hover:opacity-100 border-slate-200 bg-white text-transparent'
                   }`}>
                     {selectedItems.includes(item.id) ? (
@@ -500,7 +500,7 @@ export default function MediaPage() {
                 </div>
                 
                 <div className="space-y-0.5">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate" title={item.name}>
+                  <p className={`text-sm font-medium truncate ${selectedItems.includes(item.id) ? 'text-primary' : 'text-slate-700 dark:text-slate-200'}`} title={item.name}>
                     {item.name}
                   </p>
                   <p className="text-xs text-slate-500 truncate">
