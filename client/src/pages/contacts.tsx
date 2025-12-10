@@ -513,55 +513,6 @@ export default function ContactsPage() {
         />
       </div>
       
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
-            <Filter className="h-3.5 w-3.5 text-slate-500" />
-            Filter
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[200px]">
-          <div className="p-2">
-            <Input 
-              placeholder="Search columns..." 
-              className="h-8 text-xs" 
-              value={columnSearch}
-              onChange={(e) => setColumnSearch(e.target.value)}
-            />
-          </div>
-          <DropdownMenuSeparator />
-          <div className="max-h-[200px] overflow-y-auto">
-            {filteredColumns.map((col) => (
-              <DropdownMenuCheckboxItem
-                key={col.id}
-                checked={visibleColumns[col.id]}
-                onCheckedChange={(checked) => {
-                  if (col.id === 'name') return;
-                  setVisibleColumns(prev => ({ ...prev, [col.id]: checked }))
-                }}
-                onSelect={(e) => e.preventDefault()}
-                disabled={col.id === 'name'}
-                className="text-xs"
-              >
-                {col.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-            {filteredColumns.length === 0 && (
-              <div className="p-2 text-xs text-slate-500 text-center">
-                No columns found
-              </div>
-            )}
-          </div>
-          <DropdownMenuSeparator />
-          <div className="p-2">
-            <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 px-2 text-xs font-normal text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800">
-              <Plus className="h-3.5 w-3.5" />
-              Add custom fields
-            </Button>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
         <Download className="h-3.5 w-3.5" />
         Export
