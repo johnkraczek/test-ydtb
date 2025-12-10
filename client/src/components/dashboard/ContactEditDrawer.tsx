@@ -258,12 +258,12 @@ export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: Conta
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-white dark:border-slate-800 shadow-sm">
               <AvatarImage src={formData.image} />
-              <AvatarFallback className="text-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                {formData.initials}
+              <AvatarFallback className="text-lg bg-primary text-primary-foreground font-bold">
+                {formData.firstName?.[0]}{formData.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <SheetTitle className="text-xl">{formData.name}</SheetTitle>
+              <SheetTitle className="text-xl">{formData.firstName} {formData.lastName}</SheetTitle>
               <div className="text-sm text-slate-500 flex items-center gap-2">
                 <span className="truncate max-w-[200px]">{formData.email}</span>
                 <span>•</span>
@@ -283,20 +283,55 @@ export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: Conta
                 <div className="grid grid-cols-1 gap-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="firstName">First Name</Label>
                             <Input 
-                                id="name" 
-                                value={formData.name || ''} 
-                                onChange={(e) => handleInputChange('name', e.target.value)}
+                                id="firstName" 
+                                value={formData.firstName || ''} 
+                                onChange={(e) => handleInputChange('firstName', e.target.value)}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="source">Source</Label>
+                            <Label htmlFor="lastName">Last Name</Label>
                             <Input 
-                                id="source" 
-                                value={formData.source || ''} 
-                                onChange={(e) => handleInputChange('source', e.target.value)}
+                                id="lastName" 
+                                value={formData.lastName || ''} 
+                                onChange={(e) => handleInputChange('lastName', e.target.value)}
                             />
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="source">Source</Label>
+                            <Select 
+                                value={formData.source || ''} 
+                                onValueChange={(val) => handleInputChange('source', val)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select source" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {["Website", "Referral", "LinkedIn", "Conference", "Cold Call", "Advertisement"].map(opt => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="type">Type</Label>
+                            <Select 
+                                value={formData.type || ''} 
+                                onValueChange={(val) => handleInputChange('type', val)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {["Individual", "Company", "Non-Profit", "Government"].map(opt => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                     
@@ -326,26 +361,16 @@ export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: Conta
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                         <div className="space-y-2">
-                            <Label htmlFor="dob">Date of Birth</Label>
-                            <div className="relative">
-                                <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <Input 
-                                    id="dob" 
-                                    className="pl-9"
-                                    type="date"
-                                    value={formData.dob ? new Date(formData.dob).toISOString().split('T')[0] : ''} 
-                                    onChange={(e) => handleInputChange('dob', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="type">Type</Label>
+                    <div className="space-y-2">
+                        <Label htmlFor="dob">Date of Birth</Label>
+                        <div className="relative">
+                            <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input 
-                                id="type" 
-                                value={formData.type || ''} 
-                                onChange={(e) => handleInputChange('type', e.target.value)}
+                                id="dob" 
+                                className="pl-9"
+                                type="date"
+                                value={formData.dob ? new Date(formData.dob).toISOString().split('T')[0] : ''} 
+                                onChange={(e) => handleInputChange('dob', e.target.value)}
                             />
                         </div>
                     </div>
@@ -536,7 +561,7 @@ export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: Conta
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
                 <Button 
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                     onClick={() => {
                         onSave?.(formData);
                         onOpenChange(false);
