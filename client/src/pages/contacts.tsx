@@ -216,6 +216,7 @@ export default function ContactsPage() {
     dndCall: false,
     dndInboundCalls: false,
     dndInboundSms: false,
+    contactId: false,
   });
   const [columnSearch, setColumnSearch] = useState("");
   
@@ -316,6 +317,7 @@ export default function ContactsPage() {
     { id: "dndCall", label: "DND Calls" },
     { id: "dndInboundCalls", label: "DND Inbound Calls" },
     { id: "dndInboundSms", label: "DND Inbound SMS" },
+    { id: "contactId", label: "Contact Id" },
   ];
 
   const filteredColumns = columns.filter(col => 
@@ -503,6 +505,7 @@ export default function ContactsPage() {
                 {visibleColumns.dndCall && <SortableHeader column="dndCall" label="DND Calls" />}
                 {visibleColumns.dndInboundCalls && <SortableHeader column="dndInboundCalls" label="DND Inbound Calls" />}
                 {visibleColumns.dndInboundSms && <SortableHeader column="dndInboundSms" label="DND Inbound SMS" />}
+                {visibleColumns.contactId && <SortableHeader column="contactId" label="Contact Id" />}
                 {visibleColumns.tags && <TableHead>Tags</TableHead>}
                 <TableHead className="w-[50px] text-right pr-2">
                     <Sheet open={isColumnCreatorOpen} onOpenChange={setIsColumnCreatorOpen}>
