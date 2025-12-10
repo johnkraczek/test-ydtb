@@ -19,17 +19,23 @@ import {
   Globe,
   Shield,
   Smartphone,
-  Fingerprint
+  Fingerprint,
+  Trash2,
+  Laptop
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export default function AccountSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [firstName, setFirstName] = useState("Jane");
   const [lastName, setLastName] = useState("Doe");
   const [email, setEmail] = useState("jane.doe@example.com");
+  
+  const [passkeys, setPasskeys] = useState<Array<{id: string, name: string, addedAt: string}>>([]);
+  const [isAddingPasskey, setIsAddingPasskey] = useState(false);
 
   const handleSaveProfile = () => {
     setIsLoading(true);
@@ -37,6 +43,26 @@ export default function AccountSettingsPage() {
       setIsLoading(false);
       toast.success("Profile updated successfully");
     }, 1000);
+  };
+
+  const handleAddPasskey = () => {
+    setIsAddingPasskey(true);
+    // Simulate webauthn ceremony
+    setTimeout(() => {
+        setIsAddingPasskey(false);
+        const newPasskey = {
+            id: Date.now().toString(),
+            name: "MacBook Pro (Touch ID)",
+            addedAt: new Date().toLocaleDateString()
+        };
+        setPasskeys([...passkeys, newPasskey]);
+        toast.success("Passkey added successfully");
+    }, 1500);
+  };
+
+  const handleDeletePasskey = (id: string) => {
+    setPasskeys(passkeys.filter(p => p.id !== id));
+    toast.success("Passkey removed");
   };
 
   return (
@@ -221,18 +247,62 @@ export default function AccountSettingsPage() {
               <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Fingerprint className="h-4 w-4 text-slate-500" /> Passkey Authentication
               </h3>
-              <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-lg">
-                <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0">
-                    <Fingerprint className="h-5 w-5 text-rose-600 dark:text-rose-400" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-slate-900 dark:text-slate-100">Biometric Login</div>
-                    <p className="text-sm text-slate-500">Log in securely using your device's fingerprint or face recognition.</p>
-                  </div>
+              
+              {passkeys.length > 0 ? (
+                <div className="space-y-3">
+                    {passkeys.map(passkey => (
+                        <div key={passkey.id} className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-900/50">
+                            <div className="flex items-start gap-4">
+                                <div className="h-10 w-10 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0">
+                                    <Laptop className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{passkey.name}</div>
+                                        <Badge variant="outline" className="text-[10px] h-4 px-1 bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                                            Active
+                                        </Badge>
+                                    </div>
+                                    <p className="text-sm text-slate-500">Added on {passkey.addedAt}</p>
+                                </div>
+                            </div>
+                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-600" onClick={() => handleDeletePasskey(passkey.id)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button variant="outline" size="sm" className="w-full border-dashed" onClick={handleAddPasskey} disabled={isAddingPasskey}>
+                         {isAddingPasskey ? (
+                            <>
+                                <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> Registering...
+                            </>
+                         ) : (
+                            <>
+                                <Fingerprint className="h-3.5 w-3.5 mr-2" /> Add Another Passkey
+                            </>
+                         )}
+                    </Button>
                 </div>
-                <Button variant="outline">Add Passkey</Button>
-              </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-lg">
+                    <div className="flex items-start gap-4">
+                    <div className="h-10 w-10 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0">
+                        <Fingerprint className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                    </div>
+                    <div>
+                        <div className="font-medium text-slate-900 dark:text-slate-100">Biometric Login</div>
+                        <p className="text-sm text-slate-500">Log in securely using your device's fingerprint or face recognition.</p>
+                    </div>
+                    </div>
+                    <Button variant="outline" onClick={handleAddPasskey} disabled={isAddingPasskey}>
+                        {isAddingPasskey ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verifying...
+                            </>
+                        ) : "Add Passkey"}
+                    </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
