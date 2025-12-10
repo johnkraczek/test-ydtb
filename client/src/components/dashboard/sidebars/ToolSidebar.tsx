@@ -77,6 +77,29 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
     }
   };
 
+  const getToolTitle = () => {
+    switch (toolId) {
+      case "launchpad":
+        return "Launchpad";
+      case "home":
+        return "Dashboard";
+      case "users":
+        return "Contacts";
+      case "messages":
+        return "Messages";
+      case "media":
+        return "Media";
+      case "pages":
+        return "Pages";
+      case "automation":
+        return "Automation";
+      case "settings":
+        return "Settings";
+      default:
+        return "Menu";
+    }
+  };
+
   return (
     <div
       className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl h-full rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
@@ -86,7 +109,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header with toggle button */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4 min-h-[60px]">
-          {isOpen && <h3 className="font-display font-semibold text-slate-900 dark:text-slate-100 tracking-tight pl-1">Menu</h3>}
+          {isOpen && <h3 className="font-display font-semibold text-slate-900 dark:text-slate-100 tracking-tight pl-1">{getToolTitle()}</h3>}
           <Button
             className="h-7 w-7 p-0 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
             onClick={onToggle}
