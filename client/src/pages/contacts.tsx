@@ -119,8 +119,10 @@ import {
   Globe,
   Sparkles,
   GripVertical,
-  ArrowLeft
+  ArrowLeft,
+  Settings
 } from "lucide-react";
+import { ViewSettings } from "@/components/dashboard/ViewSettings";
 import {
   DndContext, 
   closestCenter, 
@@ -259,6 +261,8 @@ export default function ContactsPage() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [, setLocation] = useLocation();
+  const [isViewSettingsOpen, setIsViewSettingsOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
@@ -609,16 +613,35 @@ export default function ContactsPage() {
         />
       </div>
 
-      <FilterBuilder 
-        columns={columns} 
-        filters={filters} 
-        onFiltersChange={setFilters} 
-      />
+      <div className="flex items-center gap-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md shadow-sm">
+        <FilterBuilder 
+          columns={columns} 
+          filters={filters} 
+          onFiltersChange={setFilters}
+          open={isFilterOpen}
+          onOpenChange={setIsFilterOpen}
+        />
+        <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
+          onClick={() => setIsViewSettingsOpen(true)}
+        >
+          <Settings className="h-4 w-4 text-slate-500" />
+        </Button>
+      </div>
       
       <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
         <Download className="h-3.5 w-3.5" />
         Export
       </Button>
+      <ViewSettings 
+        open={isViewSettingsOpen} 
+        onOpenChange={setIsViewSettingsOpen} 
+        onOpenFields={() => setIsColumnCreatorOpen(true)}
+        onOpenFilter={() => setIsFilterOpen(true)}
+      />
     </div>
   );
 

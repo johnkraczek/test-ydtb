@@ -36,12 +36,17 @@ interface FilterBuilderProps {
   columns: { id: string; label: string; type?: string }[];
   filters: Filter[];
   onFiltersChange: (filters: Filter[]) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuilderProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function FilterBuilder({ columns, filters, onFiltersChange, open: controlledOpen, onOpenChange: controlledOnOpenChange }: FilterBuilderProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [filterName, setFilterName] = useState("");
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalIsOpen;
+  const setIsOpen = controlledOnOpenChange || setInternalIsOpen;
 
   const createFilter = (logic?: FilterLogic): FilterCondition => ({
     id: Math.random().toString(36).substr(2, 9),
