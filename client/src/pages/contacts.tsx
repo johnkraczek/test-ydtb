@@ -186,6 +186,8 @@ function SortableColumnItem({ id, column, visibleColumns, setVisibleColumns }: a
 }
 
 // Mock data for contacts
+import { ExportDrawer } from "@/components/dashboard/ExportDrawer";
+
 const generateContacts = (count: number) => {
   const tags = ["Customer", "Lead", "VIP", "Partner", "Vendor", "New", "Inactive", "Referral", "Enterprise", "Small Business"];
   
@@ -265,6 +267,8 @@ export default function ContactsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showAvatar, setShowAvatar] = useState(true);
   
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
     name: true,
@@ -630,10 +634,22 @@ export default function ContactsPage() {
         <Settings className="h-4 w-4 text-slate-500" />
       </Button>
       
-      <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800"
+        onClick={() => setIsExportOpen(true)}
+      >
         <Download className="h-3.5 w-3.5" />
         Export
       </Button>
+      <ExportDrawer 
+        open={isExportOpen} 
+        onOpenChange={setIsExportOpen}
+        columns={columns}
+        filters={filters}
+        totalContacts={currentContacts.length} 
+      />
       <ViewSettings 
         open={isViewSettingsOpen} 
         onOpenChange={setIsViewSettingsOpen} 
