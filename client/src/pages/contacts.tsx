@@ -221,7 +221,7 @@ export default function ContactsPage() {
   
   // Custom Column Creation State
   const [isColumnCreatorOpen, setIsColumnCreatorOpen] = useState(false);
-  const [columnCreatorStep, setColumnCreatorStep] = useState<'field-manager' | 'type-selection' | 'configuration'>('field-manager');
+  const [columnCreatorStep, setColumnCreatorStep] = useState<'field-manager' | 'type-selection' | 'configuration'>('type-selection');
   const [selectedColumnType, setSelectedColumnType] = useState<any>(null);
   const [newColumnConfig, setNewColumnConfig] = useState({
     name: "",
@@ -285,7 +285,7 @@ export default function ContactsPage() {
     // Here we would actually create the column
     // For mockup, we just close the sheet and reset
     setIsColumnCreatorOpen(false);
-    setColumnCreatorStep('field-manager');
+    setColumnCreatorStep('type-selection');
     setSelectedColumnType(null);
     // Maybe add a toast here
   };
@@ -293,7 +293,7 @@ export default function ContactsPage() {
   const handleCloseCreator = () => {
     setIsColumnCreatorOpen(false);
     setTimeout(() => {
-        setColumnCreatorStep('field-manager');
+        setColumnCreatorStep('type-selection');
         setSelectedColumnType(null);
     }, 300);
   };
@@ -514,7 +514,7 @@ export default function ContactsPage() {
                                     <div className="px-6 py-4 border-b">
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center gap-2">
-                                                <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setIsColumnCreatorOpen(false)}>
+                                                <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setColumnCreatorStep('type-selection')}>
                                                     <ArrowLeft className="h-4 w-4" />
                                                 </Button>
                                                 <h2 className="text-lg font-semibold">Fields</h2>
@@ -596,18 +596,20 @@ export default function ContactsPage() {
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
                                             onClick={() => setColumnCreatorStep('type-selection')}
                                         >
-                                            Create field
+                                            Create new field
                                         </Button>
                                     </div>
                                 </div>
                             ) : columnCreatorStep === 'type-selection' ? (
                                 <div className="h-full flex flex-col">
                                     <div className="px-6 py-4 border-b">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setColumnCreatorStep('field-manager')}>
-                                                <ArrowLeft className="h-4 w-4" />
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-2">
+                                                <h2 className="text-lg font-semibold">Create field</h2>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsColumnCreatorOpen(false)}>
+                                                <X className="h-4 w-4" />
                                             </Button>
-                                            <h2 className="text-lg font-semibold">Create field</h2>
                                         </div>
                                         <div className="relative">
                                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -668,6 +670,11 @@ export default function ContactsPage() {
                                                 ))}
                                             </div>
                                         </div>
+                                    </div>
+                                    <div className="p-4 border-t mt-auto">
+                                        <Button variant="outline" className="w-full gap-2 text-primary border-primary/20 bg-primary/5 hover:bg-primary/10" onClick={() => setColumnCreatorStep('field-manager')}>
+                                            <Plus className="h-4 w-4" /> Add existing fields
+                                        </Button>
                                     </div>
                                 </div>
                             ) : (
