@@ -565,7 +565,7 @@ export default function SopEditorPage() {
                                       type="color" 
                                       value={step.button.customColor}
                                       onChange={(e) => updateStepButton(step.id, 'customColor', e.target.value)}
-                                      className="h-8 w-8 p-0 border-none rounded-md cursor-pointer"
+                                      className="h-8 w-8 p-0 border-none rounded-full cursor-pointer overflow-hidden"
                                     />
                                   )}
                                 </div>
@@ -664,7 +664,7 @@ export default function SopEditorPage() {
                                         type="color" 
                                         value={step.note.customColor}
                                         onChange={(e) => updateStepNote(step.id, 'customColor', e.target.value)}
-                                        className="h-8 w-8 p-0 border-none rounded-md cursor-pointer flex-shrink-0"
+                                        className="h-8 w-8 p-0 border-none rounded-full cursor-pointer flex-shrink-0 overflow-hidden"
                                       />
                                     )}
                                   </div>
