@@ -407,14 +407,14 @@ export default function ContactDetailPage() {
         </TabsList>
 
         <TabsContent value="details" className="mt-6 space-y-6">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {/* Custom Fields Folders */}
               {MOCK_FOLDERS.map(folder => {
                 const fields = MOCK_FIELDS.filter(f => f.folderId === folder.id);
                 if (fields.length === 0) return null;
 
                 return (
-                  <Card key={folder.id}>
+                  <Card key={folder.id} className="break-inside-avoid">
                     <CardHeader>
                       <CardTitle className="text-base">{folder.name}</CardTitle>
                     </CardHeader>
@@ -454,7 +454,7 @@ export default function ContactDetailPage() {
                   if (fields.length === 0 || !hasValues) return null;
 
                    return (
-                      <Card>
+                      <Card className="break-inside-avoid">
                         <CardHeader>
                           <CardTitle className="text-base">Additional Info</CardTitle>
                         </CardHeader>
@@ -474,7 +474,7 @@ export default function ContactDetailPage() {
                    );
                })()}
 
-              <Card>
+              <Card className="break-inside-avoid">
                 <CardHeader>
                   <CardTitle className="text-base">System Details</CardTitle>
                 </CardHeader>
