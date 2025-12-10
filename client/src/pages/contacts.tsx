@@ -1347,28 +1347,18 @@ export default function ContactsPage() {
                       return <TableCell key={col.id} />;
                     })}
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[160px]">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuCheckboxItem 
-                            onSelect={() => {
-                              setEditingContact(contact);
-                              setIsEditDrawerOpen(true);
-                            }}
-                          >
-                            Edit details
-                          </DropdownMenuCheckboxItem>
-                          <DropdownMenuCheckboxItem>Add tag</DropdownMenuCheckboxItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuCheckboxItem className="text-red-600">Delete contact</DropdownMenuCheckboxItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingContact(contact);
+                          setIsEditDrawerOpen(true);
+                        }}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
