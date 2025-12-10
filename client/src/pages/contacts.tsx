@@ -230,6 +230,33 @@ export default function ContactsPage() {
     isPinned: false,
     isVisibleToGuests: true
   });
+  
+  // Dropdown options state
+  const [dropdownOptions, setDropdownOptions] = useState([
+    { id: '1', label: 'Option 1', color: 'bg-pink-500' },
+    { id: '2', label: 'Option 2', color: 'bg-purple-500' }
+  ]);
+  const [newOptionText, setNewOptionText] = useState("");
+
+  const handleAddOption = () => {
+    if (newOptionText.trim()) {
+      const colors = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-green-500', 'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      setDropdownOptions([
+        ...dropdownOptions, 
+        { 
+          id: Math.random().toString(36).substr(2, 9), 
+          label: newOptionText, 
+          color: randomColor 
+        }
+      ]);
+      setNewOptionText("");
+    }
+  };
+
+  const handleRemoveOption = (id: string) => {
+    setDropdownOptions(dropdownOptions.filter(opt => opt.id !== id));
+  };
 
   const fieldTypes = [
     { icon: List, label: "Dropdown", type: "dropdown", color: "text-emerald-600" },
@@ -580,6 +607,58 @@ export default function ContactsPage() {
                                                 onChange={(e) => setNewColumnConfig({...newColumnConfig, name: e.target.value})}
                                             />
                                         </div>
+
+                                        {selectedColumnType?.type === 'dropdown' && (
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-xs font-normal text-slate-500">Dropdown options <span className="text-red-500">*</span></Label>
+                                                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                        <span>Manual</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="space-y-2">
+                                                    {dropdownOptions.map((option) => (
+                                                        <div key={option.id} className="flex items-center gap-2 group">
+                                                            <div className="flex-1 flex items-center gap-2 h-9 px-3 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                                                                <div className={`h-2 w-2 rounded-full ${option.color}`} />
+                                                                <span className="text-sm text-slate-700 dark:text-slate-300">{option.label}</span>
+                                                            </div>
+                                                            <Button 
+                                                                variant="ghost" 
+                                                                size="icon" 
+                                                                className="h-8 w-8 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                onClick={() => handleRemoveOption(option.id)}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex-1 flex items-center gap-2 px-3 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
+                                                            <Plus className="h-4 w-4 text-indigo-600 bg-indigo-50 rounded-full p-0.5" />
+                                                            <Input 
+                                                                className="border-0 p-0 h-9 focus-visible:ring-0 placeholder:text-slate-400"
+                                                                placeholder="Type or paste options"
+                                                                value={newOptionText}
+                                                                onChange={(e) => setNewOptionText(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        e.preventDefault();
+                                                                        handleAddOption();
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm">
+                                                                <Sparkles className="h-3.5 w-3.5 text-purple-500" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div className="space-y-2">
                                             <Label>Fill method</Label>
