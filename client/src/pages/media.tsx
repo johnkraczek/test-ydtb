@@ -24,7 +24,8 @@ import {
   Check,
   Star,
   PanelRight,
-  Download
+  Download,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,14 +68,10 @@ export default function MediaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  // Debounce search query
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-        setSearchQuery(inputValue);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [inputValue]);
+  const handleSearchSubmit = () => {
+    setSearchQuery(inputValue);
+    setShowSearchResults(true);
+  };
 
   // Configure sensors for better click/drag distinction
   // Require a hold of 200ms to start dragging, allowing clicks to pass through immediately if released earlier
@@ -657,16 +654,34 @@ export default function MediaPage() {
              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
              <Input 
                 placeholder="Search files..." 
-                className="pl-9 h-9 w-full bg-white dark:bg-slate-900" 
+                className="pl-9 pr-9 h-9 w-full bg-white dark:bg-slate-900" 
                 value={inputValue}
                 onChange={(e) => {
                     setInputValue(e.target.value);
-                    setShowSearchResults(true);
+                    if (e.target.value === "") {
+                        setSearchQuery("");
+                        setShowSearchResults(false);
+                    }
                 }}
-                onFocus={() => setShowSearchResults(true)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        handleSearchSubmit();
+                    }
+                }}
+                onFocus={() => {
+                    if (searchQuery) setShowSearchResults(true);
+                }}
                 // Delay hiding to allow click event to register
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
              />
+             <Button 
+                size="icon" 
+                variant="ghost" 
+                className="absolute right-0 top-0 h-9 w-9 text-slate-400 hover:text-slate-600"
+                onClick={handleSearchSubmit}
+             >
+                <ArrowRight className="h-4 w-4" />
+             </Button>
           </div>
           
           {showSearchResults && searchQuery && (
