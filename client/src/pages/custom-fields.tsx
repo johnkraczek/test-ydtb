@@ -154,6 +154,7 @@ export default function CustomFieldsPage() {
     const [isMoveToFolderOpen, setIsMoveToFolderOpen] = useState(false);
     const [movingFieldId, setMovingFieldId] = useState<string | null>(null);
     const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+    const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
 
     // Selection state
     const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -287,10 +288,14 @@ export default function CustomFieldsPage() {
         }
     };
 
-    const deleteFolder = (id: string) => {
-        setFolders(folders.filter(f => f.id !== id));
-        // Move fields to uncategorized (null folder)
-        setFields(fields.map(f => f.folderId === id ? { ...f, folderId: null } : f));
+    const confirmDeleteFolder = () => {
+        if (folderToDelete) {
+            setFolders(folders.filter(f => f.id !== folderToDelete));
+            // Move fields to uncategorized (null folder)
+            setFields(fields.map(f => f.folderId === folderToDelete ? { ...f, folderId: null } : f));
+            setFolderToDelete(null);
+            toast.success("Folder deleted successfully");
+        }
     };
 
     const deleteField = (id: string) => {
@@ -560,6 +565,21 @@ export default function CustomFieldsPage() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
+
+                    <AlertDialog open={!!folderToDelete} onOpenChange={(open) => !open && setFolderToDelete(null)}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Folder?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to delete this folder? Any fields inside will be moved to "Uncategorized".
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDeleteFolder}>Delete Folder</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </div>
         }>
@@ -594,7 +614,7 @@ export default function CustomFieldsPage() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem>Rename Folder</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-red-600" onClick={() => deleteFolder(folder.id)}>
+                                                <DropdownMenuItem className="text-red-600" onClick={() => setFolderToDelete(folder.id)}>
                                                     Delete Folder
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
