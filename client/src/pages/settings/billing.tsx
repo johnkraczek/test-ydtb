@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   CreditCard, 
   Download, 
@@ -75,7 +77,9 @@ const PLANS = [
 export default function BillingSettingsPage() {
   const [currentPlan, setCurrentPlan] = useState("pro");
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [cardNumber, setCardNumber] = useState("4242");
 
   const handleSelectPlan = (planId: string) => {
     if (planId === currentPlan) return;
@@ -87,6 +91,15 @@ export default function BillingSettingsPage() {
       setIsUpdating(false);
       setIsPlanDialogOpen(false);
       toast.success(`Successfully switched to ${PLANS.find(p => p.id === planId)?.name} Plan`);
+    }, 1500);
+  };
+
+  const handleUpdatePaymentMethod = () => {
+    setIsUpdating(true);
+    setTimeout(() => {
+      setIsUpdating(false);
+      setIsPaymentDialogOpen(false);
+      toast.success("Payment method updated successfully");
     }, 1500);
   };
 
@@ -182,7 +195,7 @@ export default function BillingSettingsPage() {
                   <CreditCard className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                 </div>
                 <div>
-                  <div className="font-medium text-sm">Visa ending in 4242</div>
+                  <div className="font-medium text-sm">Visa ending in {cardNumber.slice(-4) || '4242'}</div>
                   <div className="text-xs text-slate-500">Expires 12/28</div>
                 </div>
               </div>
@@ -195,7 +208,7 @@ export default function BillingSettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t border-slate-100 dark:border-slate-800 pt-4 pb-4 mt-auto">
-              <Button variant="outline" size="sm" className="w-full">Update Payment Method</Button>
+              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsPaymentDialogOpen(true)}>Update Payment Method</Button>
             </CardFooter>
           </Card>
         </div>
@@ -331,6 +344,65 @@ export default function BillingSettingsPage() {
                 </div>
               ))}
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Update Payment Method Dialog */}
+        <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Update Payment Method</DialogTitle>
+              <DialogDescription>
+                Update your credit card details for future billing.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name on Card</Label>
+                <Input id="name" placeholder="John Doe" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="card">Card Number</Label>
+                <div className="relative">
+                  <CreditCard className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input 
+                    id="card" 
+                    placeholder="0000 0000 0000 0000" 
+                    className="pl-9" 
+                    value={cardNumber === "4242" ? "" : cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry">Expiry Date</Label>
+                  <Input id="expiry" placeholder="MM/YY" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cvc">CVC</Label>
+                  <Input id="cvc" placeholder="123" />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsPaymentDialogOpen(false)} disabled={isUpdating}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdatePaymentMethod} disabled={isUpdating}>
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...
+                  </>
+                ) : (
+                  "Save Payment Method"
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 
