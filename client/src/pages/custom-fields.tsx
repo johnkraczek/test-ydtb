@@ -537,10 +537,9 @@ export default function CustomFieldsPage() {
                     </div>
                 </TabsContent>
 
-                    <TabsContent value="list" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
-                        <div className="h-full">
-                            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-full">
-                                <Table>
+                    <TabsContent value="list" className="mt-0">
+                        <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                            <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
                                             <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
