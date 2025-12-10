@@ -21,6 +21,7 @@ import SopDetailPage from "@/pages/sop-detail";
 import SopEditorPage from "@/pages/sop-editor";
 import DomainSettingsPage from "@/pages/settings/domain";
 import AccountSettingsPage from "@/pages/settings/account";
+import BillingSettingsPage from "@/pages/settings/billing";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/launchpad/payment" component={PaymentSetupPage} />
       <Route path="/settings/domain" component={DomainSettingsPage} />
       <Route path="/settings/account" component={AccountSettingsPage} />
+      <Route path="/settings/billing" component={BillingSettingsPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/media" component={MediaPage} />

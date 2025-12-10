@@ -1,0 +1,208 @@
+
+import { useState } from "react";
+import DashboardLayout from "@/components/dashboard/Layout";
+import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { 
+  CreditCard, 
+  Download, 
+  CheckCircle2, 
+  AlertCircle,
+  Zap,
+  Calendar,
+  MoreVertical,
+  FileText,
+  ArrowUpRight
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Mock Data
+const INVOICES = [
+  { id: "inv_001", date: "2024-12-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
+  { id: "inv_002", date: "2024-11-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
+  { id: "inv_003", date: "2024-10-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
+  { id: "inv_004", date: "2024-09-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
+  { id: "inv_005", date: "2024-08-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
+];
+
+export default function BillingSettingsPage() {
+  return (
+    <DashboardLayout 
+      activeTool="settings"
+      header={
+        <DashboardPageHeader
+          title="Billing & Subscription"
+          description="Manage your subscription plan and payment methods."
+        />
+      }
+    >
+      <div className="max-w-5xl mx-auto space-y-8 pb-10">
+        
+        {/* Current Plan & Payment Method Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Current Plan */}
+          <Card className="md:col-span-2 border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Zap className="h-32 w-32 -mr-8 -mt-8 rotate-12" />
+            </div>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    Pro Plan
+                    <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">Active</Badge>
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    Everything you need to grow your business.
+                  </CardDescription>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">$49<span className="text-sm font-normal text-slate-500">/mo</span></div>
+                  <div className="text-xs text-slate-500">Renews on Jan 1, 2025</div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="space-y-1">
+                  <div className="text-sm font-medium text-slate-500">Storage Used</div>
+                  <div className="flex items-end gap-2">
+                    <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">7.5 GB</span>
+                    <span className="text-xs text-slate-500 mb-1">of 10 GB</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary w-[75%]" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-sm font-medium text-slate-500">Team Members</div>
+                  <div className="flex items-end gap-2">
+                    <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">5</span>
+                    <span className="text-xs text-slate-500 mb-1">of 10 seats</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 w-[50%]" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center py-3">
+              <div className="text-xs text-slate-500 flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                Next invoice will be issued on Jan 1, 2025
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">Change Plan</Button>
+                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20">Cancel Subscription</Button>
+              </div>
+            </CardFooter>
+          </Card>
+
+          {/* Payment Method */}
+          <Card className="border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+            <CardHeader>
+              <CardTitle className="text-base">Payment Method</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1">
+              <div className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-950">
+                <div className="h-10 w-14 bg-slate-100 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                  <CreditCard className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+                </div>
+                <div>
+                  <div className="font-medium text-sm">Visa ending in 4242</div>
+                  <div className="text-xs text-slate-500">Expires 12/28</div>
+                </div>
+              </div>
+              
+              <div className="mt-4 space-y-3">
+                <div className="flex items-start gap-2 text-xs text-slate-500">
+                  <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                  <p>Your default payment method will be charged automatically at the start of each billing cycle.</p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t border-slate-100 dark:border-slate-800 pt-4 pb-4 mt-auto">
+              <Button variant="outline" size="sm" className="w-full">Update Payment Method</Button>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* Invoices List */}
+        <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Invoice History</CardTitle>
+                <CardDescription>View and download your past invoices.</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowUpRight className="h-4 w-4" /> Billing Portal
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border border-slate-200 dark:border-slate-800">
+              <div className="grid grid-cols-12 gap-4 p-3 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 uppercase">
+                <div className="col-span-4 md:col-span-5">Invoice</div>
+                <div className="col-span-3 md:col-span-2">Amount</div>
+                <div className="col-span-3 md:col-span-2">Date</div>
+                <div className="col-span-2 md:col-span-2 text-right">Status</div>
+                <div className="col-span-1 text-right"></div>
+              </div>
+              
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {INVOICES.map((invoice) => (
+                  <div key={invoice.id} className="grid grid-cols-12 gap-4 p-4 items-center text-sm hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors">
+                    <div className="col-span-4 md:col-span-5 flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                        <FileText className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <div className="overflow-hidden">
+                        <div className="font-medium truncate">{invoice.description}</div>
+                        <div className="text-xs text-slate-500 truncate md:hidden">{invoice.id}</div>
+                      </div>
+                    </div>
+                    <div className="col-span-3 md:col-span-2 font-medium">{invoice.amount}</div>
+                    <div className="col-span-3 md:col-span-2 text-slate-500">{new Date(invoice.date).toLocaleDateString()}</div>
+                    <div className="col-span-2 md:col-span-2 text-right">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                        {invoice.status}
+                      </Badge>
+                    </div>
+                    <div className="col-span-12 md:col-span-1 flex justify-end mt-2 md:mt-0">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Download className="h-4 w-4 mr-2" /> Download PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <ArrowUpRight className="h-4 w-4 mr-2" /> View Details
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
+    </DashboardLayout>
+  );
+}

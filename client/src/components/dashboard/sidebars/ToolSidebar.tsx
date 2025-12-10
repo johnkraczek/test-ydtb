@@ -524,8 +524,14 @@ function SettingsSidebarContent() {
             active={location === "/settings/domain"} 
           />
         </div>
+        <div onClick={() => setLocation("/settings/billing")}>
+          <SidebarItem 
+            icon={CreditCard} 
+            label="Billing" 
+            active={location === "/settings/billing"} 
+          />
+        </div>
         <SidebarItem icon={Settings} label="General" />
-        <SidebarItem icon={CreditCard} label="Billing" />
         <SidebarItem icon={Database} label="Data & Privacy" />
       </SidebarSection>
     </div>
