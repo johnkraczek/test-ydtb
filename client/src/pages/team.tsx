@@ -53,7 +53,8 @@ const TEAM_MEMBERS = [
     status: "online",
     avatar: "https://i.pravatar.cc/150?u=1",
     email: "sarah@example.com",
-    department: "Design"
+    department: "Design",
+    accessLevel: "admin"
   },
   {
     id: "2",
@@ -62,7 +63,8 @@ const TEAM_MEMBERS = [
     status: "busy",
     avatar: "https://i.pravatar.cc/150?u=2",
     email: "michael@example.com",
-    department: "Engineering"
+    department: "Engineering",
+    accessLevel: "member"
   },
   {
     id: "3",
@@ -71,7 +73,8 @@ const TEAM_MEMBERS = [
     status: "offline",
     avatar: "https://i.pravatar.cc/150?u=3",
     email: "emma@example.com",
-    department: "Product"
+    department: "Product",
+    accessLevel: "member"
   },
   {
     id: "4",
@@ -80,7 +83,8 @@ const TEAM_MEMBERS = [
     status: "online",
     avatar: "https://i.pravatar.cc/150?u=4",
     email: "james@example.com",
-    department: "Marketing"
+    department: "Marketing",
+    accessLevel: "guest"
   },
   {
     id: "5",
@@ -89,7 +93,8 @@ const TEAM_MEMBERS = [
     status: "away",
     avatar: "https://i.pravatar.cc/150?u=5",
     email: "alex@example.com",
-    department: "Engineering"
+    department: "Engineering",
+    accessLevel: "member"
   }
 ];
 
@@ -397,6 +402,16 @@ function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid
                 <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
                   {member.department}
                 </Badge>
+                {member.accessLevel === 'admin' && (
+                  <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800">
+                    Admin
+                  </Badge>
+                )}
+                {member.accessLevel === 'guest' && (
+                  <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
+                    Guest
+                  </Badge>
+                )}
               </div>
 
               <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -421,6 +436,7 @@ function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid
                   <th className="px-4 py-3 font-medium">Member</th>
                   <th className="px-4 py-3 font-medium">Role</th>
                   <th className="px-4 py-3 font-medium">Department</th>
+                  <th className="px-4 py-3 font-medium">Access</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
@@ -442,6 +458,21 @@ function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid
                       <Badge variant="secondary" className="font-normal bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                         {member.department}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      {member.accessLevel === 'admin' && (
+                        <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800">
+                          Admin
+                        </Badge>
+                      )}
+                      {member.accessLevel === 'member' && (
+                        <span className="text-slate-600 dark:text-slate-400 text-sm">Member</span>
+                      )}
+                      {member.accessLevel === 'guest' && (
+                        <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
+                          Guest
+                        </Badge>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
