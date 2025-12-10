@@ -68,6 +68,16 @@ export default function MediaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
 
+  // Debounce search query
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+        setSearchQuery(inputValue);
+        if (inputValue) setShowSearchResults(true);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
   const handleSearchSubmit = () => {
     setSearchQuery(inputValue);
     setShowSearchResults(true);
@@ -669,7 +679,7 @@ export default function MediaPage() {
                     }
                 }}
                 onFocus={() => {
-                    if (searchQuery) setShowSearchResults(true);
+                    if (inputValue) setShowSearchResults(true);
                 }}
                 // Delay hiding to allow click event to register
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
