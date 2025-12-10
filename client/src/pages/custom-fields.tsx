@@ -548,7 +548,7 @@ export default function CustomFieldsPage() {
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
                                                             <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
-                                                            <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                                            <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                                             <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
                                                             <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
                                                             <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
@@ -637,7 +637,7 @@ export default function CustomFieldsPage() {
                                         <TableHeader>
                                             <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
                                                 <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
-                                                <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                                <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                                 <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
                                                 <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
                                                 <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
@@ -712,7 +712,7 @@ export default function CustomFieldsPage() {
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
                                             <SortableHeader column="name" label="Field Name" className="w-[20%] text-xs font-medium pl-6" />
-                                            <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                            <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                             <SortableHeader column="type" label="Type" className="w-[10%] text-xs font-medium" />
                                             <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
                                             <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
