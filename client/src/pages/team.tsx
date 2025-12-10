@@ -283,21 +283,81 @@ export default function TeamPage() {
     );
   }
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+
+  if (!isChatView) {
+    header = (
+      <DashboardPageHeader
+        hideBreadcrumbs
+        title={
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Team Directory</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm font-normal">
+              {TEAM_MEMBERS.length} active members in your organization
+            </p>
+          </div>
+        }
+        actions={
+          <div className="flex items-center gap-4">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-9 bg-white dark:bg-slate-900 h-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            {/* View Selector */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 h-9">
+              <button
+                onClick={() => setView('grid')}
+                className={`p-1 rounded-md transition-all ${
+                  view === 'grid' 
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView('list')}
+                className={`p-1 rounded-md transition-all ${
+                  view === 'list' 
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+                title="List View"
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+
+            <Button size="sm" className="h-9">
+              <Plus className="h-4 w-4 mr-2" />
+              Invite Member
+            </Button>
+          </div>
+        }
+      />
+    );
+  }
+
   return (
     <DashboardLayout activeTool="team" header={header}>
       {isChatView && chatId ? (
         <ChatView chatId={chatId} />
       ) : (
-        <TeamDirectory />
+        <TeamDirectory searchQuery={searchQuery} view={view} />
       )}
     </DashboardLayout>
   );
 }
 
-function TeamDirectory() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [view, setView] = useState<'grid' | 'list'>('grid');
-
+function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid' | 'list' }) {
   const filteredMembers = TEAM_MEMBERS.filter(member => 
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -306,57 +366,6 @@ function TeamDirectory() {
 
   return (
     <div className="flex flex-col h-full max-w-6xl mx-auto w-full">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Team Directory</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {TEAM_MEMBERS.length} active members in your organization
-          </p>
-        </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Invite Member
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Search by name, role, or department..." 
-            className="pl-9 bg-white dark:bg-slate-900"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        {/* View Selector */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
-          <button
-            onClick={() => setView('grid')}
-            className={`p-1.5 rounded-md transition-all ${
-              view === 'grid' 
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-            }`}
-            title="Grid View"
-          >
-            <LayoutGrid className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setView('list')}
-            className={`p-1.5 rounded-md transition-all ${
-              view === 'list' 
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-            }`}
-            title="List View"
-          >
-            <List className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
       {view === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMembers.map((member) => (
