@@ -44,7 +44,10 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
     } else if (toolId === "sop") {
       setLocation("/sop");
     } else if (toolId === "settings") {
-      setLocation("/settings/domain");
+      // Default to account if clicking the setting icon, or keep current if already in settings
+      if (!location.startsWith("/settings")) {
+        setLocation("/settings/account");
+      }
     }
     // Add other routes as needed
   };

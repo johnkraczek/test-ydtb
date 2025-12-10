@@ -29,7 +29,8 @@ import {
   Bot,
   ArrowRight,
   Monitor,
-  EyeOff
+  EyeOff,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,6 +40,7 @@ import { useMedia, FileSystemItem } from "@/context/media-context";
 import { Card } from "@/components/ui/card";
 import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
 import { Progress } from "@/components/ui/progress";
+import { useLocation } from "wouter";
 
 import {
   ContextMenu,
@@ -503,11 +505,26 @@ function SopSidebarContent() {
 }
 
 function SettingsSidebarContent() {
+  const [location, setLocation] = useLocation();
+
   return (
     <div className="space-y-1">
       <SidebarSection title="App Settings">
-        <SidebarItem icon={Settings} label="General" active />
-        <SidebarItem icon={User} label="Account" />
+        <div onClick={() => setLocation("/settings/account")}>
+          <SidebarItem 
+            icon={User} 
+            label="Account" 
+            active={location === "/settings/account"} 
+          />
+        </div>
+        <div onClick={() => setLocation("/settings/domain")}>
+          <SidebarItem 
+            icon={Globe} 
+            label="Domains" 
+            active={location === "/settings/domain"} 
+          />
+        </div>
+        <SidebarItem icon={Settings} label="General" />
         <SidebarItem icon={CreditCard} label="Billing" />
         <SidebarItem icon={Database} label="Data & Privacy" />
       </SidebarSection>
