@@ -342,7 +342,7 @@ export default function BillingSettingsPage() {
                           <DropdownMenuItem onClick={() => setSelectedInvoice(invoice)}>
                             <ArrowUpRight className="h-4 w-4 mr-2" /> View Details
                           </DropdownMenuItem>
-                        </DropdownMenuContent>>
+                        </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </div>
