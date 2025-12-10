@@ -104,7 +104,7 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[680px] p-0 flex flex-col">
+      <SheetContent className="w-full sm:max-w-[680px] sm:w-[680px] p-0 flex flex-col">
         <SheetHeader className="px-6 py-6 border-b bg-slate-50/50 dark:bg-slate-900/50">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-white dark:border-slate-800 shadow-sm">
