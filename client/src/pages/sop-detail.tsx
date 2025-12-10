@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useRoute } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Button } from "@/components/ui/button";
