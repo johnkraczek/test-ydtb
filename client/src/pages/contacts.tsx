@@ -633,7 +633,19 @@ export default function ContactsPage() {
                                         <div className="px-6 py-4">
                                             <div className="flex items-center justify-between mb-2">
                                                 <h3 className="text-xs font-medium text-slate-500">Shown</h3>
-                                                <Button variant="ghost" className="h-auto p-0 text-xs text-slate-500 font-normal hover:bg-transparent hover:text-slate-900">Hide all</Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    className="h-auto p-0 text-xs text-slate-500 font-normal hover:bg-transparent hover:text-slate-900"
+                                                    onClick={() => {
+                                                        setVisibleColumns(prev => {
+                                                            const next = { ...prev };
+                                                            Object.keys(next).forEach(key => next[key] = false);
+                                                            return next;
+                                                        });
+                                                    }}
+                                                >
+                                                    Hide all
+                                                </Button>
                                             </div>
                                             <div className="space-y-1">
                                                 <DndContext 
