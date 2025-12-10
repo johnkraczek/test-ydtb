@@ -27,7 +27,8 @@ import {
   Circle,
   Palette,
   Bot,
-  ArrowRight
+  ArrowRight,
+  Monitor
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -322,9 +323,10 @@ function LaunchpadSidebarContent() {
   return (
     <div className="space-y-1">
       <SidebarSection title="Setup Checklist">
-        <SidebarItem icon={CheckCircle2} label="Connect Email" badge="Done" />
-        <SidebarItem icon={CheckCircle2} label="Customize Theme" badge="Done" />
+        <SidebarItem icon={Palette} label="Customize Theme" badge="Done" />
+        <SidebarItem icon={Monitor} label="Customize Mode" badge="Done" />
         <SidebarItem icon={CreditCard} label="Connect Payments" />
+        <SidebarItem icon={Mail} label="Connect Email" />
         <SidebarItem icon={Bot} label="Connect AI Provider" />
       </SidebarSection>
       
