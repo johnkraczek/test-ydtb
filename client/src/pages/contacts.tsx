@@ -614,24 +614,21 @@ export default function ContactsPage() {
         />
       </div>
 
-      <div className="flex items-center gap-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md shadow-sm">
-        <FilterBuilder 
-          columns={columns} 
-          filters={filters} 
-          onFiltersChange={setFilters}
-          open={isFilterOpen}
-          onOpenChange={setIsFilterOpen}
-        />
-        <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
-          onClick={() => setIsViewSettingsOpen(true)}
-        >
-          <Settings className="h-4 w-4 text-slate-500" />
-        </Button>
-      </div>
+      <FilterBuilder 
+        columns={columns} 
+        filters={filters} 
+        onFiltersChange={setFilters}
+        open={isFilterOpen}
+        onOpenChange={setIsFilterOpen}
+      />
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="h-8 w-8 p-0 bg-white border-slate-200 dark:border-slate-800"
+        onClick={() => setIsViewSettingsOpen(true)}
+      >
+        <Settings className="h-4 w-4 text-slate-500" />
+      </Button>
       
       <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
         <Download className="h-3.5 w-3.5" />
