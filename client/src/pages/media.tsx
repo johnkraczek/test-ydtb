@@ -63,8 +63,18 @@ export default function MediaPage() {
   } = useMedia();
 
   const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
+  const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+
+  // Debounce search query
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+        setSearchQuery(inputValue);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   // Configure sensors for better click/drag distinction
   // Require a hold of 200ms to start dragging, allowing clicks to pass through immediately if released earlier
@@ -128,7 +138,7 @@ export default function MediaPage() {
       
       setCurrentPath(path);
       setSelectedItems([item.id]);
-      setSearchQuery("");
+      setInputValue("");
       setShowSearchResults(false);
   };
 
@@ -648,9 +658,9 @@ export default function MediaPage() {
              <Input 
                 placeholder="Search files..." 
                 className="pl-9 h-9 w-full bg-white dark:bg-slate-900" 
-                value={searchQuery}
+                value={inputValue}
                 onChange={(e) => {
-                    setSearchQuery(e.target.value);
+                    setInputValue(e.target.value);
                     setShowSearchResults(true);
                 }}
                 onFocus={() => setShowSearchResults(true)}
