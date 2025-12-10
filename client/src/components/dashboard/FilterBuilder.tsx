@@ -334,9 +334,8 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className={`h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800 ${totalFilters > 0 ? 'text-indigo-600 border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20' : ''}`}>
+        <Button variant="outline" size="sm" className={`h-8 w-8 p-0 bg-white border-slate-200 dark:border-slate-800 ${totalFilters > 0 ? 'text-indigo-600 border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20' : ''}`}>
           <FilterIcon className="h-3.5 w-3.5" />
-          {totalFilters > 0 ? `${totalFilters} Filter${totalFilters > 1 ? 's' : ''}` : 'Filter'}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[800px] p-0" align="start">
