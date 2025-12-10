@@ -561,12 +561,18 @@ export default function SopEditorPage() {
                                   </Tabs>
 
                                   {step.button.color === 'custom' && (
-                                    <Input 
-                                      type="color" 
-                                      value={step.button.customColor}
-                                      onChange={(e) => updateStepButton(step.id, 'customColor', e.target.value)}
-                                      className="h-8 w-8 p-0 border-none rounded-full cursor-pointer overflow-hidden"
-                                    />
+                                    <div className="relative h-8 w-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer shadow-sm group/color">
+                                      <div 
+                                        className="absolute inset-0 w-full h-full"
+                                        style={{ backgroundColor: step.button.customColor }}
+                                      />
+                                      <input 
+                                        type="color" 
+                                        value={step.button.customColor}
+                                        onChange={(e) => updateStepButton(step.id, 'customColor', e.target.value)}
+                                        className="absolute -top-4 -left-4 w-16 h-16 p-0 opacity-0 cursor-pointer"
+                                      />
+                                    </div>
                                   )}
                                 </div>
                              </div>
@@ -660,12 +666,18 @@ export default function SopEditorPage() {
                                     </Tabs>
                                     
                                     {step.note.color === 'custom' && (
-                                      <Input 
-                                        type="color" 
-                                        value={step.note.customColor}
-                                        onChange={(e) => updateStepNote(step.id, 'customColor', e.target.value)}
-                                        className="h-8 w-8 p-0 border-none rounded-full cursor-pointer flex-shrink-0 overflow-hidden"
-                                      />
+                                      <div className="relative h-8 w-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer shadow-sm group/color">
+                                        <div 
+                                          className="absolute inset-0 w-full h-full"
+                                          style={{ backgroundColor: step.note.customColor }}
+                                        />
+                                        <input 
+                                          type="color" 
+                                          value={step.note.customColor}
+                                          onChange={(e) => updateStepNote(step.id, 'customColor', e.target.value)}
+                                          className="absolute -top-4 -left-4 w-16 h-16 p-0 opacity-0 cursor-pointer"
+                                        />
+                                      </div>
                                     )}
                                   </div>
                                </div>
