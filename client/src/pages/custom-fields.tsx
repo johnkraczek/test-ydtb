@@ -55,7 +55,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CustomField {
     id: string;
@@ -372,10 +372,18 @@ export default function CustomFieldsPage() {
             </div>
         }>
             <div className="h-full flex flex-col">
-                <div className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6">
-                    <div className="max-w-5xl mx-auto space-y-6">
-                        {/* Folders List */}
-                        <div className="space-y-4">
+                <Tabs defaultValue="folders" className="flex-1 flex flex-col">
+                    <div className="px-6 pt-4">
+                        <TabsList>
+                            <TabsTrigger value="folders">Folders View</TabsTrigger>
+                            <TabsTrigger value="list">All Fields</TabsTrigger>
+                        </TabsList>
+                    </div>
+
+                    <TabsContent value="folders" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
+                        <div className="max-w-5xl mx-auto space-y-6">
+                            {/* Folders List */}
+                            <div className="space-y-4">
                             {folders.map(folder => (
                                 <div key={folder.id} className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                                     <div 
@@ -525,10 +533,79 @@ export default function CustomFieldsPage() {
                                         </TableBody>
                                     </Table>
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </TabsContent>
+
+                    <TabsContent value="list" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
+                        <div className="max-w-5xl mx-auto">
+                            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
+                                            <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
+                                            <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
+                                            <TableHead className="w-[15%] text-xs font-medium">Folder</TableHead>
+                                            <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                            <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {filteredFields.length > 0 ? (
+                                            filteredFields.map(field => {
+                                                const folderName = folders.find(f => f.id === field.folderId)?.name || 'Uncategorized';
+                                                return (
+                                                    <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 last:border-0">
+                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                            {field.name}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                                                {getFieldIcon(field.type)}
+                                                                <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge variant="secondary" className="font-normal text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                                                {folderName}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
+                                                            {field.description || '-'}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                                        <MoreHorizontal className="h-4 w-4" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end">
+                                                                    <DropdownMenuItem onClick={() => openEditFieldDialog(field)}>Edit Field</DropdownMenuItem>
+                                                                    <DropdownMenuItem>Move to Folder</DropdownMenuItem>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem className="text-red-600" onClick={() => deleteField(field.id)}>
+                                                                        Delete Field
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="h-24 text-center text-sm text-slate-500 italic">
+                                                    No fields found.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </DashboardLayout>
     );
