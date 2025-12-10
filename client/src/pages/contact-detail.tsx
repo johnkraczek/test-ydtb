@@ -683,6 +683,12 @@ export default function ContactDetailPage() {
                           )}
                        </div>
                     </div>
+                    
+                    <div className="pt-4 mt-auto border-t">
+                        <Button variant="outline" className="w-full gap-2 text-primary border-primary/20 bg-primary/5 hover:bg-primary/10">
+                            <Plus className="h-4 w-4" /> Add New Card
+                        </Button>
+                    </div>
                   </div>
                 </SheetContent>
               </Sheet>
