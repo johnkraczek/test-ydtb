@@ -608,10 +608,12 @@ export default function ContactsPage() {
                                             />
                                         </div>
 
-                                        {selectedColumnType?.type === 'dropdown' && (
+                                        {(selectedColumnType?.type === 'dropdown' || selectedColumnType?.type === 'labels') && (
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
-                                                    <Label className="text-xs font-normal text-slate-500">Dropdown options <span className="text-red-500">*</span></Label>
+                                                    <Label className="text-xs font-normal text-slate-500">
+                                                        {selectedColumnType.type === 'dropdown' ? 'Dropdown options' : 'Labels options'} <span className="text-red-500">*</span>
+                                                    </Label>
                                                     <div className="flex items-center gap-1 text-xs text-slate-500">
                                                         <ArrowUpDown className="h-3 w-3" />
                                                         <span>Manual</span>
