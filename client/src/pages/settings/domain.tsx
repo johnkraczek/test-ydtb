@@ -102,6 +102,7 @@ export default function DomainSettingsPage() {
           title="Domain Settings"
           description="Manage your custom domains and DNS configurations."
           hideBreadcrumbs={true}
+          actions={<></>}
         />
       }
     >

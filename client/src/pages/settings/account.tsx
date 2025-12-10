@@ -46,6 +46,7 @@ export default function AccountSettingsPage() {
           title="Account Settings"
           description="Manage your personal information and security preferences."
           hideBreadcrumbs={true}
+          actions={<></>}
         />
       }
     >
