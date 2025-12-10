@@ -40,6 +40,12 @@ import {
   CommandEmpty,
   CommandGroup,
 } from "@/components/ui/command";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
@@ -425,6 +431,21 @@ export default function ContactDetailPage() {
           title={
             <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-4 mt-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href="/contacts">
+                            <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0">
+                              <ArrowLeft className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Back to Contacts</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
                     <Avatar className="h-14 w-14 border-2 border-card shadow-sm">
                       <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
                         {customer.firstName[0]}{customer.lastName[0]}
@@ -480,16 +501,6 @@ export default function ContactDetailPage() {
     >
       <div className="space-y-8 animate-in fade-in duration-500">
       
-      {/* Back Button */}
-      <div>
-        <Link href="/contacts">
-            <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent hover:text-primary -ml-2 h-auto py-0 w-fit">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Contacts
-            </Button>
-        </Link>
-      </div>
-
       <Tabs defaultValue="details" className="w-full">
         <TabsList className="mb-4 w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
           <TabsTrigger 
