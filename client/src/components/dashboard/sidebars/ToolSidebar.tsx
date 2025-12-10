@@ -38,7 +38,8 @@ import {
   MoreHorizontal,
   Pencil,
   Trash,
-  Edit
+  Edit,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -642,12 +643,16 @@ function ContactsSidebarContent() {
   const [editingGroup, setEditingGroup] = useState<{id: string, name: string, type: string} | null>(null);
   const [newGroupName, setNewGroupName] = useState("");
   const [activeTab, setActiveTab] = useState("fixed");
+  
+  // New state for filters
+  const [filters, setFilters] = useState([{ id: '1', field: 'status', operator: 'is', value: '' }]);
 
   const openCreateDialog = () => {
     setDialogMode('create');
     setEditingGroup(null);
     setNewGroupName("");
     setActiveTab("fixed");
+    setFilters([{ id: Date.now().toString(), field: 'status', operator: 'is', value: '' }]);
     setIsDialogOpen(true);
   };
 
@@ -656,7 +661,24 @@ function ContactsSidebarContent() {
     setEditingGroup(group);
     setNewGroupName(group.name);
     setActiveTab(group.type);
+    if (mode === 'edit') {
+        setFilters([{ id: Date.now().toString(), field: 'status', operator: 'is', value: '' }]);
+    }
     setIsDialogOpen(true);
+  };
+
+  const handleAddFilter = () => {
+      setFilters([...filters, { id: Date.now().toString(), field: 'status', operator: 'is', value: '' }]);
+  };
+
+  const handleRemoveFilter = (id: string) => {
+      if (filters.length > 1) {
+          setFilters(filters.filter(f => f.id !== id));
+      }
+  };
+  
+  const updateFilter = (id: string, key: 'field' | 'operator' | 'value', val: string) => {
+      setFilters(filters.map(f => f.id === id ? { ...f, [key]: val } : f));
   };
 
   const handleDeleteGroup = (groupId: string) => {
@@ -698,7 +720,7 @@ function ContactsSidebarContent() {
                         <Plus className="h-3 w-3 text-slate-500" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>
                           {dialogMode === 'create' ? 'Create New Group' : 
@@ -743,30 +765,55 @@ function ContactsSidebarContent() {
                                           <span>Filters</span>
                                       </div>
                                       <div className="grid gap-2">
-                                          <div className="grid grid-cols-3 gap-2">
-                                              <Select defaultValue="status">
-                                                  <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                      <SelectValue placeholder="Field" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                      <SelectItem value="status">Status</SelectItem>
-                                                      <SelectItem value="tags">Tags</SelectItem>
-                                                      <SelectItem value="location">Location</SelectItem>
-                                                  </SelectContent>
-                                              </Select>
-                                              <Select defaultValue="is">
-                                                  <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                      <SelectValue placeholder="Operator" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                      <SelectItem value="is">is</SelectItem>
-                                                      <SelectItem value="is_not">is not</SelectItem>
-                                                      <SelectItem value="contains">contains</SelectItem>
-                                                  </SelectContent>
-                                              </Select>
-                                              <Input className="h-8 text-xs bg-white dark:bg-slate-900" placeholder="Value..." />
-                                          </div>
-                                          <Button variant="ghost" size="sm" className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700">
+                                          {filters.map((filter, index) => (
+                                              <div key={filter.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+                                                  <Select value={filter.field} onValueChange={(v) => updateFilter(filter.id, 'field', v)}>
+                                                      <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                          <SelectValue placeholder="Field" />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                          <SelectItem value="status">Status</SelectItem>
+                                                          <SelectItem value="tags">Tags</SelectItem>
+                                                          <SelectItem value="location">Location</SelectItem>
+                                                      </SelectContent>
+                                                  </Select>
+                                                  <Select value={filter.operator} onValueChange={(v) => updateFilter(filter.id, 'operator', v)}>
+                                                      <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                          <SelectValue placeholder="Operator" />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                          <SelectItem value="is">is</SelectItem>
+                                                          <SelectItem value="is_not">is not</SelectItem>
+                                                          <SelectItem value="contains">contains</SelectItem>
+                                                      </SelectContent>
+                                                  </Select>
+                                                  <Input 
+                                                      className="h-8 text-xs bg-white dark:bg-slate-900" 
+                                                      placeholder="Value..." 
+                                                      value={filter.value}
+                                                      onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
+                                                  />
+                                                  {filters.length > 1 && (
+                                                      <Button 
+                                                          variant="ghost" 
+                                                          size="icon" 
+                                                          className="h-8 w-8 text-slate-400 hover:text-red-500"
+                                                          onClick={() => handleRemoveFilter(filter.id)}
+                                                      >
+                                                          <X className="h-4 w-4" />
+                                                      </Button>
+                                                  )}
+                                                  {filters.length === 1 && (
+                                                      <div className="w-8" /> 
+                                                  )}
+                                              </div>
+                                          ))}
+                                          <Button 
+                                              variant="ghost" 
+                                              size="sm" 
+                                              className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700 mt-2"
+                                              onClick={handleAddFilter}
+                                          >
                                               <Plus className="h-3 w-3 mr-1" /> Add Filter
                                           </Button>
                                       </div>
