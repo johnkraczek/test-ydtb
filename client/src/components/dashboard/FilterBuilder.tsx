@@ -162,8 +162,68 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
   const renderFilterItem = (filter: Filter, index: number, depth: number = 0) => {
       const isGroup = filter.type === 'group';
       
+      if (isGroup) {
+          return (
+            <div key={filter.id} className={`flex flex-col ${depth > 0 ? 'ml-8' : ''}`}>
+                {index > 0 ? (
+                    <div className="flex items-center gap-4 py-2">
+                         <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                         <Select 
+                            value={filter.logic} 
+                            onValueChange={(val: FilterLogic) => handleUpdate(filter.id, { logic: val })}
+                        >
+                            <SelectTrigger className="h-7 text-xs bg-white dark:bg-slate-950 min-w-[70px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="AND">AND</SelectItem>
+                                <SelectItem value="OR">OR</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                    </div>
+                ) : (
+                    <div className="pb-2 text-sm text-slate-500 font-medium px-1">
+                        {depth === 0 ? 'Where' : 'Matches'}
+                    </div>
+                )}
+
+                <div className="flex items-start gap-2">
+                    <div className="flex-1 p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 relative shadow-sm">
+                        {/* Connecting line for nested groups */}
+                        {depth > 0 && (
+                            <div className="absolute left-[-24px] top-[20px] w-[24px] h-[1px] bg-slate-200 dark:bg-slate-800"></div>
+                        )}
+                        
+                        <div className="flex flex-col gap-3">
+                            {(filter as FilterGroup).items.map((item, i) => renderFilterItem(item, i, depth + 1))}
+                            
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-xs text-slate-500 hover:text-indigo-600 self-start gap-1 mt-1"
+                                onClick={() => addNestedFilter(filter.id)}
+                            >
+                                <Plus className="h-3 w-3" /> Add condition
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-slate-400 hover:text-red-500 flex-shrink-0 mt-2"
+                        onClick={() => handleRemove(filter.id)}
+                    >
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+          );
+      }
+
       return (
-        <div key={filter.id} className={`flex flex-col gap-2 ${depth > 0 ? 'ml-8' : ''}`}>
+        <div key={filter.id} className={`flex flex-col gap-2 ${depth > 0 ? 'ml-0' : ''}`}>
              <div className="flex items-center gap-2">
                 <div className="w-[80px] flex-shrink-0">
                     {index === 0 ? (
@@ -186,66 +246,46 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                     )}
                 </div>
 
-                {isGroup ? (
-                    <div className="flex-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 relative">
-                        <div className="absolute left-[-22px] top-[14px] w-[22px] h-[1px] bg-slate-200 dark:bg-slate-800"></div>
-                        <div className="flex flex-col gap-3">
-                            {(filter as FilterGroup).items.map((item, i) => renderFilterItem(item, i, depth + 1))}
-                            
-                            <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 text-xs text-slate-500 hover:text-indigo-600 self-start gap-1"
-                                onClick={() => addNestedFilter(filter.id)}
-                            >
-                                <Plus className="h-3 w-3" /> Add filter
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        <Select 
-                            value={(filter as FilterCondition).field} 
-                            onValueChange={(val) => handleUpdate(filter.id, { field: val })}
-                        >
-                            <SelectTrigger className="h-8 text-xs w-[160px] bg-white dark:bg-slate-950">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {columns.map(col => (
-                                    <SelectItem key={col.id} value={col.id}>{col.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                <Select 
+                    value={(filter as FilterCondition).field} 
+                    onValueChange={(val) => handleUpdate(filter.id, { field: val })}
+                >
+                    <SelectTrigger className="h-8 text-xs w-[160px] bg-white dark:bg-slate-950">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {columns.map(col => (
+                            <SelectItem key={col.id} value={col.id}>{col.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
-                        <Select 
-                            value={(filter as FilterCondition).operator} 
-                            onValueChange={(val: FilterOperator) => handleUpdate(filter.id, { operator: val })}
-                        >
-                            <SelectTrigger className="h-8 text-xs w-[140px] bg-white dark:bg-slate-950">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {getOperators(columns.find(c => c.id === (filter as FilterCondition).field)?.type).map(op => (
-                                    <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                <Select 
+                    value={(filter as FilterCondition).operator} 
+                    onValueChange={(val: FilterOperator) => handleUpdate(filter.id, { operator: val })}
+                >
+                    <SelectTrigger className="h-8 text-xs w-[140px] bg-white dark:bg-slate-950">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {getOperators(columns.find(c => c.id === (filter as FilterCondition).field)?.type).map(op => (
+                            <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
-                        <div className="flex-1">
-                            {['is_empty', 'is_not_empty'].includes((filter as FilterCondition).operator) ? (
-                                <div className="h-8 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700" />
-                            ) : (
-                                <Input 
-                                    className="h-8 text-xs bg-white dark:bg-slate-950" 
-                                    placeholder="Value..." 
-                                    value={(filter as FilterCondition).value}
-                                    onChange={(e) => handleUpdate(filter.id, { value: e.target.value })}
-                                />
-                            )}
-                        </div>
-                    </>
-                )}
+                <div className="flex-1">
+                    {['is_empty', 'is_not_empty'].includes((filter as FilterCondition).operator) ? (
+                        <div className="h-8 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700" />
+                    ) : (
+                        <Input 
+                            className="h-8 text-xs bg-white dark:bg-slate-950" 
+                            placeholder="Value..." 
+                            value={(filter as FilterCondition).value}
+                            onChange={(e) => handleUpdate(filter.id, { value: e.target.value })}
+                        />
+                    )}
+                </div>
 
                 <Button 
                     variant="ghost" 
@@ -279,7 +319,7 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
           {totalFilters > 0 ? `${totalFilters} Filter${totalFilters > 1 ? 's' : ''}` : 'Filter'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[700px] p-0" align="start">
+      <PopoverContent className="w-[800px] p-0" align="start">
         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
                 <h4 className="font-medium text-sm">Filters</h4>
