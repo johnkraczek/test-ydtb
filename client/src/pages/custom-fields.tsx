@@ -46,6 +46,9 @@ import {
     Hash,
     Calendar as CalendarIcon,
     CheckSquare,
+    ArrowUp,
+    ArrowDown,
+    ArrowUpDown,
     AlignLeft
 } from "lucide-react";
 import {
@@ -107,6 +110,10 @@ export default function CustomFieldsPage() {
     const [isCreateFieldOpen, setIsCreateFieldOpen] = useState(false);
     const [newFolderName, setNewFolderName] = useState("");
     
+    // Sorting state
+    const [sortColumn, setSortColumn] = useState<string>('name');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
     // Field editing state
     const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
     const [fieldFormData, setFieldFormData] = useState<Partial<CustomField>>({ 
@@ -200,9 +207,38 @@ export default function CustomFieldsPage() {
         return <Icon className="h-4 w-4 text-slate-500" />;
     };
 
+    const handleSort = (column: string) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
     const filteredFields = fields.filter(f => 
         f.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ).sort((a, b) => {
+        let aValue: any = a[sortColumn as keyof CustomField] || '';
+        let bValue: any = b[sortColumn as keyof CustomField] || '';
+
+        // Handle special cases
+        if (sortColumn === 'folder') {
+            const folderA = folders.find(f => f.id === a.folderId)?.name || 'Uncategorized';
+            const folderB = folders.find(f => f.id === b.folderId)?.name || 'Uncategorized';
+            aValue = folderA;
+            bValue = folderB;
+        }
+
+        if (typeof aValue === 'string') {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+        }
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
 
     const groupedFields: Record<string, CustomField[]> = {
         uncategorized: filteredFields.filter(f => !f.folderId),
@@ -210,6 +246,21 @@ export default function CustomFieldsPage() {
             ...acc,
             [folder.id]: filteredFields.filter(f => f.folderId === folder.id)
         }), {} as Record<string, CustomField[]>)
+    };
+
+    const SortableHeader = ({ column, label, className = "" }: { column: string, label: string, className?: string }) => {
+        return (
+            <TableHead className={`cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none ${className}`} onClick={() => handleSort(column)}>
+                <div className="flex items-center gap-1">
+                    {label}
+                    {sortColumn === column ? (
+                        sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                        <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 opacity-50" />
+                    )}
+                </div>
+            </TableHead>
+        );
     };
 
     return (
@@ -542,10 +593,10 @@ export default function CustomFieldsPage() {
                             <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                            <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
-                                            <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
-                                            <TableHead className="w-[15%] text-xs font-medium">Folder</TableHead>
-                                            <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                            <SortableHeader column="name" label="Field Name" className="w-[30%] text-xs font-medium" />
+                                            <SortableHeader column="type" label="Type" className="w-[20%] text-xs font-medium" />
+                                            <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
+                                            <SortableHeader column="description" label="Description" className="w-[25%] text-xs font-medium" />
                                             <TableHead className="w-[10%] text-xs font-medium"></TableHead>
                                         </TableRow>
                                     </TableHeader>
