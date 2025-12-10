@@ -23,7 +23,8 @@ import {
   Scissors,
   Check,
   Star,
-  PanelRight
+  PanelRight,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,6 +203,9 @@ export default function MediaPage() {
                  </DropdownMenuLabel>
                  <ContextMenuSeparator />
                  <ContextMenuItem inset>
+                    <Download className="mr-2 h-4 w-4" /> Download {selectedItems.length} Items
+                 </ContextMenuItem>
+                 <ContextMenuItem inset>
                     <Copy className="mr-2 h-4 w-4" /> Copy {selectedItems.length} Items
                     <ContextMenuShortcut>⌘C</ContextMenuShortcut>
                  </ContextMenuItem>
@@ -224,6 +228,9 @@ export default function MediaPage() {
                 <ContextMenuSeparator />
                 <ContextMenuItem inset>
                     <ExternalLink className="mr-2 h-4 w-4" /> Open
+                </ContextMenuItem>
+                <ContextMenuItem inset>
+                    <Download className="mr-2 h-4 w-4" /> Download
                 </ContextMenuItem>
                 <ContextMenuItem inset>
                     <Info className="mr-2 h-4 w-4" /> Get Info
