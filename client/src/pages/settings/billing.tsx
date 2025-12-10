@@ -37,7 +37,14 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 // Mock Data
+const SAVED_CARDS = [
+  { id: "card_1", last4: "4242", brand: "Visa", expiry: "12/28" },
+  { id: "card_2", last4: "5555", brand: "Mastercard", expiry: "10/26" },
+];
+
 const INVOICES = [
   { id: "inv_001", date: "2024-12-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
   { id: "inv_002", date: "2024-11-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
@@ -80,8 +87,11 @@ export default function BillingSettingsPage() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [cardNumber, setCardNumber] = useState("4242");
+  const [selectedCardId, setSelectedCardId] = useState("card_1");
+  const [isAddingNewCard, setIsAddingNewCard] = useState(false);
 
   const handleSelectPlan = (planId: string) => {
+    // ... existing handleSelectPlan logic
     if (planId === currentPlan) return;
     setIsUpdating(true);
     
@@ -99,7 +109,17 @@ export default function BillingSettingsPage() {
     setTimeout(() => {
       setIsUpdating(false);
       setIsPaymentDialogOpen(false);
-      toast.success("Payment method updated successfully");
+      
+      if (isAddingNewCard) {
+         setCardNumber(cardNumber || "4242"); // In a real app this would come from the form
+         toast.success("New payment method added and set as default");
+      } else {
+         const card = SAVED_CARDS.find(c => c.id === selectedCardId);
+         if (card) setCardNumber(card.last4);
+         toast.success("Default payment method updated");
+      }
+      
+      setIsAddingNewCard(false);
     }, 1500);
   };
 
@@ -116,6 +136,8 @@ export default function BillingSettingsPage() {
       }
     >
       <div className="max-w-5xl mx-auto space-y-8 pb-10">
+        
+        {/* ... existing content ... */}
         
         {/* Current Plan & Payment Method Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -208,7 +230,10 @@ export default function BillingSettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t border-slate-100 dark:border-slate-800 pt-4 pb-4 mt-auto">
-              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsPaymentDialogOpen(true)}>Update Payment Method</Button>
+              <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                setIsPaymentDialogOpen(true);
+                setIsAddingNewCard(false);
+              }}>Update Payment Method</Button>
             </CardFooter>
           </Card>
         </div>
@@ -353,55 +378,103 @@ export default function BillingSettingsPage() {
             <DialogHeader>
               <DialogTitle>Update Payment Method</DialogTitle>
               <DialogDescription>
-                Update your credit card details for future billing.
+                Select an existing card or add a new one for future billing.
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name on Card</Label>
-                <Input id="name" placeholder="John Doe" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="card">Card Number</Label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                  <Input 
-                    id="card" 
-                    placeholder="0000 0000 0000 0000" 
-                    className="pl-9" 
-                    value={cardNumber === "4242" ? "" : cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                  />
+            <div className="py-4 space-y-4">
+              {!isAddingNewCard ? (
+                <div className="space-y-4">
+                  <RadioGroup value={selectedCardId} onValueChange={setSelectedCardId} className="space-y-3">
+                    {SAVED_CARDS.map((card) => (
+                      <div key={card.id} className="flex items-center space-x-2 border border-slate-200 dark:border-slate-800 rounded-lg p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                        <RadioGroupItem value={card.id} id={card.id} />
+                        <Label htmlFor={card.id} className="flex-1 cursor-pointer flex items-center justify-between font-normal">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-12 bg-slate-100 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                              <CreditCard className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-sm text-slate-900 dark:text-slate-100">{card.brand} ending in {card.last4}</div>
+                              <div className="text-xs text-slate-500">Expires {card.expiry}</div>
+                            </div>
+                          </div>
+                          {card.last4 === cardNumber && (
+                             <Badge variant="secondary" className="text-[10px] h-5">Default</Badge>
+                          )}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start gap-2 h-12" 
+                    onClick={() => setIsAddingNewCard(true)}
+                  >
+                    <div className="h-8 w-12 bg-slate-50 dark:bg-slate-900 rounded border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center">
+                      <CreditCard className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <span>Add New Card...</span>
+                  </Button>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="expiry">Expiry Date</Label>
-                  <Input id="expiry" placeholder="MM/YY" />
+              ) : (
+                <div className="grid gap-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name on Card</Label>
+                    <Input id="name" placeholder="John Doe" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="card">Card Number</Label>
+                    <div className="relative">
+                      <CreditCard className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                      <Input 
+                        id="card" 
+                        placeholder="0000 0000 0000 0000" 
+                        className="pl-9" 
+                        onChange={(e) => setCardNumber(e.target.value.slice(-4))}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="expiry">Expiry Date</Label>
+                      <Input id="expiry" placeholder="MM/YY" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cvc">CVC</Label>
+                      <Input id="cvc" placeholder="123" />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cvc">CVC</Label>
-                  <Input id="cvc" placeholder="123" />
-                </div>
-              </div>
+              )}
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsPaymentDialogOpen(false)} disabled={isUpdating}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpdatePaymentMethod} disabled={isUpdating}>
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...
-                  </>
-                ) : (
-                  "Save Payment Method"
-                )}
-              </Button>
+            <DialogFooter className="flex justify-between sm:justify-between">
+              {isAddingNewCard ? (
+                <Button variant="ghost" onClick={() => setIsAddingNewCard(false)} disabled={isUpdating}>
+                  Back
+                </Button>
+              ) : (
+                <div /> /* Spacer */
+              )}
+              
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsPaymentDialogOpen(false)} disabled={isUpdating}>
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdatePaymentMethod} disabled={isUpdating}>
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...
+                    </>
+                  ) : (
+                    "Save Payment Method"
+                  )}
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
