@@ -113,17 +113,33 @@ interface ToolIconsSidebarProps {
   onToolSelect?: (toolId: string) => void;
   isToolSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
+  mode?: "client" | "agency";
 }
+
+const AGENCY_TOOLS: ToolItem[] = [
+  {
+    id: "agency-home",
+    icon: Home,
+    label: "Agency Dashboard",
+    visible: true,
+  },
+];
 
 export function ToolIconsSidebar({
   activeTool = "home",
   onToolSelect,
   isToolSidebarOpen = true,
   onToggleSidebar,
+  mode = "client",
 }: ToolIconsSidebarProps) {
-  const [tools, setTools] = useState<ToolItem[]>(INITIAL_TOOLS);
+  const [tools, setTools] = useState<ToolItem[]>(mode === "agency" ? AGENCY_TOOLS : INITIAL_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  // Update tools when mode changes
+  useEffect(() => {
+    setTools(mode === "agency" ? AGENCY_TOOLS : INITIAL_TOOLS);
+  }, [mode]);
 
   // If the active tool is hidden by the user, redirect to home (Dashboard)
   // This handles the case where a user hides "Launchpad" while currently on the Launchpad page

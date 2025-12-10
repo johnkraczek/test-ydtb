@@ -14,9 +14,10 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   activeTool?: string;
   header?: React.ReactNode;
+  mode?: "client" | "agency";
 }
 
-export default function DashboardLayout({ children, activeTool: initialActiveTool = "home", header }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, activeTool: initialActiveTool = "home", header, mode = "client" }: DashboardLayoutProps) {
   const [activeTool, setActiveTool] = useState(initialActiveTool);
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const [location, setLocation] = useLocation();
@@ -35,6 +36,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
     // Simple routing based on tool ID
     if (toolId === "home") {
       setLocation("/");
+    } else if (toolId === "agency-home") {
+      setLocation("/agency");
     } else if (toolId === "launchpad") {
       setLocation("/launchpad");
     } else if (toolId === "users") {
@@ -87,6 +90,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
           onToolSelect={handleToolSelect}
           isToolSidebarOpen={isToolSidebarOpen}
           onToggleSidebar={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
+          mode={mode}
         />
 
         {/* Collapsible Tool Sidebar + Main Content */}
