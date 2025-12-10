@@ -36,6 +36,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useRef } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { InvoiceTemplate } from "@/components/billing/InvoiceTemplate";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -90,6 +94,9 @@ export default function BillingSettingsPage() {
   const [selectedCardId, setSelectedCardId] = useState("card_1");
   const [isAddingNewCard, setIsAddingNewCard] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<typeof INVOICES[0] | null>(null);
+  
+  const [invoiceToPrint, setInvoiceToPrint] = useState<typeof INVOICES[0] | null>(null);
+  const invoiceRef = useRef<HTMLDivElement>(null);
 
   const handleSelectPlan = (planId: string) => {
     if (planId === currentPlan) return;
@@ -121,6 +128,47 @@ export default function BillingSettingsPage() {
       
       setIsAddingNewCard(false);
     }, 1500);
+  };
+
+  const handleDownloadPDF = async (invoice: typeof INVOICES[0]) => {
+    const toastId = toast.loading("Generating invoice PDF...");
+    setInvoiceToPrint(invoice);
+    
+    // Wait for render
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    try {
+        if (invoiceRef.current) {
+            const canvas = await html2canvas(invoiceRef.current, {
+                scale: 2, 
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`invoice-${invoice.id}.pdf`);
+            
+            toast.dismiss(toastId);
+            toast.success("Invoice downloaded successfully");
+        }
+    } catch (error) {
+        console.error("PDF generation failed", error);
+        toast.dismiss(toastId);
+        toast.error("Failed to generate PDF");
+    } finally {
+        setInvoiceToPrint(null);
+    }
   };
 
   const activePlanDetails = PLANS.find(p => p.id === currentPlan) || PLANS[1];
@@ -287,13 +335,13 @@ export default function BillingSettingsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownloadPDF(invoice)}>
                             <Download className="h-4 w-4 mr-2" /> Download PDF
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => setSelectedInvoice(invoice)}>
                             <ArrowUpRight className="h-4 w-4 mr-2" /> View Details
                           </DropdownMenuItem>
-                        </DropdownMenuContent>
+                        </DropdownMenuContent>>
                       </DropdownMenu>
                     </div>
                   </div>
@@ -367,12 +415,19 @@ export default function BillingSettingsPage() {
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setSelectedInvoice(null)}>Close</Button>
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={() => selectedInvoice && handleDownloadPDF(selectedInvoice)}>
                 <Download className="h-4 w-4" /> Download PDF
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Hidden Invoice Template for PDF Generation */}
+        <div className="absolute top-0 left-0 overflow-hidden h-0 w-0">
+            <div ref={invoiceRef}>
+                <InvoiceTemplate invoice={invoiceToPrint} />
+            </div>
+        </div>
 
         {/* Change Plan Dialog */}
         <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
