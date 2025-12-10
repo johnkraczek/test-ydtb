@@ -30,7 +30,10 @@ import {
   ArrowRight,
   Monitor,
   EyeOff,
-  Globe
+  Globe,
+  Briefcase,
+  Hash,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -64,6 +67,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return <HomeSidebarContent />;
       case "users":
         return <ContactsSidebarContent />;
+      case "team":
+        return <TeamSidebarContent />;
       case "messages":
         return <MessagesSidebarContent />;
       case "media":
@@ -89,6 +94,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
         return "Dashboard";
       case "users":
         return "Contacts";
+      case "team":
+        return "Team";
       case "messages":
         return "Messages";
       case "media":
@@ -392,6 +399,90 @@ function HomeSidebarContent() {
   );
 }
 
+
+function TeamSidebarContent() {
+  const [location, setLocation] = useLocation();
+
+  return (
+    <div className="space-y-1">
+      <div onClick={() => setLocation("/team")}>
+        <SidebarItem 
+          icon={User} 
+          label="Team Directory" 
+          active={location === "/team"} 
+        />
+      </div>
+
+      <Separator className="my-2 bg-slate-100 dark:bg-slate-800" />
+      
+      <SidebarSection title="Conversations">
+        <div onClick={() => setLocation("/team/chat/general")}>
+          <SidebarItem 
+            icon={Hash} 
+            label="general" 
+            active={location === "/team/chat/general"} 
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/design")}>
+          <SidebarItem 
+            icon={Hash} 
+            label="design" 
+            active={location === "/team/chat/design"} 
+            badge="3"
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/engineering")}>
+          <SidebarItem 
+            icon={Hash} 
+            label="engineering" 
+            active={location === "/team/chat/engineering"} 
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/random")}>
+          <SidebarItem 
+            icon={Hash} 
+            label="random" 
+            active={location === "/team/chat/random"} 
+            badge="5"
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/announcements")}>
+          <SidebarItem 
+            icon={Hash} 
+            label="announcements" 
+            active={location === "/team/chat/announcements"} 
+            badge="1"
+          />
+        </div>
+      </SidebarSection>
+      
+      <SidebarSection title="Direct Messages">
+        <div onClick={() => setLocation("/team/chat/sarah")}>
+          <SidebarItem 
+            icon={User} 
+            label="Sarah Wilson" 
+            active={location === "/team/chat/sarah"} 
+            badge="1"
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/michael")}>
+          <SidebarItem 
+            icon={User} 
+            label="Michael Chen" 
+            active={location === "/team/chat/michael"} 
+          />
+        </div>
+        <div onClick={() => setLocation("/team/chat/emma")}>
+          <SidebarItem 
+            icon={User} 
+            label="Emma Rodriguez" 
+            active={location === "/team/chat/emma"} 
+          />
+        </div>
+      </SidebarSection>
+    </div>
+  );
+}
 
 function MessagesSidebarContent() {
   return (

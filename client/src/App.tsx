@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import DashboardPage from "@/pages/dashboard";
 import ContactsPage from "@/pages/contacts";
 import ContactDetailPage from "@/pages/contact-detail";
+import TeamPage from "@/pages/team";
 import MediaPage from "@/pages/media";
 import MessagesPage from "@/pages/messages";
 import AutomationPage from "@/pages/automation";
@@ -35,6 +36,8 @@ function Router() {
       <Route path="/settings/billing" component={BillingSettingsPage} />
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
+      <Route path="/team" component={TeamPage} />
+      <Route path="/team/chat/:chatId" component={TeamPage} />
       <Route path="/media" component={MediaPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/automation" component={AutomationPage} />

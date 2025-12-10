@@ -12,7 +12,8 @@ import {
   Grid3X3,
   LayoutTemplate,
   File,
-  Rocket
+  Rocket,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +46,12 @@ const INITIAL_TOOLS: ToolItem[] = [
     id: "users",
     icon: Users,
     label: "Contacts",
+    visible: true,
+  },
+  {
+    id: "team",
+    icon: Briefcase,
+    label: "Team",
     visible: true,
   },
   {

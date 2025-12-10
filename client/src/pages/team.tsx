@@ -1,0 +1,349 @@
+import { useState } from "react";
+import DashboardLayout from "@/components/dashboard/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  Search, 
+  MoreVertical, 
+  Phone, 
+  Video, 
+  Mail, 
+  MessageSquare,
+  Plus,
+  Hash,
+  Smile,
+  Paperclip,
+  Send,
+  MoreHorizontal,
+  CheckCircle2,
+  Clock,
+  Briefcase
+} from "lucide-react";
+import { useRoute } from "wouter";
+
+// Mock Data
+const TEAM_MEMBERS = [
+  {
+    id: "1",
+    name: "Sarah Wilson",
+    role: "Product Designer",
+    status: "online",
+    avatar: "https://i.pravatar.cc/150?u=1",
+    email: "sarah@example.com",
+    department: "Design"
+  },
+  {
+    id: "2",
+    name: "Michael Chen",
+    role: "Senior Developer",
+    status: "busy",
+    avatar: "https://i.pravatar.cc/150?u=2",
+    email: "michael@example.com",
+    department: "Engineering"
+  },
+  {
+    id: "3",
+    name: "Emma Rodriguez",
+    role: "Product Manager",
+    status: "offline",
+    avatar: "https://i.pravatar.cc/150?u=3",
+    email: "emma@example.com",
+    department: "Product"
+  },
+  {
+    id: "4",
+    name: "James Kim",
+    role: "Marketing Lead",
+    status: "online",
+    avatar: "https://i.pravatar.cc/150?u=4",
+    email: "james@example.com",
+    department: "Marketing"
+  },
+  {
+    id: "5",
+    name: "Alex Turner",
+    role: "Frontend Developer",
+    status: "away",
+    avatar: "https://i.pravatar.cc/150?u=5",
+    email: "alex@example.com",
+    department: "Engineering"
+  }
+];
+
+const CHANNELS = [
+  { id: "general", name: "general", unread: 0 },
+  { id: "design", name: "design", unread: 3 },
+  { id: "engineering", name: "engineering", unread: 0 },
+  { id: "random", name: "random", unread: 5 },
+  { id: "announcements", name: "announcements", unread: 1 }
+];
+
+const MESSAGES = [
+  {
+    id: 1,
+    senderId: "1",
+    content: "Hey everyone! Just pushed the new design updates.",
+    timestamp: "10:30 AM",
+    reactions: [{ emoji: "👍", count: 2 }]
+  },
+  {
+    id: 2,
+    senderId: "2",
+    content: "Awesome, I'll take a look shortly.",
+    timestamp: "10:32 AM",
+    reactions: []
+  },
+  {
+    id: 3,
+    senderId: "5",
+    content: "Can we sync about the navigation component later?",
+    timestamp: "10:45 AM",
+    reactions: []
+  },
+  {
+    id: 4,
+    senderId: "1",
+    content: "Sure! How about 2pm?",
+    timestamp: "10:46 AM",
+    reactions: [{ emoji: "✅", count: 1 }]
+  }
+];
+
+export default function TeamPage() {
+  const [match, params] = useRoute("/team/chat/:chatId");
+  const isChatView = match;
+  const chatId = params?.chatId;
+
+  return (
+    <DashboardLayout activeTool="team">
+      {isChatView && chatId ? (
+        <ChatView chatId={chatId} />
+      ) : (
+        <TeamDirectory />
+      )}
+    </DashboardLayout>
+  );
+}
+
+function TeamDirectory() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredMembers = TEAM_MEMBERS.filter(member => 
+    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.department.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="flex flex-col h-full max-w-6xl mx-auto w-full">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Team Directory</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            {TEAM_MEMBERS.length} active members in your organization
+          </p>
+        </div>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Invite Member
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-4 mb-6">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input 
+            placeholder="Search by name, role, or department..." 
+            className="pl-9 bg-white dark:bg-slate-900"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+           {/* Filters could go here */}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredMembers.map((member) => (
+          <div key={member.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={member.avatar} />
+                    <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900 ${
+                    member.status === 'online' ? 'bg-green-500' : 
+                    member.status === 'busy' ? 'bg-red-500' : 
+                    member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
+                  }`} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">{member.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{member.role}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2 mb-4">
+              <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
+                {member.department}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                <MessageSquare className="h-3.5 w-3.5 mr-2" />
+                Message
+              </Button>
+              <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                <Mail className="h-3.5 w-3.5 mr-2" />
+                Email
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatView({ chatId }: { chatId: string }) {
+  const isChannel = CHANNELS.find(c => c.id === chatId);
+  const isDirectMessage = !isChannel; // Simplified logic
+  
+  // Mock data for DM user if it's a DM
+  const dmUser = isDirectMessage ? TEAM_MEMBERS[0] : null;
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-140px)] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      {/* Chat Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3">
+          {isChannel ? (
+            <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-slate-500" />
+            </div>
+          ) : (
+            <div className="relative">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={dmUser?.avatar} />
+                <AvatarFallback>{dmUser?.name.substring(0, 2)}</AvatarFallback>
+              </Avatar>
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-green-500" />
+            </div>
+          )}
+          
+          <div>
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              {isChannel ? chatId : dmUser?.name}
+              {isChannel && <Badge variant="outline" className="text-[10px] h-4 font-normal">Channel</Badge>}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {isChannel ? `${TEAM_MEMBERS.length} members` : dmUser?.role}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+            <Phone className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+            <Video className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Messages Area */}
+      <ScrollArea className="flex-1 p-6">
+        <div className="space-y-6">
+          {/* Date Separator */}
+          <div className="flex items-center justify-center my-4">
+            <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs text-slate-500 font-medium">
+              Today
+            </div>
+          </div>
+
+          {MESSAGES.map((msg) => {
+            const sender = TEAM_MEMBERS.find(m => m.id === msg.senderId);
+            const isMe = msg.senderId === "1"; // Mock "Me" user
+            
+            return (
+              <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
+                <Avatar className="h-8 w-8 mt-1">
+                  <AvatarImage src={sender?.avatar} />
+                  <AvatarFallback>{sender?.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                
+                <div className={`flex flex-col gap-1 max-w-[70%] ${isMe ? 'items-end' : 'items-start'}`}>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sender?.name}</span>
+                    <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                  </div>
+                  
+                  <div className={`p-3 rounded-2xl text-sm ${
+                    isMe 
+                      ? 'bg-primary text-primary-foreground rounded-tr-sm' 
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-sm'
+                  }`}>
+                    {msg.content}
+                  </div>
+
+                  {msg.reactions.length > 0 && (
+                    <div className="flex gap-1 mt-0.5">
+                      {msg.reactions.map((reaction, i) => (
+                        <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-1.5 py-0.5 text-[10px] flex items-center gap-1 shadow-sm">
+                          <span>{reaction.emoji}</span>
+                          <span className="text-slate-500">{reaction.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </ScrollArea>
+
+      {/* Input Area */}
+      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-2 shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+          <Input 
+            className="border-none shadow-none focus-visible:ring-0 px-3 min-h-[40px]" 
+            placeholder={`Message ${isChannel ? '#' + chatId : dmUser?.name}...`} 
+          />
+          <div className="flex items-center justify-between px-2 pb-1 pt-2">
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                <Smile className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                <Paperclip className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button size="sm" className="h-8 px-4">
+              <Send className="h-3.5 w-3.5 mr-2" />
+              Send
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
