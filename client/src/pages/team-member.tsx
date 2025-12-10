@@ -1,5 +1,5 @@
 import { useRoute, Link } from "wouter";
-import { ChevronRight, Home, Search, Copy } from "lucide-react";
+import { ChevronRight, Home, Search, Copy, Pencil, X, Check } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -201,11 +201,83 @@ const PERMISSIONS_SCHEMA = [
   }
 ];
 
+function EditableField({ 
+  label, 
+  value, 
+  onSave, 
+  isEditable = true 
+}: { 
+  label: string, 
+  value: string, 
+  onSave: (newValue: string) => void,
+  isEditable?: boolean 
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentValue, setCurrentValue] = useState(value);
+
+  const handleSave = () => {
+    onSave(currentValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setCurrentValue(value);
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="space-y-1.5">
+        <Label className="text-xs text-slate-500">{label}</Label>
+        <div className="flex items-center gap-2">
+          <Input 
+            value={currentValue}
+            onChange={(e) => setCurrentValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSave();
+              if (e.key === 'Escape') handleCancel();
+            }}
+            autoFocus
+            className="h-8 text-sm"
+          />
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" onClick={handleSave}>
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={handleCancel}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className={`group relative ${isEditable ? 'cursor-pointer' : ''}`} 
+      onClick={() => isEditable && setIsEditing(true)}
+    >
+      <Label className="text-xs text-slate-500">{label}</Label>
+      <div className="flex items-center gap-2 mt-0.5 min-h-[24px]">
+        <div className="text-sm font-medium">{value}</div>
+        {isEditable && (
+          <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function TeamMemberPage() {
   const [match, params] = useRoute("/team/member/:id");
   const memberId = params?.id;
-  const member = TEAM_MEMBERS.find(m => m.id === memberId);
+  const initialMember = TEAM_MEMBERS.find(m => m.id === memberId);
+  const [member, setMember] = useState(initialMember);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Update local state when memberId changes
+  if (initialMember?.id !== member?.id && initialMember) {
+    setMember(initialMember);
+  }
 
   // Mock state for permissions
   const [permissions, setPermissions] = useState<Record<string, boolean>>({
@@ -236,6 +308,12 @@ export default function TeamMemberPage() {
     // For now, we'll just simulate a successful copy
     setCopyDialogOpen(false);
     // Optional: Add toast notification here
+  };
+
+  const updateMemberField = (field: keyof typeof TEAM_MEMBERS[0], value: string) => {
+    if (member) {
+      setMember({ ...member, [field]: value });
+    }
   };
 
   const togglePermission = (id: string) => {
@@ -349,33 +427,54 @@ export default function TeamMemberPage() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Personal Information</CardTitle>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs text-slate-500">
+                        <Pencil className="h-3 w-3 mr-1.5" />
+                        Edit Details
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                        <div>
-                         <Label className="text-xs text-slate-500">Full Name</Label>
-                         <div className="text-sm font-medium">{member.name}</div>
+                         <EditableField 
+                           label="Full Name" 
+                           value={member.name} 
+                           onSave={(val) => updateMemberField('name', val)} 
+                         />
                        </div>
                        <div>
-                         <Label className="text-xs text-slate-500">Email Address</Label>
-                         <div className="text-sm font-medium">{member.email}</div>
+                         <EditableField 
+                           label="Email Address" 
+                           value={member.email} 
+                           onSave={(val) => updateMemberField('email', val)} 
+                         />
                        </div>
                        <div>
-                         <Label className="text-xs text-slate-500">Phone</Label>
-                         <div className="text-sm font-medium">+1 (555) 123-4567</div>
+                         <EditableField 
+                           label="Phone" 
+                           value="+1 (555) 123-4567" 
+                           onSave={(val) => console.log('Update phone', val)} 
+                         />
                        </div>
                        <div>
-                         <Label className="text-xs text-slate-500">Location</Label>
-                         <div className="text-sm font-medium">{member.location}</div>
+                         <EditableField 
+                           label="Location" 
+                           value={member.location || ""} 
+                           onSave={(val) => updateMemberField('location', val)} 
+                         />
                        </div>
                        <div>
-                         <Label className="text-xs text-slate-500">Timezone</Label>
-                         <div className="text-sm font-medium">{member.timezone}</div>
+                         <EditableField 
+                           label="Timezone" 
+                           value={member.timezone || ""} 
+                           onSave={(val) => updateMemberField('timezone', val)} 
+                         />
                        </div>
                        <div>
                          <Label className="text-xs text-slate-500">Joined Date</Label>
-                         <div className="text-sm font-medium">{member.joinedDate}</div>
+                         <div className="text-sm font-medium mt-0.5">{member.joinedDate}</div>
                        </div>
                     </div>
                   </CardContent>
@@ -391,19 +490,26 @@ export default function TeamMemberPage() {
                          <Label className="text-xs text-slate-500">Department</Label>
                          <div className="flex items-center gap-2 mt-1">
                             <Badge variant="secondary">{member.department}</Badge>
+                            <Button variant="ghost" size="icon" className="h-5 w-5 text-slate-400 hover:text-slate-600">
+                              <Pencil className="h-3 w-3" />
+                            </Button>
                          </div>
                        </div>
                        <div>
-                         <Label className="text-xs text-slate-500">Role</Label>
-                         <div className="text-sm font-medium mt-1">{member.role}</div>
+                         <EditableField 
+                           label="Role" 
+                           value={member.role} 
+                           onSave={(val) => updateMemberField('role', val)} 
+                         />
                        </div>
                        <div>
                          <Label className="text-xs text-slate-500">Manager</Label>
-                         <div className="flex items-center gap-2 mt-1">
+                         <div className="flex items-center gap-2 mt-1 group cursor-pointer">
                             <Avatar className="h-6 w-6">
                                 <AvatarFallback>JD</AvatarFallback>
                             </Avatar>
                             <span className="text-sm font-medium">John Doe</span>
+                            <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                          </div>
                        </div>
                     </div>
