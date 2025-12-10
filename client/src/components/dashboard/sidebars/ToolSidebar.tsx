@@ -86,7 +86,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header with toggle button */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4 min-h-[60px]">
-          {isOpen && <h3 className="font-display font-semibold text-slate-900 dark:text-slate-100 tracking-tight pl-1">Explorer</h3>}
+          {isOpen && <h3 className="font-display font-semibold text-slate-900 dark:text-slate-100 tracking-tight pl-1">Menu</h3>}
           <Button
             className="h-7 w-7 p-0 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
             onClick={onToggle}
