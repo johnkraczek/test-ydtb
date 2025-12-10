@@ -564,7 +564,7 @@ export default function CustomFieldsPage() {
             </div>
         }>
             <div className="h-full flex flex-col">
-                    <TabsContent value="folders" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
+                    <TabsContent value="folders" className="flex-1 overflow-auto p-6 mt-0">
                         <div className="max-w-5xl mx-auto space-y-6">
                             {/* Folders List */}
                             <div className="space-y-4">
