@@ -359,6 +359,7 @@ export default function ContactsPage() {
           title="Contacts"
           description="Manage your team and contacts."
           actions={headerActions}
+          hideBreadcrumbs={true}
         />
       }
     >
