@@ -166,7 +166,15 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
           return (
             <div key={filter.id} className={`flex flex-col ${depth > 0 ? 'ml-8' : ''}`}>
                 {index > 0 ? (
-                    <div className="flex items-center gap-4 py-2">
+                    <div className="flex items-center gap-2 py-2">
+                         <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-7 text-xs text-slate-500 hover:text-indigo-600 gap-1 px-2"
+                            onClick={() => addNestedFilter(filter.id)}
+                        >
+                            <Plus className="h-3 w-3" /> Add condition
+                        </Button>
                          <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
                          <Select 
                             value={filter.logic} 
@@ -192,8 +200,18 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                     </div>
                 ) : (
                     <div className="flex items-center justify-between pb-2 px-1">
-                        <div className="text-sm text-slate-500 font-medium">
-                            {depth === 0 ? 'Where' : 'Matches'}
+                        <div className="flex items-center gap-2">
+                             <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-xs text-slate-500 hover:text-indigo-600 gap-1 px-2"
+                                onClick={() => addNestedFilter(filter.id)}
+                            >
+                                <Plus className="h-3 w-3" /> Add condition
+                            </Button>
+                            <div className="text-sm text-slate-500 font-medium">
+                                {depth === 0 ? 'Where' : 'Matches'}
+                            </div>
                         </div>
                         <Button 
                             variant="ghost" 
@@ -215,15 +233,6 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                         
                         <div className="flex flex-col gap-3">
                             {(filter as FilterGroup).items.map((item, i) => renderFilterItem(item, i, depth + 1))}
-                            
-                            <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 text-xs text-slate-500 hover:text-indigo-600 self-start gap-1 mt-1"
-                                onClick={() => addNestedFilter(filter.id)}
-                            >
-                                <Plus className="h-3 w-3" /> Add condition
-                            </Button>
                         </div>
                     </div>
                 </div>
