@@ -34,7 +34,11 @@ import {
   Briefcase,
   Hash,
   Search,
-  Filter
+  Filter,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+  Edit
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -53,6 +57,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 
 import {
   Dialog,
@@ -450,22 +461,24 @@ function SidebarSection({ title, children }: { title: string; children: React.Re
     );
 }
 
-function SidebarItem({ icon: Icon, label, badge, active }: { icon: any, label: string, badge?: string, active?: boolean }) {
+function SidebarItem({ icon: Icon, label, badge, active, actions }: { icon: any, label: string, badge?: string, active?: boolean, actions?: React.ReactNode }) {
     return (
-        <Button 
-            className={`w-full justify-between group h-9 rounded-lg px-2.5 font-normal ${active ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`} 
-            variant="ghost"
-        >
-            <div className="flex items-center gap-2.5">
-                <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
+        <div className={`group/item flex items-center w-full h-9 rounded-lg px-2.5 font-normal transition-colors ${active ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}>
+            <div className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer">
+                <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-slate-400 group-hover/item:text-slate-600 dark:group-hover/item:text-slate-300"}`} />
                 <span className="truncate">{label}</span>
             </div>
             {badge && (
-                <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-normal bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-normal bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 ml-2">
                     {badge}
                 </Badge>
             )}
-        </Button>
+            {actions && (
+                <div className="opacity-0 group-hover/item:opacity-100 transition-opacity ml-2">
+                    {actions}
+                </div>
+            )}
+        </div>
     )
 }
 
@@ -625,16 +638,44 @@ function ContactsSidebarContent() {
     { id: '3', name: 'Vendors', type: 'fixed' }
   ]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'rename'>('create');
+  const [editingGroup, setEditingGroup] = useState<{id: string, name: string, type: string} | null>(null);
   const [newGroupName, setNewGroupName] = useState("");
   const [activeTab, setActiveTab] = useState("fixed");
 
-  const handleCreateGroup = () => {
+  const openCreateDialog = () => {
+    setDialogMode('create');
+    setEditingGroup(null);
+    setNewGroupName("");
+    setActiveTab("fixed");
+    setIsDialogOpen(true);
+  };
+
+  const openEditDialog = (group: {id: string, name: string, type: string}, mode: 'edit' | 'rename') => {
+    setDialogMode(mode);
+    setEditingGroup(group);
+    setNewGroupName(group.name);
+    setActiveTab(group.type);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    setGroups(groups.filter(g => g.id !== groupId));
+  };
+
+  const handleSaveGroup = () => {
     if (newGroupName.trim()) {
-      setGroups([...groups, { 
-        id: Date.now().toString(), 
-        name: newGroupName, 
-        type: activeTab 
-      }]);
+      if (editingGroup) {
+        // Edit existing
+        setGroups(groups.map(g => g.id === editingGroup.id ? { ...g, name: newGroupName, type: activeTab } : g));
+      } else {
+        // Create new
+        setGroups([...groups, { 
+          id: Date.now().toString(), 
+          name: newGroupName, 
+          type: activeTab 
+        }]);
+      }
       setNewGroupName("");
       setIsDialogOpen(false);
     }
@@ -653,74 +694,94 @@ function ContactsSidebarContent() {
             <h4 className="font-semibold text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Groups</h4>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-4 w-4 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm">
+                    <Button variant="ghost" size="icon" className="h-4 w-4 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm" onClick={openCreateDialog}>
                         <Plus className="h-3 w-3 text-slate-500" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Create New Group</DialogTitle>
+                        <DialogTitle>
+                          {dialogMode === 'create' ? 'Create New Group' : 
+                           dialogMode === 'rename' ? 'Rename Group' : 'Edit Group'}
+                        </DialogTitle>
                     </DialogHeader>
-                    <Tabs defaultValue="fixed" value={activeTab} onValueChange={setActiveTab} className="w-full mt-2">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="fixed">Fixed Group</TabsTrigger>
-                            <TabsTrigger value="smart">Smart Group</TabsTrigger>
-                        </TabsList>
-                        
-                        <div className="py-4 space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Group Name</Label>
-                                <Input 
-                                    id="name" 
-                                    placeholder={activeTab === 'fixed' ? "e.g. VIP Clients" : "e.g. High Value Leads"} 
-                                    value={newGroupName}
-                                    onChange={(e) => setNewGroupName(e.target.value)}
-                                />
-                            </div>
-                            
-                            {activeTab === 'smart' && (
-                                <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                                    <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        <Filter className="h-4 w-4" />
-                                        <span>Filters</span>
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <Select defaultValue="status">
-                                                <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                    <SelectValue placeholder="Field" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="status">Status</SelectItem>
-                                                    <SelectItem value="tags">Tags</SelectItem>
-                                                    <SelectItem value="location">Location</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Select defaultValue="is">
-                                                <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
-                                                    <SelectValue placeholder="Operator" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="is">is</SelectItem>
-                                                    <SelectItem value="is_not">is not</SelectItem>
-                                                    <SelectItem value="contains">contains</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Input className="h-8 text-xs bg-white dark:bg-slate-900" placeholder="Value..." />
-                                        </div>
-                                        <Button variant="ghost" size="sm" className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700">
-                                            <Plus className="h-3 w-3 mr-1" /> Add Filter
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    
+                    {dialogMode === 'rename' ? (
+                      <div className="py-4 space-y-4">
+                         <div className="space-y-2">
+                              <Label htmlFor="name">Group Name</Label>
+                              <Input 
+                                  id="name" 
+                                  placeholder="e.g. VIP Clients" 
+                                  value={newGroupName}
+                                  onChange={(e) => setNewGroupName(e.target.value)}
+                              />
+                          </div>
+                      </div>
+                    ) : (
+                      <Tabs defaultValue="fixed" value={activeTab} onValueChange={setActiveTab} className="w-full mt-2">
+                          <TabsList className="grid w-full grid-cols-2">
+                              <TabsTrigger value="fixed" disabled={dialogMode === 'edit' && activeTab === 'smart'}>Fixed Group</TabsTrigger>
+                              <TabsTrigger value="smart" disabled={dialogMode === 'edit' && activeTab === 'fixed'}>Smart Group</TabsTrigger>
+                          </TabsList>
+                          
+                          <div className="py-4 space-y-4">
+                              <div className="space-y-2">
+                                  <Label htmlFor="name">Group Name</Label>
+                                  <Input 
+                                      id="name" 
+                                      placeholder={activeTab === 'fixed' ? "e.g. VIP Clients" : "e.g. High Value Leads"} 
+                                      value={newGroupName}
+                                      onChange={(e) => setNewGroupName(e.target.value)}
+                                  />
+                              </div>
+                              
+                              {activeTab === 'smart' && (
+                                  <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                                      <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                          <Filter className="h-4 w-4" />
+                                          <span>Filters</span>
+                                      </div>
+                                      <div className="grid gap-2">
+                                          <div className="grid grid-cols-3 gap-2">
+                                              <Select defaultValue="status">
+                                                  <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                      <SelectValue placeholder="Field" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                      <SelectItem value="status">Status</SelectItem>
+                                                      <SelectItem value="tags">Tags</SelectItem>
+                                                      <SelectItem value="location">Location</SelectItem>
+                                                  </SelectContent>
+                                              </Select>
+                                              <Select defaultValue="is">
+                                                  <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                      <SelectValue placeholder="Operator" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                      <SelectItem value="is">is</SelectItem>
+                                                      <SelectItem value="is_not">is not</SelectItem>
+                                                      <SelectItem value="contains">contains</SelectItem>
+                                                  </SelectContent>
+                                              </Select>
+                                              <Input className="h-8 text-xs bg-white dark:bg-slate-900" placeholder="Value..." />
+                                          </div>
+                                          <Button variant="ghost" size="sm" className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700">
+                                              <Plus className="h-3 w-3 mr-1" /> Add Filter
+                                          </Button>
+                                      </div>
+                                  </div>
+                              )}
+                          </div>
+                      </Tabs>
+                    )}
 
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                            <Button onClick={handleCreateGroup}>Create Group</Button>
-                        </DialogFooter>
-                    </Tabs>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleSaveGroup}>
+                          {dialogMode === 'create' ? 'Create Group' : 'Save Changes'}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
@@ -730,6 +791,32 @@ function ContactsSidebarContent() {
                     key={group.id} 
                     icon={group.type === 'smart' ? Zap : Folder} 
                     label={group.name} 
+                    actions={
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                            <MoreHorizontal className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={() => openEditDialog(group, 'rename')}>
+                            <Pencil className="h-3.5 w-3.5 mr-2" />
+                            Rename
+                          </DropdownMenuItem>
+                          {group.type === 'smart' && (
+                            <DropdownMenuItem onClick={() => openEditDialog(group, 'edit')}>
+                              <Edit className="h-3.5 w-3.5 mr-2" />
+                              Edit Rules
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleDeleteGroup(group.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10">
+                            <Trash className="h-3.5 w-3.5 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    }
                 />
             ))}
         </div>
