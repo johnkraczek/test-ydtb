@@ -541,7 +541,7 @@ export default function SopEditorPage() {
                                     onValueChange={(val) => val && updateStepButton(step.id, 'color', val)}
                                     className="w-full"
                                   >
-                                    <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                    <TabsList className="flex w-fit h-8 p-1 bg-slate-100 dark:bg-slate-800 gap-1">
                                       <TabsTrigger value="primary" aria-label="Primary" className="h-6 w-8 text-xs px-0">
                                         <div className="h-4 w-4 rounded-full bg-primary" />
                                       </TabsTrigger>
@@ -630,7 +630,7 @@ export default function SopEditorPage() {
                                     onValueChange={(val) => val && updateStepNote(step.id, 'icon', val)}
                                     className="w-full"
                                   >
-                                    <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                    <TabsList className="flex w-fit h-8 p-1 bg-slate-100 dark:bg-slate-800 gap-1">
                                       <TabsTrigger value="info" className="h-6 w-8 text-xs px-0"><Info className="h-3.5 w-3.5" /></TabsTrigger>
                                       <TabsTrigger value="warning" className="h-6 w-8 text-xs px-0"><AlertTriangle className="h-3.5 w-3.5" /></TabsTrigger>
                                       <TabsTrigger value="tip" className="h-6 w-8 text-xs px-0"><Lightbulb className="h-3.5 w-3.5" /></TabsTrigger>
@@ -646,7 +646,7 @@ export default function SopEditorPage() {
                                       onValueChange={(val) => val && updateStepNote(step.id, 'color', val)}
                                       className="w-full"
                                     >
-                                      <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                      <TabsList className="flex w-fit h-8 p-1 bg-slate-100 dark:bg-slate-800 gap-1">
                                         <TabsTrigger value="amber" aria-label="Amber" className="h-6 w-8 text-xs px-0">
                                           <div className="h-3 w-3 rounded-full bg-amber-500" />
                                         </TabsTrigger>
