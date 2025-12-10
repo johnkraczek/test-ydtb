@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -20,6 +21,13 @@ import {
   CommandEmpty,
   CommandGroup,
 } from "@/components/ui/command";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
@@ -52,6 +60,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 import { ContactEditDrawer, MOCK_FOLDERS, MOCK_FIELDS } from "@/components/dashboard/ContactEditDrawer";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
