@@ -15,7 +15,9 @@ import {
   Calendar,
   MoreVertical,
   FileText,
-  ArrowUpRight
+  ArrowUpRight,
+  Check,
+  Loader2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,6 +25,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 // Mock Data
 const INVOICES = [
@@ -33,7 +44,54 @@ const INVOICES = [
   { id: "inv_005", date: "2024-08-01", amount: "$49.00", status: "Paid", description: "Pro Plan - Monthly" },
 ];
 
+const PLANS = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: "$19",
+    period: "/mo",
+    description: "Perfect for hobbyists and small projects.",
+    features: ["1 User Seat", "2GB Storage", "Basic Support", "1 Custom Domain"]
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: "$49",
+    period: "/mo",
+    description: "Everything you need to grow your business.",
+    features: ["5 User Seats", "10GB Storage", "Priority Support", "5 Custom Domains", "Advanced Analytics"],
+    popular: true
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: "$199",
+    period: "/mo",
+    description: "Advanced features for large teams.",
+    features: ["Unlimited Seats", "1TB Storage", "24/7 Dedicated Support", "Unlimited Domains", "SSO & Audit Logs"]
+  }
+];
+
 export default function BillingSettingsPage() {
+  const [currentPlan, setCurrentPlan] = useState("pro");
+  const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleSelectPlan = (planId: string) => {
+    if (planId === currentPlan) return;
+    setIsUpdating(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setCurrentPlan(planId);
+      setIsUpdating(false);
+      setIsPlanDialogOpen(false);
+      toast.success(`Successfully switched to ${PLANS.find(p => p.id === planId)?.name} Plan`);
+    }, 1500);
+  };
+
+  const activePlanDetails = PLANS.find(p => p.id === currentPlan) || PLANS[1];
+
   return (
     <DashboardLayout 
       activeTool="settings"
@@ -58,15 +116,15 @@ export default function BillingSettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-xl flex items-center gap-2">
-                    Pro Plan
+                    {activePlanDetails.name} Plan
                     <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">Active</Badge>
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    Everything you need to grow your business.
+                    {activePlanDetails.description}
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">$49<span className="text-sm font-normal text-slate-500">/mo</span></div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{activePlanDetails.price}<span className="text-sm font-normal text-slate-500">{activePlanDetails.period}</span></div>
                   <div className="text-xs text-slate-500">Renews on Jan 1, 2025</div>
                 </div>
               </div>
@@ -77,20 +135,26 @@ export default function BillingSettingsPage() {
                   <div className="text-sm font-medium text-slate-500">Storage Used</div>
                   <div className="flex items-end gap-2">
                     <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">7.5 GB</span>
-                    <span className="text-xs text-slate-500 mb-1">of 10 GB</span>
+                    <span className="text-xs text-slate-500 mb-1">of {currentPlan === 'starter' ? '2 GB' : currentPlan === 'pro' ? '10 GB' : '1 TB'}</span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary w-[75%]" />
+                    <div 
+                      className={`h-full bg-primary transition-all duration-500`} 
+                      style={{ width: currentPlan === 'starter' ? '100%' : currentPlan === 'pro' ? '75%' : '1%' }}
+                    />
                   </div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-sm font-medium text-slate-500">Team Members</div>
                   <div className="flex items-end gap-2">
                     <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">5</span>
-                    <span className="text-xs text-slate-500 mb-1">of 10 seats</span>
+                    <span className="text-xs text-slate-500 mb-1">of {currentPlan === 'starter' ? '1 seat' : currentPlan === 'pro' ? '10 seats' : 'Unlimited'}</span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 w-[50%]" />
+                     <div 
+                      className={`h-full bg-blue-500 transition-all duration-500`} 
+                      style={{ width: currentPlan === 'starter' ? '100%' : currentPlan === 'pro' ? '50%' : '5%' }}
+                    />
                   </div>
                 </div>
               </div>
@@ -101,7 +165,7 @@ export default function BillingSettingsPage() {
                 Next invoice will be issued on Jan 1, 2025
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">Change Plan</Button>
+                <Button variant="outline" size="sm" onClick={() => setIsPlanDialogOpen(true)}>Change Plan</Button>
                 <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20">Cancel Subscription</Button>
               </div>
             </CardFooter>
@@ -201,6 +265,74 @@ export default function BillingSettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Change Plan Dialog */}
+        <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+          <DialogContent className="sm:max-w-[900px]">
+            <DialogHeader>
+              <DialogTitle>Change Subscription Plan</DialogTitle>
+              <DialogDescription>
+                Choose the plan that best fits your needs. You can upgrade or downgrade at any time.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+              {PLANS.map((plan) => (
+                <div 
+                  key={plan.id}
+                  className={`relative rounded-xl border-2 p-4 transition-all cursor-pointer hover:border-primary/50 ${
+                    currentPlan === plan.id 
+                      ? "border-primary bg-primary/5 dark:bg-primary/10" 
+                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
+                  } ${plan.popular ? "md:-mt-4 md:mb-4 shadow-lg z-10" : ""}`}
+                  onClick={() => handleSelectPlan(plan.id)}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <div className="space-y-2 mb-4">
+                    <h3 className="font-bold text-lg">{plan.name}</h3>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold">{plan.price}</span>
+                      <span className="text-sm text-slate-500">{plan.period}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-snug h-8">
+                      {plan.description}
+                    </p>
+                  </div>
+                  
+                  <Separator className="my-4" />
+                  
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs">
+                        <Check className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button 
+                    className={`w-full ${currentPlan === plan.id ? "bg-primary/20 text-primary hover:bg-primary/30 border-none shadow-none" : ""}`}
+                    variant={currentPlan === plan.id ? "outline" : "default"}
+                    disabled={currentPlan === plan.id || isUpdating}
+                  >
+                    {isUpdating && currentPlan !== plan.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : currentPlan === plan.id ? (
+                      "Current Plan"
+                    ) : (
+                      "Select Plan"
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
 
       </div>
     </DashboardLayout>
