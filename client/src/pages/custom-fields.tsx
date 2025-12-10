@@ -60,6 +60,7 @@ import { Label } from "@/components/ui/label";
 interface CustomField {
     id: string;
     name: string;
+    slug: string;
     type: 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'multiselect';
     folderId: string | null;
     description?: string;
@@ -91,20 +92,28 @@ export default function CustomFieldsPage() {
     ]);
     
     const [fields, setFields] = useState<CustomField[]>([
-        { id: '1', name: 'Job Title', type: 'text', folderId: '1', description: 'Current job title' },
-        { id: '2', name: 'Company Size', type: 'select', folderId: '2', options: ['1-10', '11-50', '50+'] },
-        { id: '3', name: 'Annual Revenue', type: 'number', folderId: '2' },
-        { id: '4', name: 'Lead Source Detail', type: 'text', folderId: '3' },
-        { id: '5', name: 'Interests', type: 'multiselect', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
-        { id: '6', name: 'Contract Start Date', type: 'date', folderId: '2' },
-        { id: '7', name: 'Uncategorized Field', type: 'text', folderId: null },
+        { id: '1', name: 'Job Title', slug: 'job_title', type: 'text', folderId: '1', description: 'Current job title' },
+        { id: '2', name: 'Company Size', slug: 'company_size', type: 'select', folderId: '2', options: ['1-10', '11-50', '50+'] },
+        { id: '3', name: 'Annual Revenue', slug: 'annual_revenue', type: 'number', folderId: '2' },
+        { id: '4', name: 'Lead Source Detail', slug: 'lead_source_detail', type: 'text', folderId: '3' },
+        { id: '5', name: 'Interests', slug: 'interests', type: 'multiselect', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
+        { id: '6', name: 'Contract Start Date', slug: 'contract_start_date', type: 'date', folderId: '2' },
+        { id: '7', name: 'Uncategorized Field', slug: 'uncategorized_field', type: 'text', folderId: null },
     ]);
 
     const [expandedFolders, setExpandedFolders] = useState<string[]>(['1', '2', '3']);
     const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
     const [isCreateFieldOpen, setIsCreateFieldOpen] = useState(false);
     const [newFolderName, setNewFolderName] = useState("");
-    const [newFieldData, setNewFieldData] = useState<Partial<CustomField>>({ type: 'text', folderId: '1' });
+    
+    // Field editing state
+    const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+    const [fieldFormData, setFieldFormData] = useState<Partial<CustomField>>({ 
+        type: 'text', 
+        folderId: '1',
+        id: '',
+        slug: ''
+    });
 
     const toggleFolder = (folderId: string) => {
         if (expandedFolders.includes(folderId)) {
@@ -122,18 +131,53 @@ export default function CustomFieldsPage() {
         }
     };
 
-    const handleCreateField = () => {
-        if (newFieldData.name) {
-            setFields([...fields, { 
-                id: Math.random().toString(36).substr(2, 9), 
-                name: newFieldData.name,
-                type: newFieldData.type as any || 'text',
-                folderId: newFieldData.folderId || null,
-                description: newFieldData.description,
-                options: newFieldData.options,
-                required: newFieldData.required
-            }]);
-            setNewFieldData({ type: 'text', folderId: '1' });
+    const openCreateFieldDialog = () => {
+        setEditingFieldId(null);
+        setFieldFormData({ 
+            type: 'text', 
+            folderId: '1',
+            id: Math.random().toString(36).substr(2, 9),
+            slug: ''
+        });
+        setIsCreateFieldOpen(true);
+    };
+
+    const openEditFieldDialog = (field: CustomField) => {
+        setEditingFieldId(field.id);
+        setFieldFormData({ ...field });
+        setIsCreateFieldOpen(true);
+    };
+
+    const handleSaveField = () => {
+        if (fieldFormData.name) {
+            if (editingFieldId) {
+                // Update existing
+                setFields(fields.map(f => f.id === editingFieldId ? { 
+                    ...f, 
+                    name: fieldFormData.name!,
+                    // Type is fixed on edit
+                    // Slug is fixed on edit
+                    folderId: fieldFormData.folderId || null,
+                    description: fieldFormData.description,
+                    options: fieldFormData.options,
+                    required: fieldFormData.required
+                } : f));
+            } else {
+                // Create new
+                // Generate slug if empty
+                const generatedSlug = fieldFormData.slug || fieldFormData.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+                
+                setFields([...fields, { 
+                    id: fieldFormData.id || Math.random().toString(36).substr(2, 9), 
+                    name: fieldFormData.name,
+                    slug: generatedSlug,
+                    type: fieldFormData.type as any || 'text',
+                    folderId: fieldFormData.folderId || null,
+                    description: fieldFormData.description,
+                    options: fieldFormData.options,
+                    required: fieldFormData.required
+                }]);
+            }
             setIsCreateFieldOpen(false);
         }
     };
@@ -147,6 +191,7 @@ export default function CustomFieldsPage() {
     const deleteField = (id: string) => {
         setFields(fields.filter(f => f.id !== id));
     };
+
 
     const getFieldIcon = (type: string) => {
         const typeObj = FIELD_TYPES.find(t => t.value === type);
@@ -216,16 +261,16 @@ export default function CustomFieldsPage() {
 
                     <Dialog open={isCreateFieldOpen} onOpenChange={setIsCreateFieldOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm shadow-indigo-200 dark:shadow-none">
+                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm shadow-indigo-200 dark:shadow-none" onClick={openCreateFieldDialog}>
                                 <Plus className="h-4 w-4" />
                                 Add Field
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[500px]">
                             <DialogHeader>
-                                <DialogTitle>Create Custom Field</DialogTitle>
+                                <DialogTitle>{editingFieldId ? 'Edit Custom Field' : 'Create Custom Field'}</DialogTitle>
                                 <DialogDescription>
-                                    Add a new field to capture specific data about your contacts.
+                                    {editingFieldId ? 'Modify existing custom field properties.' : 'Add a new field to capture specific data about your contacts.'}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="py-4 space-y-4">
@@ -234,19 +279,43 @@ export default function CustomFieldsPage() {
                                     <Input 
                                         id="field-name" 
                                         placeholder="e.g. T-Shirt Size" 
-                                        value={newFieldData.name || ''}
-                                        onChange={(e) => setNewFieldData({...newFieldData, name: e.target.value})}
+                                        value={fieldFormData.name || ''}
+                                        onChange={(e) => setFieldFormData({...fieldFormData, name: e.target.value})}
                                     />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="field-slug">Field Slug</Label>
+                                        <Input 
+                                            id="field-slug" 
+                                            placeholder="e.g. t_shirt_size" 
+                                            value={fieldFormData.slug || ''}
+                                            onChange={(e) => setFieldFormData({...fieldFormData, slug: e.target.value})}
+                                            disabled={!!editingFieldId}
+                                            className={editingFieldId ? "bg-slate-100 text-slate-500" : ""}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="field-id">Field ID</Label>
+                                        <Input 
+                                            id="field-id" 
+                                            value={fieldFormData.id || ''}
+                                            disabled={true}
+                                            className="bg-slate-100 text-slate-500 font-mono text-xs"
+                                        />
+                                    </div>
                                 </div>
                                 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="field-type">Field Type</Label>
                                         <Select 
-                                            value={newFieldData.type} 
-                                            onValueChange={(val: any) => setNewFieldData({...newFieldData, type: val})}
+                                            value={fieldFormData.type} 
+                                            onValueChange={(val: any) => setFieldFormData({...fieldFormData, type: val})}
+                                            disabled={!!editingFieldId}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className={editingFieldId ? "bg-slate-100 text-slate-500 opacity-100" : ""}>
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -265,8 +334,8 @@ export default function CustomFieldsPage() {
                                     <div className="space-y-2">
                                         <Label htmlFor="field-folder">Folder</Label>
                                         <Select 
-                                            value={newFieldData.folderId || "uncategorized"} 
-                                            onValueChange={(val) => setNewFieldData({...newFieldData, folderId: val === "uncategorized" ? null : val})}
+                                            value={fieldFormData.folderId || "uncategorized"} 
+                                            onValueChange={(val) => setFieldFormData({...fieldFormData, folderId: val === "uncategorized" ? null : val})}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select folder" />
@@ -286,14 +355,16 @@ export default function CustomFieldsPage() {
                                     <Input 
                                         id="field-desc" 
                                         placeholder="What is this field used for?" 
-                                        value={newFieldData.description || ''}
-                                        onChange={(e) => setNewFieldData({...newFieldData, description: e.target.value})}
+                                        value={fieldFormData.description || ''}
+                                        onChange={(e) => setFieldFormData({...fieldFormData, description: e.target.value})}
                                     />
                                 </div>
                             </div>
                             <DialogFooter>
                                 <Button variant="outline" onClick={() => setIsCreateFieldOpen(false)}>Cancel</Button>
-                                <Button onClick={handleCreateField} disabled={!newFieldData.name}>Create Field</Button>
+                                <Button onClick={handleSaveField} disabled={!fieldFormData.name}>
+                                    {editingFieldId ? 'Save Changes' : 'Create Field'}
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -373,7 +444,7 @@ export default function CustomFieldsPage() {
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align="end">
-                                                                            <DropdownMenuItem>Edit Field</DropdownMenuItem>
+                                                                            <DropdownMenuItem onClick={() => openEditFieldDialog(field)}>Edit Field</DropdownMenuItem>
                                                                             <DropdownMenuItem>Move to Folder</DropdownMenuItem>
                                                                             <DropdownMenuSeparator />
                                                                             <DropdownMenuItem className="text-red-600" onClick={() => deleteField(field.id)}>
