@@ -49,8 +49,10 @@ import {
     ArrowUp,
     ArrowDown,
     ArrowUpDown,
-    AlignLeft
+    AlignLeft,
+    Copy
 } from "lucide-react";
+import { toast } from "sonner";
 import {
     Select,
     SelectContent,
@@ -214,6 +216,11 @@ export default function CustomFieldsPage() {
             setSortColumn(column);
             setSortDirection('asc');
         }
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Copied to clipboard");
     };
 
     const filteredFields = fields.filter(f => 
@@ -473,9 +480,10 @@ export default function CustomFieldsPage() {
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                            <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
-                                                            <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
-                                                            <TableHead className="w-[40%] text-xs font-medium">Description</TableHead>
+                                                            <TableHead className="w-[25%] text-xs font-medium">Field Name</TableHead>
+                                                            <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                                            <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
                                                             <TableHead className="w-[10%] text-xs font-medium"></TableHead>
                                                         </TableRow>
                                                     </TableHeader>
@@ -489,6 +497,17 @@ export default function CustomFieldsPage() {
                                                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                                                         {getFieldIcon(field.type)}
                                                                         <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <div 
+                                                                        className="group flex items-center gap-2 cursor-pointer w-fit"
+                                                                        onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                                    >
+                                                                        <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
+                                                                            {`{{${field.slug}}}`}
+                                                                        </code>
+                                                                        <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                                     </div>
                                                                 </TableCell>
                                                                 <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
@@ -540,9 +559,10 @@ export default function CustomFieldsPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                <TableHead className="w-[30%] text-xs font-medium">Field Name</TableHead>
-                                                <TableHead className="w-[20%] text-xs font-medium">Type</TableHead>
-                                                <TableHead className="w-[40%] text-xs font-medium">Description</TableHead>
+                                                <TableHead className="w-[25%] text-xs font-medium">Field Name</TableHead>
+                                                <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                                <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
                                                 <TableHead className="w-[10%] text-xs font-medium"></TableHead>
                                             </TableRow>
                                         </TableHeader>
@@ -556,6 +576,17 @@ export default function CustomFieldsPage() {
                                                         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                                             {getFieldIcon(field.type)}
                                                             <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div 
+                                                            className="group flex items-center gap-2 cursor-pointer w-fit"
+                                                            onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                        >
+                                                            <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
+                                                                {`{{${field.slug}}}`}
+                                                            </code>
+                                                            <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
@@ -593,10 +624,11 @@ export default function CustomFieldsPage() {
                             <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                            <SortableHeader column="name" label="Field Name" className="w-[30%] text-xs font-medium" />
-                                            <SortableHeader column="type" label="Type" className="w-[20%] text-xs font-medium" />
+                                            <SortableHeader column="name" label="Field Name" className="w-[25%] text-xs font-medium" />
+                                            <SortableHeader column="type" label="Type" className="w-[15%] text-xs font-medium" />
+                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
                                             <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
-                                            <SortableHeader column="description" label="Description" className="w-[25%] text-xs font-medium" />
+                                            <SortableHeader column="description" label="Description" className="w-[15%] text-xs font-medium" />
                                             <TableHead className="w-[10%] text-xs font-medium"></TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -613,6 +645,17 @@ export default function CustomFieldsPage() {
                                                             <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                                                 {getFieldIcon(field.type)}
                                                                 <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div 
+                                                                className="group flex items-center gap-2 cursor-pointer w-fit"
+                                                                onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                            >
+                                                                <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
+                                                                    {`{{${field.slug}}}`}
+                                                                </code>
+                                                                <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
