@@ -137,6 +137,37 @@ export default function CustomValuesPage() {
     const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
     const [editingFolderName, setEditingFolderName] = useState("");
 
+    // Inline editing state
+    const [editingCellId, setEditingCellId] = useState<string | null>(null);
+    const [editingCellValue, setEditingCellValue] = useState("");
+
+    const startEditingCell = (value: CustomValue) => {
+        setEditingCellId(value.id);
+        setEditingCellValue(value.value);
+    };
+
+    const saveCellEdit = () => {
+        if (editingCellId) {
+            setValues(values.map(v => v.id === editingCellId ? { ...v, value: editingCellValue } : v));
+            setEditingCellId(null);
+            setEditingCellValue("");
+            toast.success("Value updated");
+        }
+    };
+
+    const cancelCellEdit = () => {
+        setEditingCellId(null);
+        setEditingCellValue("");
+    };
+
+    const handleCellKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            saveCellEdit();
+        } else if (e.key === 'Escape') {
+            cancelCellEdit();
+        }
+    };
+
     // Selection state
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
@@ -572,10 +603,22 @@ export default function CustomValuesPage() {
                                                     <Copy className="h-3 w-3 ml-2 opacity-0 group-hover/code:opacity-100 transition-opacity" />
                                                 </div>
                                             </TableCell>
-                                            <TableCell>
-                                                <span className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[300px] block" title={value.value}>
-                                                    {value.value}
-                                                </span>
+                                            <TableCell onClick={() => !editingCellId && startEditingCell(value)} className="cursor-pointer">
+                                                {editingCellId === value.id ? (
+                                                    <Input 
+                                                        value={editingCellValue}
+                                                        onChange={(e) => setEditingCellValue(e.target.value)}
+                                                        onBlur={saveCellEdit}
+                                                        onKeyDown={handleCellKeyDown}
+                                                        autoFocus
+                                                        className="h-8"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                ) : (
+                                                    <span className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[300px] block" title={value.value}>
+                                                        {value.value}
+                                                    </span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="secondary" className="font-normal text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200">
