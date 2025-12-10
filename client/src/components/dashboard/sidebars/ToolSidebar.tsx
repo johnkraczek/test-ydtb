@@ -46,16 +46,113 @@ import { Progress } from "@/components/ui/progress";
 import { useLocation } from "wouter";
 
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface ToolSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   toolId: string;
+}
+
+
+// Mock users for the dialog
+const MOCK_USERS = [
+  { id: "1", name: "Sarah Wilson", role: "Product Designer", avatar: "https://i.pravatar.cc/150?u=1" },
+  { id: "2", name: "Michael Chen", role: "Senior Developer", avatar: "https://i.pravatar.cc/150?u=2" },
+  { id: "3", name: "Emma Rodriguez", role: "Product Manager", avatar: "https://i.pravatar.cc/150?u=3" },
+  { id: "4", name: "James Kim", role: "Marketing Lead", avatar: "https://i.pravatar.cc/150?u=4" },
+  { id: "5", name: "Alex Turner", role: "Frontend Developer", avatar: "https://i.pravatar.cc/150?u=5" },
+];
+
+function NewConversationDialog({ children }: { children: React.ReactNode }) {
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const filteredUsers = MOCK_USERS.filter(user => 
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleUser = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>New Conversation</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search people..."
+              className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+            {filteredUsers.map((user) => (
+              <div 
+                key={user.id} 
+                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                onClick={() => toggleUser(user.id)}
+              >
+                <Checkbox 
+                  id={`user-${user.id}`} 
+                  checked={selectedUsers.includes(user.id)}
+                  onCheckedChange={() => toggleUser(user.id)}
+                />
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar} />
+                  <AvatarFallback>{user.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <Label 
+                    htmlFor={`user-${user.id}`} 
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    {user.name}
+                  </Label>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{user.role}</p>
+                </div>
+              </div>
+            ))}
+            {filteredUsers.length === 0 && (
+              <p className="text-center text-sm text-slate-500 py-4">No users found</p>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button disabled={selectedUsers.length === 0} onClick={() => setOpen(false)}>
+            Start Chat {selectedUsers.length > 0 && `(${selectedUsers.length})`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
@@ -186,6 +283,13 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                       </Button>
                    </div>
                 </div>
+            ) : toolId === "team" ? (
+              <NewConversationDialog>
+                <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
+                    <Plus className="h-4 w-4" />
+                    <span className="font-medium">New Conversation</span>
+                </Button>
+              </NewConversationDialog>
             ) : toolId !== "settings" && (
                 <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
                     <Plus className="h-4 w-4" />
