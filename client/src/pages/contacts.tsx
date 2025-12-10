@@ -568,9 +568,6 @@ export default function ContactsPage() {
                                                 <h2 className="text-lg font-semibold">{selectedColumnType?.label}</h2>
                                                 <ChevronDown className="h-4 w-4 text-slate-400" />
                                             </div>
-                                            <Button variant="ghost" size="icon" className="ml-auto h-8 w-8" onClick={handleCloseCreator}>
-                                                <X className="h-4 w-4" />
-                                            </Button>
                                         </div>
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
