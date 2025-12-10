@@ -987,6 +987,13 @@ function SettingsSidebarContent() {
             active={location === "/settings/domain"} 
           />
         </div>
+        <div onClick={() => setLocation("/settings/custom-values")}>
+          <SidebarItem 
+            icon={Database} 
+            label="Custom Values" 
+            active={location === "/settings/custom-values"} 
+          />
+        </div>
         <SidebarItem icon={Briefcase} label="Workspace" />
         <SidebarItem icon={LayoutGrid} label="Integrations" />
       </SidebarSection>
