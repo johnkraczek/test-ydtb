@@ -43,6 +43,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       setLocation("/pages");
     } else if (toolId === "sop") {
       setLocation("/sop");
+    } else if (toolId === "settings") {
+      setLocation("/settings/domain");
     }
     // Add other routes as needed
   };
