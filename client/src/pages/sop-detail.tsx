@@ -68,6 +68,7 @@ const MOCK_SOP_DETAIL = {
     {
       id: "s2",
       title: "Welcome Email & Access Provisioning",
+      imageUrl: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
       content: (
         <div className="space-y-4 text-slate-600 dark:text-slate-300">
           <p>

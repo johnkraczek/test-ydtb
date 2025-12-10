@@ -54,7 +54,7 @@ const MOCK_SOP_DATA = {
     {
       id: "s2",
       title: "Welcome Email & Access Provisioning",
-      imageUrl: "",
+      imageUrl: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
       content: "Once the technical setup is complete, we need to welcome the client and provide them with their initial access credentials.",
       note: ""
     }
