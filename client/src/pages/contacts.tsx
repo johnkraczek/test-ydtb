@@ -223,6 +223,7 @@ export default function ContactsPage() {
   const [isColumnCreatorOpen, setIsColumnCreatorOpen] = useState(false);
   const [columnCreatorStep, setColumnCreatorStep] = useState<'field-manager' | 'type-selection' | 'configuration'>('type-selection');
   const [selectedColumnType, setSelectedColumnType] = useState<any>(null);
+  const [isTypeSelectorOpen, setIsTypeSelectorOpen] = useState(false);
   const [createFieldSearch, setCreateFieldSearch] = useState("");
   const [existingFieldSearch, setExistingFieldSearch] = useState("");
   const [newColumnConfig, setNewColumnConfig] = useState({
@@ -702,11 +703,40 @@ export default function ContactsPage() {
                                             <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setColumnCreatorStep('type-selection')}>
                                                 <ArrowLeft className="h-4 w-4" />
                                             </Button>
-                                            <div className="flex items-center gap-2">
-                                                {selectedColumnType && <selectedColumnType.icon className={`h-4 w-4 ${selectedColumnType.color}`} />}
-                                                <h2 className="text-lg font-semibold">{selectedColumnType?.label}</h2>
-                                                <ChevronDown className="h-4 w-4 text-slate-400" />
-                                            </div>
+                                            
+                                            <Popover open={isTypeSelectorOpen} onOpenChange={setIsTypeSelectorOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="ghost" className="flex items-center gap-2 h-9 px-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                                                        {selectedColumnType && <selectedColumnType.icon className={`h-4 w-4 ${selectedColumnType.color}`} />}
+                                                        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{selectedColumnType?.label}</h2>
+                                                        <ChevronDown className="h-4 w-4 text-slate-400" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="p-0 w-[280px]" align="start">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search..." />
+                                                        <CommandList>
+                                                            <CommandEmpty>No results found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {fieldTypes.map((type) => (
+                                                                    <CommandItem
+                                                                        key={type.type}
+                                                                        value={type.label}
+                                                                        onSelect={() => {
+                                                                            setSelectedColumnType(type);
+                                                                            setIsTypeSelectorOpen(false);
+                                                                        }}
+                                                                        className="flex items-center gap-3 py-2.5 cursor-pointer"
+                                                                    >
+                                                                        <type.icon className={`h-4 w-4 ${type.color}`} />
+                                                                        <span>{type.label}</span>
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
                                         </div>
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
