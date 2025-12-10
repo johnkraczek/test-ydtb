@@ -127,6 +127,96 @@ function SortableCardItem({ id, label, visible, onVisibilityChange }: any) {
   );
 }
 
+// Editable Field Component
+function EditableField({ field, value, onSave }: { field: any, value: any, onSave: (val: any) => void }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentValue, setCurrentValue] = useState(value);
+
+  const handleSave = () => {
+    onSave(currentValue);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setCurrentValue(value);
+      setIsEditing(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2 w-full">
+        {field.type === 'select' ? (
+           <Select value={currentValue} onValueChange={setCurrentValue}>
+             <SelectTrigger className="h-8 text-xs">
+               <SelectValue />
+             </SelectTrigger>
+             <SelectContent>
+               {field.options?.map((opt: string) => (
+                 <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+               ))}
+             </SelectContent>
+           </Select>
+        ) : field.type === 'date' ? (
+           <Input 
+             type="date" 
+             value={currentValue ? new Date(currentValue).toISOString().split('T')[0] : ''} 
+             onChange={(e) => setCurrentValue(e.target.value)}
+             className="h-8 text-xs"
+             onKeyDown={handleKeyDown}
+             autoFocus
+           />
+        ) : (
+           <Input 
+             value={currentValue || ''} 
+             onChange={(e) => setCurrentValue(e.target.value)}
+             className="h-8 text-xs"
+             onKeyDown={handleKeyDown}
+             autoFocus
+           />
+        )}
+        <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" onClick={handleSave}>
+          <Check className="h-4 w-4" />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 hover:text-slate-600" onClick={() => { setIsEditing(false); setCurrentValue(value); }}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  let displayValue = value;
+  if (field.type === 'date' && value) {
+     try {
+         displayValue = format(new Date(value as string), "MMM d, yyyy");
+     } catch (e) {
+         displayValue = value;
+     }
+  } else if (Array.isArray(value)) {
+      displayValue = Array.isArray(value) ? value.join(", ") : value;
+  }
+
+  return (
+    <div className="group flex items-start justify-between min-h-[32px]">
+       <div>
+          <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+          <span className="text-sm font-medium">{displayValue}</span>
+       </div>
+       <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={() => { setCurrentValue(value); setIsEditing(true); }}
+       >
+          <Pencil className="h-3 w-3 text-slate-400" />
+       </Button>
+    </div>
+  );
+}
+
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
   const id = params?.id;
@@ -673,20 +763,15 @@ export default function ContactDetailPage() {
                           }
 
                           return (
-                            <div key={field.id} className="group flex items-start justify-between">
-                               <div>
-                                  <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
-                                  <span className="text-sm font-medium">{displayValue}</span>
-                               </div>
-                               <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={() => setIsEditDrawerOpen(true)}
-                               >
-                                  <Pencil className="h-3 w-3 text-slate-400" />
-                               </Button>
-                            </div>
+                            <EditableField 
+                                key={field.id} 
+                                field={field} 
+                                value={value} 
+                                onSave={(newValue) => {
+                                    setCustomer(prev => ({ ...prev, [field.slug]: newValue }));
+                                    toast({ title: "Field Updated", description: `${field.name} updated successfully.` });
+                                }} 
+                            />
                           );
                        })}
                      </CardContent>
@@ -711,20 +796,15 @@ export default function ContactDetailPage() {
                              const value = customer[field.slug as keyof typeof customer];
                              if (!value) return null;
                              return (
-                               <div key={field.id} className="group flex items-start justify-between">
-                                  <div>
-                                     <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
-                                     <span className="text-sm font-medium">{value}</span>
-                                  </div>
-                                  <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => setIsEditDrawerOpen(true)}
-                                  >
-                                      <Pencil className="h-3 w-3 text-slate-400" />
-                                  </Button>
-                               </div>
+                                <EditableField 
+                                    key={field.id} 
+                                    field={field} 
+                                    value={value} 
+                                    onSave={(newValue) => {
+                                        setCustomer(prev => ({ ...prev, [field.slug]: newValue }));
+                                        toast({ title: "Field Updated", description: `${field.name} updated successfully.` });
+                                    }} 
+                                />
                              );
                           })}
                         </CardContent>
