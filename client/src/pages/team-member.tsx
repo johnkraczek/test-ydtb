@@ -1,5 +1,5 @@
 import { useRoute, Link } from "wouter";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, Search, Copy } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,16 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Mail, 
   MessageSquare, 
@@ -211,6 +221,23 @@ export default function TeamMemberPage() {
     view_pages: true
   });
 
+  const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+  const [permissionSearchQuery, setPermissionSearchQuery] = useState("");
+  const [selectedCopyUser, setSelectedCopyUser] = useState<string | null>(null);
+
+  const filteredCopyMembers = TEAM_MEMBERS.filter(m => 
+    m.id !== member.id && 
+    (m.name.toLowerCase().includes(permissionSearchQuery.toLowerCase()) || 
+     m.role.toLowerCase().includes(permissionSearchQuery.toLowerCase()))
+  );
+
+  const handleCopyPermissions = () => {
+    // In a real app, we would fetch the selected user's permissions and apply them
+    // For now, we'll just simulate a successful copy
+    setCopyDialogOpen(false);
+    // Optional: Add toast notification here
+  };
+
   const togglePermission = (id: string) => {
     setPermissions(prev => ({
       ...prev,
@@ -393,7 +420,72 @@ export default function TeamMemberPage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400">Manage what tools and features {member.name.split(' ')[0]} can access.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">Copy from...</Button>
+                  <Dialog open={copyDialogOpen} onOpenChange={setCopyDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Copy className="h-3.5 w-3.5 mr-2" />
+                        Copy from...
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Copy Permissions</DialogTitle>
+                        <DialogDescription>
+                          Select a team member to copy permissions from. This will overwrite current settings.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <div className="relative mb-4">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <Input
+                            placeholder="Search team members..."
+                            className="pl-9"
+                            value={permissionSearchQuery}
+                            onChange={(e) => setPermissionSearchQuery(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                          {filteredCopyMembers.map((m) => (
+                            <div 
+                              key={m.id} 
+                              className={`flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border ${
+                                selectedCopyUser === m.id 
+                                  ? 'border-primary bg-primary/5' 
+                                  : 'border-transparent'
+                              }`}
+                              onClick={() => setSelectedCopyUser(m.id)}
+                            >
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={m.avatar} />
+                                <AvatarFallback>{m.name.substring(0, 2)}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <Label className="text-sm font-medium cursor-pointer block">
+                                  {m.name}
+                                </Label>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{m.role}</p>
+                              </div>
+                              {selectedCopyUser === m.id && (
+                                <div className="h-2 w-2 rounded-full bg-primary" />
+                              )}
+                            </div>
+                          ))}
+                          {filteredCopyMembers.length === 0 && (
+                            <p className="text-center text-sm text-slate-500 py-4">No members found</p>
+                          )}
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setCopyDialogOpen(false)}>Cancel</Button>
+                        <Button 
+                          disabled={!selectedCopyUser} 
+                          onClick={handleCopyPermissions}
+                        >
+                          Apply Permissions
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <Button size="sm">Save Changes</Button>
                 </div>
               </div>
