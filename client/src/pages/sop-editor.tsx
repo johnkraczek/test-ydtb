@@ -534,22 +534,30 @@ export default function SopEditorPage() {
                              </div>
                              <div className="space-y-1.5">
                                 <Label className="text-xs">Color</Label>
-                                <div className="flex gap-2">
-                                  <Select 
+                                <div className="flex gap-2 items-center">
+                                  <ToggleGroup 
+                                    type="single" 
                                     value={step.button.color} 
-                                    onValueChange={(val) => updateStepButton(step.id, 'color', val)}
+                                    onValueChange={(val) => val && updateStepButton(step.id, 'color', val)}
+                                    className="justify-start bg-transparent border-0 p-0 h-8 gap-1"
                                   >
-                                    <SelectTrigger className="h-8 flex-1">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="primary">Primary (Brand)</SelectItem>
-                                      <SelectItem value="secondary">Secondary (Gray)</SelectItem>
-                                      <SelectItem value="outline">Outline</SelectItem>
-                                      <SelectItem value="destructive">Destructive (Red)</SelectItem>
-                                      <SelectItem value="custom">Custom</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                    <ToggleGroupItem value="primary" aria-label="Primary" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900">
+                                      <div className="h-4 w-4 rounded-full bg-primary" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem value="secondary" aria-label="Secondary" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-500 ring-offset-2 dark:ring-offset-slate-900">
+                                      <div className="h-4 w-4 rounded-full bg-slate-500" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem value="outline" aria-label="Outline" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-300 ring-offset-2 dark:ring-offset-slate-900">
+                                      <div className="h-4 w-4 rounded-full border border-slate-300 bg-white dark:bg-slate-950" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem value="destructive" aria-label="Destructive" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-red-500 ring-offset-2 dark:ring-offset-slate-900">
+                                      <div className="h-4 w-4 rounded-full bg-red-500" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem value="custom" aria-label="Custom" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-400 ring-offset-2 dark:ring-offset-slate-900">
+                                      <div className="h-4 w-4 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                                    </ToggleGroupItem>
+                                  </ToggleGroup>
+
                                   {step.button.color === 'custom' && (
                                     <Input 
                                       type="color" 
@@ -631,22 +639,30 @@ export default function SopEditorPage() {
                                </div>
                                <div className="space-y-1.5 flex-1">
                                   <Label className="text-xs">Color</Label>
-                                  <div className="flex gap-2">
-                                    <Select 
+                                  <div className="flex gap-2 items-center h-8">
+                                    <ToggleGroup 
+                                      type="single" 
                                       value={step.note.color} 
-                                      onValueChange={(val) => updateStepNote(step.id, 'color', val)}
+                                      onValueChange={(val) => val && updateStepNote(step.id, 'color', val)}
+                                      className="justify-start bg-white/50 dark:bg-black/20 border border-transparent rounded-md p-1 h-8 gap-1"
                                     >
-                                      <SelectTrigger className="h-8 bg-white/50 dark:bg-black/20 border-transparent flex-1">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="amber">Amber</SelectItem>
-                                        <SelectItem value="blue">Blue</SelectItem>
-                                        <SelectItem value="red">Red</SelectItem>
-                                        <SelectItem value="green">Green</SelectItem>
-                                        <SelectItem value="custom">Custom</SelectItem>
-                                      </SelectContent>
-                                    </Select>
+                                      <ToggleGroupItem value="amber" aria-label="Amber" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-amber-500 ring-offset-1 ring-offset-transparent">
+                                        <div className="h-3 w-3 rounded-full bg-amber-500" />
+                                      </ToggleGroupItem>
+                                      <ToggleGroupItem value="blue" aria-label="Blue" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-blue-500 ring-offset-1 ring-offset-transparent">
+                                        <div className="h-3 w-3 rounded-full bg-blue-500" />
+                                      </ToggleGroupItem>
+                                      <ToggleGroupItem value="red" aria-label="Red" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-red-500 ring-offset-1 ring-offset-transparent">
+                                        <div className="h-3 w-3 rounded-full bg-red-500" />
+                                      </ToggleGroupItem>
+                                      <ToggleGroupItem value="green" aria-label="Green" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-green-500 ring-offset-1 ring-offset-transparent">
+                                        <div className="h-3 w-3 rounded-full bg-green-500" />
+                                      </ToggleGroupItem>
+                                      <ToggleGroupItem value="custom" aria-label="Custom" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-400 ring-offset-1 ring-offset-transparent">
+                                        <div className="h-3 w-3 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                                      </ToggleGroupItem>
+                                    </ToggleGroup>
+                                    
                                     {step.note.color === 'custom' && (
                                       <Input 
                                         type="color" 
