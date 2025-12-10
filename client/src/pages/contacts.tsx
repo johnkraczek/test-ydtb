@@ -188,6 +188,8 @@ function SortableColumnItem({ id, column, visibleColumns, setVisibleColumns }: a
 // Mock data for contacts
 import { ExportDrawer } from "@/components/dashboard/ExportDrawer";
 
+import { ContactEditDrawer } from "@/components/dashboard/ContactEditDrawer";
+
 const generateContacts = (count: number) => {
   const tags = ["Customer", "Lead", "VIP", "Partner", "Vendor", "New", "Inactive", "Referral", "Enterprise", "Small Business"];
   
@@ -268,6 +270,10 @@ export default function ContactsPage() {
   const [showAvatar, setShowAvatar] = useState(true);
   
   const [isExportOpen, setIsExportOpen] = useState(false);
+  
+  // Edit Drawer State
+  const [editingContact, setEditingContact] = useState<any>(null);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
@@ -1341,9 +1347,28 @@ export default function ContactsPage() {
                       return <TableCell key={col.id} />;
                     })}
                     <TableCell>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuCheckboxItem 
+                            onSelect={() => {
+                              setEditingContact(contact);
+                              setIsEditDrawerOpen(true);
+                            }}
+                          >
+                            Edit details
+                          </DropdownMenuCheckboxItem>
+                          <DropdownMenuCheckboxItem>Add tag</DropdownMenuCheckboxItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuCheckboxItem className="text-red-600">Delete contact</DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
@@ -1689,6 +1714,11 @@ export default function ContactsPage() {
             </div>
           </div>
         )}
+        <ContactEditDrawer 
+          open={isEditDrawerOpen} 
+          onOpenChange={setIsEditDrawerOpen} 
+          contact={editingContact} 
+        />
       </div>
     </DashboardLayout>
   );
