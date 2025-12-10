@@ -226,7 +226,7 @@ export default function TeamMemberPage() {
   const [selectedCopyUser, setSelectedCopyUser] = useState<string | null>(null);
 
   const filteredCopyMembers = TEAM_MEMBERS.filter(m => 
-    m.id !== member.id && 
+    member && m.id !== member.id && 
     (m.name.toLowerCase().includes(permissionSearchQuery.toLowerCase()) || 
      m.role.toLowerCase().includes(permissionSearchQuery.toLowerCase()))
   );
@@ -422,7 +422,7 @@ export default function TeamMemberPage() {
                 <div className="flex items-center gap-2">
                   <Dialog open={copyDialogOpen} onOpenChange={setCopyDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                         <Copy className="h-3.5 w-3.5 mr-2" />
                         Copy from...
                       </Button>
