@@ -45,7 +45,6 @@ export default function AccountSettingsPage() {
         <DashboardPageHeader
           title="Account Settings"
           description="Manage your personal information and security preferences."
-          breadcrumbs={null}
         />
       }
     >

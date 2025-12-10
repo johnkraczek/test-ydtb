@@ -101,7 +101,6 @@ export default function DomainSettingsPage() {
         <DashboardPageHeader
           title="Domain Settings"
           description="Manage your custom domains and DNS configurations."
-          breadcrumbs={null}
         />
       }
     >
