@@ -534,9 +534,10 @@ export default function CustomFieldsPage() {
                                         </TableBody>
                                     </Table>
                                 </div>
-                            </div>
+                            )}
                         </div>
-                    </TabsContent>
+                    </div>
+                </TabsContent>
 
                     <TabsContent value="list" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
                         <div className="max-w-5xl mx-auto">
