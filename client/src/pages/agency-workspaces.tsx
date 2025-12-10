@@ -101,11 +101,27 @@ export default function AgencyWorkspacesPage() {
     reviews: true,
   });
 
+  const [selectedWorkspaces, setSelectedWorkspaces] = useState<number[]>([]);
+
   const toggleMetric = (key: keyof typeof visibleMetrics) => {
     setVisibleMetrics(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const toggleWorkspaceSelection = (id: number) => {
+    setSelectedWorkspaces(prev => 
+      prev.includes(id) ? prev.filter(wId => wId !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedWorkspaces.length === WORKSPACES.length) {
+      setSelectedWorkspaces([]);
+    } else {
+      setSelectedWorkspaces(WORKSPACES.map(w => w.id));
+    }
   };
 
   return (
@@ -215,10 +231,39 @@ export default function AgencyWorkspacesPage() {
       }
     >
       <div className="space-y-6 max-w-[1600px] mx-auto">
+        {/* Selection Bar */}
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-3">
+             <Checkbox 
+                id="select-all" 
+                checked={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0}
+                onCheckedChange={toggleSelectAll}
+             />
+             <Label htmlFor="select-all" className="cursor-pointer font-medium text-slate-600 dark:text-slate-400">Select All</Label>
+          </div>
+          
+          <Select disabled={selectedWorkspaces.length === 0}>
+            <SelectTrigger className="w-[180px] h-9">
+              <SelectValue placeholder="Bulk Actions" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="activate">Activate Selected</SelectItem>
+              <SelectItem value="deactivate">Deactivate Selected</SelectItem>
+              <SelectItem value="delete" className="text-rose-600">Delete Selected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Workspaces List */}
         <div className="space-y-4">
           {WORKSPACES.map((workspace) => (
-            <WorkspaceCard key={workspace.id} workspace={workspace} visibleMetrics={visibleMetrics} />
+            <WorkspaceCard 
+              key={workspace.id} 
+              workspace={workspace} 
+              visibleMetrics={visibleMetrics}
+              isSelected={selectedWorkspaces.includes(workspace.id)}
+              onToggleSelection={() => toggleWorkspaceSelection(workspace.id)}
+            />
           ))}
         </div>
       </div>
@@ -226,21 +271,29 @@ export default function AgencyWorkspacesPage() {
   );
 }
 
-function WorkspaceCard({ workspace, visibleMetrics }: { workspace: any, visibleMetrics: any }) {
+function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelection }: { workspace: any, visibleMetrics: any, isSelected: boolean, onToggleSelection: () => void }) {
   // Count active metrics to adjust grid columns if needed
   const activeMetricCount = Object.values(visibleMetrics).filter(Boolean).length;
   
   return (
-    <Card className="overflow-hidden border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
+    <Card className={`overflow-hidden border-slate-200/60 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 ${isSelected ? 'ring-2 ring-primary border-primary' : ''}`}>
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column: Identity & Contact */}
           <div className="w-full lg:w-1/4 space-y-4">
             <div className="flex items-start gap-4">
-              <Avatar className="h-12 w-12 rounded-lg border border-slate-200">
-                <AvatarImage src={workspace.avatar} />
-                <AvatarFallback className="rounded-lg">{workspace.name.substring(0, 2)}</AvatarFallback>
-              </Avatar>
+              <div className="relative group cursor-pointer" onClick={onToggleSelection}>
+                 <Avatar className="h-12 w-12 rounded-lg border border-slate-200 group-hover:opacity-80 transition-opacity">
+                   <AvatarImage src={workspace.avatar} />
+                   <AvatarFallback className="rounded-lg">{workspace.name.substring(0, 2)}</AvatarFallback>
+                 </Avatar>
+                 {isSelected && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-primary/90 rounded-lg">
+                        <Check className="h-6 w-6 text-white" />
+                    </div>
+                 )}
+              </div>
+              
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">{workspace.name}</h3>
