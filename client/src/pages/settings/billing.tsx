@@ -135,15 +135,17 @@ export default function BillingSettingsPage() {
     setInvoiceToPrint(invoice);
     
     // Wait for render
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     try {
-        if (invoiceRef.current) {
-            const canvas = await html2canvas(invoiceRef.current, {
+        const element = invoiceRef.current;
+        if (element) {
+            const canvas = await html2canvas(element, {
                 scale: 2, 
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                windowWidth: 1000 // Force width to ensure layout is correct
             });
             
             const imgData = canvas.toDataURL('image/png');
@@ -161,6 +163,10 @@ export default function BillingSettingsPage() {
             
             toast.dismiss(toastId);
             toast.success("Invoice downloaded successfully");
+        } else {
+            console.error("Invoice ref is null");
+            toast.dismiss(toastId);
+            toast.error("Failed to generate PDF: Template not found");
         }
     } catch (error) {
         console.error("PDF generation failed", error);
@@ -424,9 +430,9 @@ export default function BillingSettingsPage() {
         </Dialog>
 
         {/* Hidden Invoice Template for PDF Generation */}
-        <div className="absolute top-0 left-0 overflow-hidden h-0 w-0">
+        <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
             <div ref={invoiceRef}>
-                <InvoiceTemplate invoice={invoiceToPrint} />
+                {invoiceToPrint && <InvoiceTemplate invoice={invoiceToPrint} />}
             </div>
         </div>
 
