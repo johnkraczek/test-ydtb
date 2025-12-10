@@ -928,26 +928,33 @@ export default function CustomFieldsPage() {
 
                                 <div className="h-4 w-px bg-zinc-700 mx-1 shrink-0" />
 
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2">
-                                            <Trash className="h-4 w-4 text-red-400" />
-                                            Delete
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Delete {selectedFields.length} Fields?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                Are you sure you want to delete the selected fields? This action cannot be undone.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete}>Delete</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
+                                {selectedFields.some(id => fields.find(f => f.id === id)?.category === 'contact') ? (
+                                    <Button variant="ghost" size="sm" className="text-zinc-500 cursor-not-allowed h-8 gap-2" disabled>
+                                        <Trash className="h-4 w-4 text-zinc-500" />
+                                        Delete
+                                    </Button>
+                                ) : (
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2">
+                                                <Trash className="h-4 w-4 text-red-400" />
+                                                Delete
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Delete {selectedFields.length} Fields?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure you want to delete the selected fields? This action cannot be undone.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                )}
                             </div>
                         </div>
                     )}
