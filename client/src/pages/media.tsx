@@ -63,6 +63,8 @@ export default function MediaPage() {
   } = useMedia();
 
   const [draggedItem, setDraggedItem] = useState<FileSystemItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // Configure sensors for better click/drag distinction
   // Require a hold of 200ms to start dragging, allowing clicks to pass through immediately if released earlier
@@ -101,6 +103,33 @@ export default function MediaPage() {
       }
     }
     setDraggedItem(null);
+  };
+
+  const searchResults = searchQuery.trim() 
+    ? items.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : [];
+
+  const handleSearchResultClick = (item: FileSystemItem) => {
+      // Find path to this item's parent folder
+      const path: FileSystemItem[] = [];
+      let currentParentId = item.parentId;
+      
+      let depth = 0;
+      while (currentParentId && depth < 50) {
+          const parent = items.find(i => i.id === currentParentId);
+          if (parent) {
+              path.unshift(parent);
+              currentParentId = parent.parentId;
+          } else {
+              break;
+          }
+          depth++;
+      }
+      
+      setCurrentPath(path);
+      setSelectedItems([item.id]);
+      setSearchQuery("");
+      setShowSearchResults(false);
   };
 
   const DraggableItem = React.forwardRef<HTMLDivElement, { item: FileSystemItem, children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>>(
@@ -613,9 +642,58 @@ export default function MediaPage() {
             <PanelRight className="h-4 w-4" />
         </Button>
         
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input placeholder="Search files..." className="pl-9 h-9 w-[200px] bg-white dark:bg-slate-900" />
+        <div className="relative hidden sm:block w-[250px] z-50">
+          <div className="relative">
+             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+             <Input 
+                placeholder="Search files..." 
+                className="pl-9 h-9 w-full bg-white dark:bg-slate-900" 
+                value={searchQuery}
+                onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchResults(true);
+                }}
+                onFocus={() => setShowSearchResults(true)}
+                // Delay hiding to allow click event to register
+                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+             />
+          </div>
+          
+          {showSearchResults && searchQuery && (
+             <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl overflow-hidden max-h-[300px] flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                <ScrollArea className="flex-1">
+                    {searchResults.length > 0 ? (
+                        <div className="p-1">
+                            {searchResults.map(result => (
+                                <div 
+                                    key={result.id}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer transition-colors"
+                                    onClick={() => handleSearchResultClick(result)}
+                                >
+                                    {result.type === 'folder' ? (
+                                        <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                    ) : result.type === 'image' ? (
+                                        <ImageIcon className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                                    ) : (
+                                        <FileText className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                                    )}
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className="text-sm font-medium truncate text-slate-900 dark:text-slate-100">{result.name}</span>
+                                        <span className="text-xs text-slate-500 truncate">
+                                            in {result.parentId ? items.find(i => i.id === result.parentId)?.name : 'Home'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-4 text-center text-sm text-slate-500">
+                            No results found
+                        </div>
+                    )}
+                </ScrollArea>
+             </div>
+          )}
         </div>
         
         <Button className="h-9 gap-2 shadow-md shadow-primary/20">
