@@ -22,7 +22,16 @@ import {
   Type, 
   Info,
   ChevronLeft,
-  Image as ImageIcon
+  Image as ImageIcon,
+  MoreVertical,
+  Link as LinkIcon,
+  AlertCircle,
+  AlertTriangle,
+  Lightbulb,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Maximize
 } from "lucide-react";
 import { DashboardBreadcrumb } from "@/components/dashboard/layouts/DashboardBreadcrumb";
 import {
@@ -32,8 +41,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
+
+// Types for our SOP structure
+type ImageSettings = {
+  url: string;
+  size: 'small' | 'medium' | 'large' | 'full';
+  align: 'left' | 'center' | 'right';
+};
+
+type StepNote = {
+  title: string;
+  content: string;
+  color: 'blue' | 'amber' | 'red' | 'green';
+  icon: 'info' | 'warning' | 'tip' | 'alert';
+};
+
+type StepButton = {
+  text: string;
+  url: string;
+  color: 'primary' | 'secondary' | 'outline' | 'destructive';
+};
+
+interface SopStep {
+  id: string;
+  title: string;
+  content: string;
+  image?: ImageSettings;
+  note?: StepNote;
+  button?: StepButton;
+}
 
 // Mock data to pre-fill if editing
 const MOCK_SOP_DATA = {
@@ -47,16 +96,33 @@ const MOCK_SOP_DATA = {
     {
       id: "s1",
       title: "Initial Account Configuration",
-      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+      image: {
+        url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+        size: 'medium',
+        align: 'center'
+      } as ImageSettings,
       content: "The first step in onboarding a new client is to ensure their account is properly configured in the admin panel.\n\n• Verify the contract details in Salesforce matching the signed agreement.\n• Create the organization tenant in the Super Admin dashboard.\n• Set the user seat limit according to the plan.",
-      note: "Do not activate the account until the billing method has been verified by the Finance team."
+      note: {
+        title: "Important:",
+        content: "Do not activate the account until the billing method has been verified by the Finance team.",
+        color: "amber",
+        icon: "warning"
+      } as StepNote
     },
     {
       id: "s2",
       title: "Welcome Email & Access Provisioning",
-      imageUrl: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
+      image: {
+        url: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
+        size: 'medium',
+        align: 'center'
+      } as ImageSettings,
       content: "Once the technical setup is complete, we need to welcome the client and provide them with their initial access credentials.",
-      note: ""
+      button: {
+        text: "Open Email Templates",
+        url: "/templates/welcome",
+        color: "primary"
+      } as StepButton
     }
   ]
 };
@@ -73,21 +139,69 @@ export default function SopEditorPage() {
   const [videoUrl, setVideoUrl] = useState(isEditing ? MOCK_SOP_DATA.videoUrl : "");
   const [description, setDescription] = useState(isEditing ? MOCK_SOP_DATA.description : "");
   
-  const [steps, setSteps] = useState(isEditing ? MOCK_SOP_DATA.steps : [
-    { id: "new-1", title: "", imageUrl: "", content: "", note: "" }
+  const [steps, setSteps] = useState<SopStep[]>(isEditing ? MOCK_SOP_DATA.steps : [
+    { id: "new-1", title: "", content: "" }
   ]);
 
   const addStep = () => {
-    setSteps([...steps, { id: `new-${Date.now()}`, title: "", imageUrl: "", content: "", note: "" }]);
+    setSteps([...steps, { id: `new-${Date.now()}`, title: "", content: "" }]);
   };
 
   const removeStep = (id: string) => {
     setSteps(steps.filter(s => s.id !== id));
   };
 
-  const updateStep = (id: string, field: string, value: string) => {
+  const updateStep = (id: string, field: keyof SopStep, value: any) => {
     setSteps(steps.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
+
+  const updateStepImage = (id: string, field: keyof ImageSettings, value: any) => {
+    setSteps(steps.map(s => {
+      if (s.id !== id) return s;
+      const currentImage = s.image || { url: '', size: 'medium', align: 'center' };
+      return { ...s, image: { ...currentImage, [field]: value } };
+    }));
+  };
+
+  const updateStepNote = (id: string, field: keyof StepNote, value: any) => {
+    setSteps(steps.map(s => {
+      if (s.id !== id) return s;
+      const currentNote = s.note || { title: 'Note:', content: '', color: 'amber', icon: 'info' };
+      return { ...s, note: { ...currentNote, [field]: value } };
+    }));
+  };
+
+  const updateStepButton = (id: string, field: keyof StepButton, value: any) => {
+    setSteps(steps.map(s => {
+      if (s.id !== id) return s;
+      const currentButton = s.button || { text: 'Click Here', url: '', color: 'primary' };
+      return { ...s, button: { ...currentButton, [field]: value } };
+    }));
+  };
+
+  const addDetailToStep = (id: string, type: 'note' | 'button') => {
+    setSteps(steps.map(s => {
+      if (s.id !== id) return s;
+      if (type === 'note' && !s.note) {
+        return { ...s, note: { title: 'Note:', content: '', color: 'amber', icon: 'info' } };
+      }
+      if (type === 'button' && !s.button) {
+        return { ...s, button: { text: 'Action Button', url: '', color: 'primary' } };
+      }
+      return s;
+    }));
+  };
+
+  const removeDetailFromStep = (id: string, type: 'note' | 'button') => {
+    setSteps(steps.map(s => {
+      if (s.id !== id) return s;
+      const newStep = { ...s };
+      if (type === 'note') delete newStep.note;
+      if (type === 'button') delete newStep.button;
+      return newStep;
+    }));
+  };
+
 
   const moveStep = (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index === 0) return;
@@ -246,40 +360,120 @@ export default function SopEditorPage() {
 
                   <Separator />
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-800 w-fit">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Bold className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Italic className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><List className="h-3.5 w-3.5" /></Button>
-                      <Separator orientation="vertical" className="h-4 mx-1" />
-                      
-                      <FileSelectionDialog 
-                        trigger={
-                          <Button variant={step.imageUrl ? "secondary" : "ghost"} size="icon" className={`h-7 w-7 ${step.imageUrl ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>
-                            <ImageIcon className="h-3.5 w-3.5" />
-                          </Button>
-                        }
-                        onSelect={(file) => {
-                          if (file.url) {
-                            updateStep(step.id, 'imageUrl', file.url);
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-md border border-slate-200 dark:border-slate-800 w-fit">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Bold className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Italic className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><List className="h-3.5 w-3.5" /></Button>
+                        <Separator orientation="vertical" className="h-4 mx-1" />
+                        
+                        <FileSelectionDialog 
+                          trigger={
+                            <Button variant={step.image?.url ? "secondary" : "ghost"} size="icon" className={`h-7 w-7 ${step.image?.url ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>
+                              <ImageIcon className="h-3.5 w-3.5" />
+                            </Button>
                           }
-                        }}
-                      />
+                          onSelect={(file) => {
+                            if (file.url) {
+                              updateStepImage(step.id, 'url', file.url);
+                            }
+                          }}
+                        />
+                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8 gap-2 text-xs">
+                            <Plus className="h-3.5 w-3.5" /> Add Detail
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => addDetailToStep(step.id, 'note')} disabled={!!step.note}>
+                            <Info className="h-4 w-4 mr-2" /> Add Note
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => addDetailToStep(step.id, 'button')} disabled={!!step.button}>
+                            <LinkIcon className="h-4 w-4 mr-2" /> Add Button
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                     
-                    {step.imageUrl && (
-                      <div className="relative group w-fit">
-                        <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 max-w-md">
-                          <img src={step.imageUrl} alt="Step visual" className="max-h-[200px] w-auto object-cover" />
+                    {step.image?.url && (
+                      <div className="flex flex-col md:flex-row gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div className="relative group w-fit">
+                          <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                             <img 
+                                src={step.image.url} 
+                                alt="Step visual" 
+                                className={`w-auto object-cover ${
+                                  step.image.size === 'small' ? 'h-32' :
+                                  step.image.size === 'medium' ? 'h-48' :
+                                  step.image.size === 'large' ? 'h-64' : 'h-80'
+                                }`} 
+                              />
+                          </div>
+                          <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            onClick={() => updateStep(step.id, 'image', undefined)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </div>
-                        <Button 
-                          variant="destructive" 
-                          size="icon" 
-                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                          onClick={() => updateStep(step.id, 'imageUrl', "")}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+
+                        <div className="flex-1 space-y-4 pt-2">
+                           <div className="space-y-2">
+                             <Label className="text-xs text-slate-500 uppercase">Image Size</Label>
+                             <div className="flex items-center gap-1">
+                               {['small', 'medium', 'large', 'full'].map((size) => (
+                                 <Button 
+                                    key={size}
+                                    variant={step.image?.size === size ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => updateStepImage(step.id, 'size', size)}
+                                    className="h-7 text-xs capitalize"
+                                 >
+                                    {size}
+                                 </Button>
+                               ))}
+                             </div>
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label className="text-xs text-slate-500 uppercase">Alignment</Label>
+                             <div className="flex items-center gap-1">
+                               <Button 
+                                  variant={step.image?.align === 'left' ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => updateStepImage(step.id, 'align', 'left')}
+                                  className="h-7 w-7"
+                                  title="Left"
+                               >
+                                  <AlignLeft className="h-3.5 w-3.5" />
+                               </Button>
+                               <Button 
+                                  variant={step.image?.align === 'center' ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => updateStepImage(step.id, 'align', 'center')}
+                                  className="h-7 w-7"
+                                  title="Center"
+                               >
+                                  <AlignCenter className="h-3.5 w-3.5" />
+                               </Button>
+                               <Button 
+                                  variant={step.image?.align === 'right' ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => updateStepImage(step.id, 'align', 'right')}
+                                  className="h-7 w-7"
+                                  title="Right"
+                               >
+                                  <AlignRight className="h-3.5 w-3.5" />
+                               </Button>
+                             </div>
+                           </div>
+                        </div>
                       </div>
                     )}
 
@@ -289,21 +483,146 @@ export default function SopEditorPage() {
                       value={step.content}
                       onChange={(e) => updateStep(step.id, 'content', e.target.value)}
                     />
-                  </div>
 
-                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-md border border-amber-100 dark:border-amber-900/20">
-                    <div className="flex items-start gap-3">
-                      <Info className="h-4 w-4 text-amber-600 mt-0.5" />
-                      <div className="flex-1 space-y-2">
-                        <Label className="text-xs font-medium text-amber-800 dark:text-amber-200 uppercase">Important Note (Optional)</Label>
-                        <Input 
-                          placeholder="Add a warning or helpful tip..." 
-                          className="bg-transparent border-none p-0 h-auto focus-visible:ring-0 text-sm text-slate-700 dark:text-slate-300 placeholder:text-amber-700/50"
-                          value={step.note}
-                          onChange={(e) => updateStep(step.id, 'note', e.target.value)}
-                        />
+                    {/* Button Editor */}
+                    {step.button && (
+                       <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-md border border-slate-200 dark:border-slate-800 space-y-3 relative group">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute top-2 right-2 h-6 w-6 text-slate-400 hover:text-red-500"
+                            onClick={() => removeDetailFromStep(step.id, 'button')}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <div className="flex items-center gap-2 mb-2">
+                             <LinkIcon className="h-4 w-4 text-slate-500" />
+                             <span className="text-xs font-semibold uppercase text-slate-500">Action Button</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <div className="space-y-1.5">
+                                <Label className="text-xs">Button Text</Label>
+                                <Input 
+                                  value={step.button.text} 
+                                  onChange={(e) => updateStepButton(step.id, 'text', e.target.value)}
+                                  className="h-8"
+                                  placeholder="e.g. Open Dashboard"
+                                />
+                             </div>
+                             <div className="space-y-1.5">
+                                <Label className="text-xs">URL</Label>
+                                <Input 
+                                  value={step.button.url} 
+                                  onChange={(e) => updateStepButton(step.id, 'url', e.target.value)}
+                                  className="h-8"
+                                  placeholder="https://..."
+                                />
+                             </div>
+                             <div className="space-y-1.5">
+                                <Label className="text-xs">Color</Label>
+                                <Select 
+                                  value={step.button.color} 
+                                  onValueChange={(val) => updateStepButton(step.id, 'color', val)}
+                                >
+                                  <SelectTrigger className="h-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="primary">Primary (Brand)</SelectItem>
+                                    <SelectItem value="secondary">Secondary (Gray)</SelectItem>
+                                    <SelectItem value="outline">Outline</SelectItem>
+                                    <SelectItem value="destructive">Destructive (Red)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                             </div>
+                          </div>
+                       </div>
+                    )}
+
+                    {/* Note Editor */}
+                    {step.note && (
+                      <div className={`p-4 rounded-md border space-y-3 relative group ${
+                        step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800' :
+                        step.note.color === 'red' ? 'bg-red-50 border-red-100 dark:bg-red-900/10 dark:border-red-800' :
+                        step.note.color === 'green' ? 'bg-green-50 border-green-100 dark:bg-green-900/10 dark:border-green-800' :
+                        'bg-amber-50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-800'
+                      }`}>
+                         <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute top-2 right-2 h-6 w-6 text-slate-400 hover:text-red-500"
+                            onClick={() => removeDetailFromStep(step.id, 'note')}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <div className="space-y-1.5">
+                                <Label className="text-xs">Note Title</Label>
+                                <div className="relative">
+                                  {step.note.icon === 'info' && <Info className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />}
+                                  {step.note.icon === 'warning' && <AlertTriangle className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />}
+                                  {step.note.icon === 'tip' && <Lightbulb className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />}
+                                  {step.note.icon === 'alert' && <AlertCircle className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />}
+                                  
+                                  <Input 
+                                    value={step.note.title} 
+                                    onChange={(e) => updateStepNote(step.id, 'title', e.target.value)}
+                                    className="h-8 pl-8 bg-white/50 dark:bg-black/20 border-transparent focus:bg-white dark:focus:bg-black"
+                                    placeholder="Note:"
+                                  />
+                                </div>
+                             </div>
+                             
+                             <div className="flex gap-2">
+                               <div className="space-y-1.5 flex-1">
+                                  <Label className="text-xs">Icon</Label>
+                                  <Select 
+                                    value={step.note.icon} 
+                                    onValueChange={(val) => updateStepNote(step.id, 'icon', val)}
+                                  >
+                                    <SelectTrigger className="h-8 bg-white/50 dark:bg-black/20 border-transparent">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="info">Info</SelectItem>
+                                      <SelectItem value="warning">Warning</SelectItem>
+                                      <SelectItem value="tip">Tip</SelectItem>
+                                      <SelectItem value="alert">Alert</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                               </div>
+                               <div className="space-y-1.5 flex-1">
+                                  <Label className="text-xs">Color</Label>
+                                  <Select 
+                                    value={step.note.color} 
+                                    onValueChange={(val) => updateStepNote(step.id, 'color', val)}
+                                  >
+                                    <SelectTrigger className="h-8 bg-white/50 dark:bg-black/20 border-transparent">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="amber">Amber</SelectItem>
+                                      <SelectItem value="blue">Blue</SelectItem>
+                                      <SelectItem value="red">Red</SelectItem>
+                                      <SelectItem value="green">Green</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                               </div>
+                             </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                              <Label className="text-xs">Content</Label>
+                              <Input 
+                                value={step.note.content}
+                                onChange={(e) => updateStepNote(step.id, 'content', e.target.value)}
+                                className="h-8 bg-white/50 dark:bg-black/20 border-transparent focus:bg-white dark:focus:bg-black"
+                                placeholder="Enter note content..."
+                              />
+                          </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

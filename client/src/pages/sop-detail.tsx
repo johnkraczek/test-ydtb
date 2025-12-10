@@ -20,7 +20,11 @@ import {
   Share2,
   Download,
   Printer,
-  FileText
+  FileText,
+  AlertTriangle,
+  Info,
+  Lightbulb,
+  AlertCircle
 } from "lucide-react";
 import { DashboardBreadcrumb } from "@/components/dashboard/layouts/DashboardBreadcrumb";
 import {
@@ -46,7 +50,11 @@ const MOCK_SOP_DETAIL = {
     {
       id: "s1",
       title: "Initial Account Configuration",
-      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+      image: {
+        url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+        size: 'medium',
+        align: 'center'
+      },
       content: (
         <div className="space-y-4 text-slate-600 dark:text-slate-300">
           <p>
@@ -59,16 +67,23 @@ const MOCK_SOP_DETAIL = {
             <li>Set the user seat limit according to the plan (Starter: 5, Pro: 20, Enterprise: Unlimited).</li>
             <li>Enable "SSO" and "Audit Logs" features if they are on the Enterprise plan.</li>
           </ul>
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md border border-blue-100 dark:border-blue-800 text-sm text-blue-800 dark:text-blue-300">
-            <strong>Note:</strong> Do not activate the account until the billing method has been verified by the Finance team.
-          </div>
         </div>
-      )
+      ),
+      note: {
+        title: "Important:",
+        content: "Do not activate the account until the billing method has been verified by the Finance team.",
+        color: "amber",
+        icon: "warning"
+      }
     },
     {
       id: "s2",
       title: "Welcome Email & Access Provisioning",
-      imageUrl: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
+      image: {
+        url: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&auto=format&fit=crop&q=60",
+        size: 'medium',
+        align: 'center'
+      },
       content: (
         <div className="space-y-4 text-slate-600 dark:text-slate-300">
           <p>
@@ -84,7 +99,12 @@ const MOCK_SOP_DETAIL = {
             <li>CC the Account Executive and the assigned Customer Success Manager.</li>
           </ol>
         </div>
-      )
+      ),
+      button: {
+        text: "Open Email Templates",
+        url: "#",
+        color: "primary"
+      }
     },
     {
       id: "s3",
@@ -211,12 +231,54 @@ export default function SopDetailPage() {
                     </div>
                     
                     <div className={`transition-opacity duration-300 ${completedSteps.includes(step.id) ? 'opacity-50' : 'opacity-100'}`}>
-                      {step.imageUrl && (
-                        <div className="mb-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
-                          <img src={step.imageUrl} alt={step.title} className="w-full h-auto object-cover max-h-[400px]" />
+                      {step.image?.url && (
+                        <div className={`mb-4 flex ${
+                          step.image.align === 'center' ? 'justify-center' : 
+                          step.image.align === 'right' ? 'justify-end' : 'justify-start'
+                        }`}>
+                          <div className={`rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 ${
+                             step.image.size === 'small' ? 'max-w-xs' :
+                             step.image.size === 'medium' ? 'max-w-md' :
+                             step.image.size === 'large' ? 'max-w-3xl' : 'w-full'
+                          }`}>
+                            <img src={step.image.url} alt={step.title} className="w-full h-auto object-cover" />
+                          </div>
                         </div>
                       )}
+                      
                       {step.content}
+
+                      {step.note && (
+                        <div className={`mt-4 p-4 rounded-md border text-sm flex gap-3 ${
+                          step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300' :
+                          step.note.color === 'red' ? 'bg-red-50 border-red-100 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300' :
+                          step.note.color === 'green' ? 'bg-green-50 border-green-100 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' :
+                          'bg-amber-50 border-amber-100 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300'
+                        }`}>
+                          <div className="flex-shrink-0 mt-0.5">
+                            {step.note.icon === 'info' && <Info className="h-4 w-4" />}
+                            {step.note.icon === 'warning' && <AlertTriangle className="h-4 w-4" />}
+                            {step.note.icon === 'tip' && <Lightbulb className="h-4 w-4" />}
+                            {step.note.icon === 'alert' && <AlertCircle className="h-4 w-4" />}
+                          </div>
+                          <div>
+                            <span className="font-semibold block mb-0.5">{step.note.title}</span>
+                            {step.note.content}
+                          </div>
+                        </div>
+                      )}
+
+                      {step.button && (
+                        <div className="mt-4">
+                          <Button 
+                            variant={step.button.color as any || "default"}
+                            className="gap-2"
+                            onClick={() => window.open(step.button.url, '_blank')}
+                          >
+                            {step.button.text}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
