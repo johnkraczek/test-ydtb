@@ -424,12 +424,6 @@ export default function ContactDetailPage() {
           hideBreadcrumbs={true}
           title={
             <div className="flex flex-col gap-2">
-                <Link href="/contacts">
-                  <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent hover:text-primary -ml-2 h-auto py-0 w-fit">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Contacts
-                  </Button>
-                </Link>
                 <div className="flex items-center gap-4 mt-2">
                     <Avatar className="h-14 w-14 border-2 border-card shadow-sm">
                       <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
@@ -485,8 +479,16 @@ export default function ContactDetailPage() {
       }
     >
       <div className="space-y-8 animate-in fade-in duration-500">
-
-
+      
+      {/* Back Button */}
+      <div>
+        <Link href="/contacts">
+            <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent hover:text-primary -ml-2 h-auto py-0 w-fit">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Contacts
+            </Button>
+        </Link>
+      </div>
 
       <Tabs defaultValue="details" className="w-full">
         <TabsList className="mb-4 w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
