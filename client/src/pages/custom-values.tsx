@@ -655,155 +655,264 @@ export default function CustomValuesPage() {
                     </div>
                 </TabsContent>
                 
-                <TabsContent value="folders" className="flex-1 p-8 m-0 outline-none overflow-y-auto">
-                    <div className="max-w-4xl mx-auto space-y-6">
-                        {/* Uncategorized Section */}
-                        {groupedValues.uncategorized && groupedValues.uncategorized.length > 0 && (
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Uncategorized</h3>
-                                    <Badge variant="secondary">{groupedValues.uncategorized.length}</Badge>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {groupedValues.uncategorized.map(value => (
-                                        <div key={value.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors group">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Type className="h-4 w-4 text-indigo-500" />
-                                                    <span className="font-medium text-slate-900 dark:text-slate-100">{value.name}</span>
-                                                </div>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-6 w-6 -mt-1 -mr-1 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <MoreHorizontal className="h-3 w-3" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => openEditValueDialog(value)}>Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => openMoveToFolderDialog(value)}>Move</DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => deleteValue(value.id)}>Delete</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <div 
-                                                    className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                                    onClick={() => copyToClipboard(`{{company.${value.slug}}}`)}
-                                                >
-                                                    {`{{company.${value.slug}}}`}
-                                                </div>
-                                                <p className="text-sm text-slate-600 dark:text-slate-300 truncate">{value.value}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Folders */}
+                <TabsContent value="folders" className="flex-1 overflow-auto p-6 mt-0">
+                    <div className="max-w-7xl mx-auto space-y-6">
+                        {/* Folders List */}
+                        <div className="space-y-4">
                         {folders.map(folder => (
-                            <div key={folder.id} className="space-y-3">
-                                <div className="flex items-center justify-between group/folder">
-                                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleFolder(folder.id)}>
-                                        {expandedFolders.includes(folder.id) ? (
-                                            <ChevronDown className="h-5 w-5 text-slate-400" />
-                                        ) : (
-                                            <ChevronRight className="h-5 w-5 text-slate-400" />
-                                        )}
-                                        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-                                            {editingFolderId === folder.id ? (
-                                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                                    <Input 
-                                                        value={editingFolderName} 
-                                                        onChange={e => setEditingFolderName(e.target.value)}
-                                                        className="h-7 w-48"
-                                                        autoFocus
-                                                        onKeyDown={e => e.key === 'Enter' && saveFolderRename(e)}
-                                                    />
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={saveFolderRename}><Check className="h-4 w-4 text-green-600" /></Button>
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEditingFolder}><X className="h-4 w-4 text-red-600" /></Button>
-                                                </div>
-                                            ) : (
-                                                folder.name
-                                            )}
-                                        </h3>
-                                        <Badge variant="secondary">{groupedValues[folder.id]?.length || 0}</Badge>
-                                    </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover/folder:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditingFolder(folder)}>
-                                            <Pencil className="h-4 w-4 text-slate-400" />
-                                        </Button>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-red-600" onClick={() => setFolderToDelete(folder.id)}>
-                                                    <Trash className="h-4 w-4" />
+                            <div key={folder.id} className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                <div 
+                                    className="flex items-center justify-between px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+                                    onClick={() => !editingFolderId && toggleFolder(folder.id)}
+                                >
+                                    <div className="flex items-center gap-2 flex-1">
+                                        {editingFolderId === folder.id ? (
+                                            <div className="flex items-center gap-2 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+                                                <Input 
+                                                    value={editingFolderName}
+                                                    onChange={(e) => setEditingFolderName(e.target.value)}
+                                                    className="h-8 text-sm"
+                                                    autoFocus
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') saveFolderRename(e);
+                                                        if (e.key === 'Escape') cancelEditingFolder(e as any);
+                                                    }}
+                                                />
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" onClick={saveFolderRename}>
+                                                    <Check className="h-4 w-4" />
                                                 </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete Folder?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This will delete the folder "{folder.name}". Values inside will be moved to Uncategorized.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel onClick={() => setFolderToDelete(null)}>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={confirmDeleteFolder} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </div>
-                                </div>
-                                
-                                {expandedFolders.includes(folder.id) && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
-                                        {(!groupedValues[folder.id] || groupedValues[folder.id].length === 0) ? (
-                                            <div className="col-span-2 py-8 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                                                <p className="text-sm text-slate-500">No values in this folder</p>
-                                                <Button variant="link" className="text-indigo-600" onClick={() => {
-                                                    setSelectedFolderId(folder.id);
-                                                    openBulkMoveDialog();
-                                                }}>
-                                                    Move values here
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-500 hover:text-slate-700" onClick={cancelEditingFolder}>
+                                                    <X className="h-4 w-4" />
                                                 </Button>
                                             </div>
                                         ) : (
-                                            groupedValues[folder.id].map(value => (
-                                                <div key={value.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors group">
-                                                    <div className="flex items-start justify-between mb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <Type className="h-4 w-4 text-indigo-500" />
-                                                            <span className="font-medium text-slate-900 dark:text-slate-100">{value.name}</span>
-                                                        </div>
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="h-6 w-6 -mt-1 -mr-1 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <MoreHorizontal className="h-3 w-3" />
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem onClick={() => openEditValueDialog(value)}>Edit</DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => openMoveToFolderDialog(value)}>Move</DropdownMenuItem>
-                                                                <DropdownMenuItem className="text-red-600" onClick={() => deleteValue(value.id)}>Delete</DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div 
-                                                            className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-pointer"
-                                                            onClick={() => copyToClipboard(`{{company.${value.slug}}}`)}
-                                                        >
-                                                            {`{{company.${value.slug}}}`}
-                                                        </div>
-                                                        <p className="text-sm text-slate-600 dark:text-slate-300 truncate">{value.value}</p>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            <>
+                                                {expandedFolders.includes(folder.id) ? (
+                                                    <ChevronDown className="h-4 w-4 text-slate-500" />
+                                                ) : (
+                                                    <ChevronRight className="h-4 w-4 text-slate-500" />
+                                                )}
+                                                <Folder className="h-4 w-4 text-indigo-500" />
+                                                <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{folder.name}</span>
+                                                <Badge variant="secondary" className="ml-2 text-[10px] h-5">
+                                                    {groupedValues[folder.id]?.length || 0} values
+                                                </Badge>
+                                            </>
+                                        )}
+                                    </div>
+                                    {!editingFolderId && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => startEditingFolder(folder)}>Rename Folder</DropdownMenuItem>
+                                                <DropdownMenuItem className="text-red-600" onClick={() => setFolderToDelete(folder.id)}>
+                                                    Delete Folder
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
+                                </div>
+
+                                {expandedFolders.includes(folder.id) && !editingFolderId && (
+                                    <div className="border-t border-slate-100 dark:border-slate-800">
+                                        {groupedValues[folder.id]?.length > 0 ? (
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
+                                                        <TableHead className="w-[50px] pl-6">
+                                                            <Checkbox 
+                                                                checked={groupedValues[folder.id].length > 0 && groupedValues[folder.id].every(f => selectedValues.includes(f.id))}
+                                                                onCheckedChange={(checked) => toggleSelectGroup(groupedValues[folder.id], !!checked)}
+                                                                aria-label={`Select all in ${folder.name}`}
+                                                            />
+                                                        </TableHead>
+                                                        <TableHead className="w-[20%] text-xs font-medium">Value Name</TableHead>
+                                                        <TableHead className="w-[30%] text-xs font-medium">Value</TableHead>
+                                                        <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                                        <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                                        <TableHead className="w-[5%] text-xs font-medium"></TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {groupedValues[folder.id].map(value => {
+                                                        const isSelected = selectedValues.includes(value.id);
+                                                        return (
+                                                            <TableRow key={value.id} className={`hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 ${isSelected ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                                                <TableCell className="pl-6">
+                                                                    <Checkbox 
+                                                                        checked={isSelected}
+                                                                        onCheckedChange={(checked) => toggleSelectValue(value.id, !!checked)}
+                                                                        aria-label={`Select ${value.name}`}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                                    {value.name}
+                                                                </TableCell>
+                                                                <TableCell onClick={() => !editingCellId && startEditingCell(value)} className="cursor-pointer">
+                                                                    {editingCellId === value.id ? (
+                                                                        <Input 
+                                                                            value={editingCellValue}
+                                                                            onChange={(e) => setEditingCellValue(e.target.value)}
+                                                                            onBlur={saveCellEdit}
+                                                                            onKeyDown={handleCellKeyDown}
+                                                                            autoFocus
+                                                                            className="h-8"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+                                                                    ) : (
+                                                                        <span className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[300px] block" title={value.value}>
+                                                                            {value.value}
+                                                                        </span>
+                                                                    )}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <div 
+                                                                        className="group flex items-center gap-2 cursor-pointer w-fit"
+                                                                        onClick={() => copyToClipboard(`{{company.${value.slug}}}`)}
+                                                                    >
+                                                                        <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
+                                                                            {`{{company.${value.slug}}}`}
+                                                                        </code>
+                                                                        <Copy className="h-3 w-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
+                                                                    {value.description || '-'}
+                                                                </TableCell>
+                                                                <TableCell className="text-right">
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                                                <MoreHorizontal className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent align="end">
+                                                                            <DropdownMenuItem onClick={() => openEditValueDialog(value)}>Edit Value</DropdownMenuItem>
+                                                                            <DropdownMenuItem onClick={() => openMoveToFolderDialog(value)}>Move to Folder</DropdownMenuItem>
+                                                                            <DropdownMenuSeparator />
+                                                                            <DropdownMenuItem className="text-red-600" onClick={() => deleteValue(value.id)}>
+                                                                                Delete Value
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )})}
+                                                </TableBody>
+                                            </Table>
+                                        ) : (
+                                            <div className="py-8 text-center text-sm text-slate-500 italic">
+                                                No values in this folder yet.
+                                            </div>
                                         )}
                                     </div>
                                 )}
                             </div>
                         ))}
+
+                        {/* Uncategorized Values */}
+                        {groupedValues.uncategorized?.length > 0 && (
+                            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-6">
+                                <div className="px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="h-4 w-4 text-slate-400" />
+                                        <span className="font-medium text-sm text-slate-900 dark:text-slate-100">Uncategorized Values</span>
+                                        <Badge variant="secondary" className="ml-2 text-[10px] h-5">
+                                            {groupedValues.uncategorized.length} values
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
+                                            <TableHead className="w-[50px] pl-6">
+                                                <Checkbox 
+                                                    checked={groupedValues.uncategorized.length > 0 && groupedValues.uncategorized.every(f => selectedValues.includes(f.id))}
+                                                    onCheckedChange={(checked) => toggleSelectGroup(groupedValues.uncategorized, !!checked)}
+                                                    aria-label="Select all uncategorized"
+                                                />
+                                            </TableHead>
+                                            <TableHead className="w-[20%] text-xs font-medium">Value Name</TableHead>
+                                            <TableHead className="w-[30%] text-xs font-medium">Value</TableHead>
+                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                            <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                            <TableHead className="w-[5%] text-xs font-medium"></TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {groupedValues.uncategorized.map(value => {
+                                            const isSelected = selectedValues.includes(value.id);
+                                            return (
+                                                <TableRow key={value.id} className={`hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 ${isSelected ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                                    <TableCell className="pl-6">
+                                                        <Checkbox 
+                                                            checked={isSelected}
+                                                            onCheckedChange={(checked) => toggleSelectValue(value.id, !!checked)}
+                                                            aria-label={`Select ${value.name}`}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                        {value.name}
+                                                    </TableCell>
+                                                    <TableCell onClick={() => !editingCellId && startEditingCell(value)} className="cursor-pointer">
+                                                        {editingCellId === value.id ? (
+                                                            <Input 
+                                                                value={editingCellValue}
+                                                                onChange={(e) => setEditingCellValue(e.target.value)}
+                                                                onBlur={saveCellEdit}
+                                                                onKeyDown={handleCellKeyDown}
+                                                                autoFocus
+                                                                className="h-8"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                        ) : (
+                                                            <span className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[300px] block" title={value.value}>
+                                                                {value.value}
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div 
+                                                            className="group flex items-center gap-2 cursor-pointer w-fit"
+                                                            onClick={() => copyToClipboard(`{{company.${value.slug}}}`)}
+                                                        >
+                                                            <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
+                                                                {`{{company.${value.slug}}}`}
+                                                            </code>
+                                                            <Copy className="h-3 w-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-sm text-slate-500 truncate max-w-[200px]">
+                                                        {value.description || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem onClick={() => openEditValueDialog(value)}>Edit Value</DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => openMoveToFolderDialog(value)}>Move to Folder</DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem className="text-red-600" onClick={() => deleteValue(value.id)}>
+                                                                    Delete Value
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )})}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+                        </div>
                     </div>
                 </TabsContent>
             </DashboardLayout>
