@@ -117,7 +117,8 @@ import {
   DollarSign,
   ChevronDown,
   Globe,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from "lucide-react";
 
 // Mock data for contacts
