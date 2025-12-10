@@ -204,34 +204,65 @@ export default function LaunchpadPage() {
 
                   {/* Specific controls for Mode Picker */}
                   {task.type === "mode-picker" && !task.completed && (
-                    <div className="flex gap-2 mt-3 pt-2">
-                      <Button
-                        variant={theme === 'light' ? 'default' : 'outline'}
-                        size="sm"
+                    <div className="grid grid-cols-3 gap-3 mt-4">
+                      <div 
+                        className={`cursor-pointer rounded-lg border-2 p-1 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
                         onClick={() => setTheme('light')}
-                        className={`gap-2 h-8 ${theme === 'light' ? 'bg-primary text-primary-foreground' : ''}`}
                       >
-                        <Sun className="h-4 w-4" />
-                        Light
-                      </Button>
-                      <Button
-                        variant={theme === 'dark' ? 'default' : 'outline'}
-                        size="sm"
+                        <div className="bg-slate-100 rounded-md h-16 w-full border border-slate-200 relative overflow-hidden flex">
+                           <div className="w-6 bg-white border-r border-slate-200 h-full flex flex-col items-center gap-1 pt-2">
+                              <div className="w-3 h-3 bg-primary rounded-sm" />
+                              <div className="w-3 h-3 bg-slate-200 rounded-sm" />
+                           </div>
+                           <div className="flex-1 bg-white p-2">
+                              <div className="w-12 h-2 bg-slate-200 rounded mb-2" />
+                              <div className="w-8 h-2 bg-primary/20 rounded" />
+                           </div>
+                        </div>
+                        <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Light</div>
+                      </div>
+
+                      <div 
+                        className={`cursor-pointer rounded-lg border-2 p-1 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
                         onClick={() => setTheme('dark')}
-                        className={`gap-2 h-8 ${theme === 'dark' ? 'bg-primary text-primary-foreground' : ''}`}
                       >
-                        <Moon className="h-4 w-4" />
-                        Dark
-                      </Button>
-                      <Button
-                        variant={theme === 'system' ? 'default' : 'outline'}
-                        size="sm"
+                        <div className="bg-slate-900 rounded-md h-16 w-full border border-slate-800 relative overflow-hidden flex">
+                           <div className="w-6 bg-slate-800 border-r border-slate-700 h-full flex flex-col items-center gap-1 pt-2">
+                              <div className="w-3 h-3 bg-primary rounded-sm" />
+                              <div className="w-3 h-3 bg-slate-700 rounded-sm" />
+                           </div>
+                           <div className="flex-1 bg-slate-900 p-2">
+                              <div className="w-12 h-2 bg-slate-700 rounded mb-2" />
+                              <div className="w-8 h-2 bg-primary/30 rounded" />
+                           </div>
+                        </div>
+                        <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Dark</div>
+                      </div>
+
+                      <div 
+                        className={`cursor-pointer rounded-lg border-2 p-1 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
                         onClick={() => setTheme('system')}
-                        className={`gap-2 h-8 ${theme === 'system' ? 'bg-primary text-primary-foreground' : ''}`}
                       >
-                        <Monitor className="h-4 w-4" />
-                        System
-                      </Button>
+                         <div className="rounded-md h-16 w-full border border-slate-200 dark:border-slate-700 relative overflow-hidden flex">
+                           <div className="w-1/2 bg-white h-full flex">
+                              <div className="w-3 bg-slate-50 border-r border-slate-100 h-full flex flex-col items-center gap-1 pt-2">
+                                 <div className="w-1.5 h-1.5 bg-primary rounded-[1px]" />
+                              </div>
+                              <div className="flex-1 p-1">
+                                 <div className="w-4 h-1 bg-slate-200 rounded mb-1" />
+                              </div>
+                           </div>
+                           <div className="w-1/2 bg-slate-900 h-full flex">
+                              <div className="w-3 bg-slate-800 border-r border-slate-700 h-full flex flex-col items-center gap-1 pt-2">
+                                 <div className="w-1.5 h-1.5 bg-primary rounded-[1px]" />
+                              </div>
+                              <div className="flex-1 p-1">
+                                 <div className="w-4 h-1 bg-slate-700 rounded mb-1" />
+                              </div>
+                           </div>
+                        </div>
+                        <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Auto</div>
+                      </div>
                     </div>
                   )}
                 </div>
