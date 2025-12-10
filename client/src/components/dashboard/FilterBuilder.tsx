@@ -172,7 +172,7 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                             value={filter.logic} 
                             onValueChange={(val: FilterLogic) => handleUpdate(filter.id, { logic: val })}
                         >
-                            <SelectTrigger className="h-7 text-xs bg-white dark:bg-slate-950 min-w-[70px]">
+                            <SelectTrigger className="h-7 text-xs bg-white dark:bg-slate-950 w-auto min-w-[60px] max-w-[80px] justify-center">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
