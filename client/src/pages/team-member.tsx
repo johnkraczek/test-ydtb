@@ -298,8 +298,12 @@ export default function TeamMemberPage() {
   });
 
   const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+  const [managerDialogOpen, setManagerDialogOpen] = useState(false);
   const [permissionSearchQuery, setPermissionSearchQuery] = useState("");
+  const [managerSearchQuery, setManagerSearchQuery] = useState("");
   const [selectedCopyUser, setSelectedCopyUser] = useState<string | null>(null);
+  const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
+  const [manager, setManager] = useState<{id: string, name: string, avatar?: string} | null>({ id: '99', name: 'John Doe', avatar: '' });
 
   const filteredCopyMembers = TEAM_MEMBERS.filter(m => 
     member && m.id !== member.id && 
@@ -307,11 +311,31 @@ export default function TeamMemberPage() {
      m.role.toLowerCase().includes(permissionSearchQuery.toLowerCase()))
   );
 
+  const filteredManagerCandidates = TEAM_MEMBERS.filter(m => 
+    member && m.id !== member.id && 
+    (m.name.toLowerCase().includes(managerSearchQuery.toLowerCase()) || 
+     m.role.toLowerCase().includes(managerSearchQuery.toLowerCase()))
+  );
+
   const handleCopyPermissions = () => {
     // In a real app, we would fetch the selected user's permissions and apply them
     // For now, we'll just simulate a successful copy
     setCopyDialogOpen(false);
     // Optional: Add toast notification here
+  };
+
+  const handleUpdateManager = () => {
+    if (selectedManagerId) {
+      const selected = TEAM_MEMBERS.find(m => m.id === selectedManagerId);
+      if (selected) {
+        setManager({
+          id: selected.id,
+          name: selected.name,
+          avatar: selected.avatar
+        });
+      }
+      setManagerDialogOpen(false);
+    }
   };
 
   const updateMemberField = (field: keyof typeof TEAM_MEMBERS[0], value: string) => {
@@ -508,13 +532,76 @@ export default function TeamMemberPage() {
                        </div>
                        <div>
                          <Label className="text-xs text-slate-500">Manager</Label>
-                         <div className="flex items-center gap-2 mt-1 group cursor-pointer">
-                            <Avatar className="h-6 w-6">
-                                <AvatarFallback>JD</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm font-medium">John Doe</span>
-                            <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                         </div>
+                         <Dialog open={managerDialogOpen} onOpenChange={setManagerDialogOpen}>
+                           <DialogTrigger asChild>
+                             <div className="flex items-center gap-2 mt-1 group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 -ml-1.5 rounded-md transition-colors">
+                                <Avatar className="h-6 w-6">
+                                    <AvatarImage src={manager?.avatar} />
+                                    <AvatarFallback>{manager?.name.substring(0, 2)}</AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-medium">{manager?.name || "Select Manager"}</span>
+                                <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                             </div>
+                           </DialogTrigger>
+                           <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Select Manager</DialogTitle>
+                                <DialogDescription>
+                                  Choose a manager for {member.name}.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <div className="relative mb-4">
+                                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                  <Input
+                                    placeholder="Search team members..."
+                                    className="pl-9"
+                                    value={managerSearchQuery}
+                                    onChange={(e) => setManagerSearchQuery(e.target.value)}
+                                  />
+                                </div>
+                                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                                  {filteredManagerCandidates.map((m) => (
+                                    <div 
+                                      key={m.id} 
+                                      className={`flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer border ${
+                                        selectedManagerId === m.id 
+                                          ? 'border-primary bg-primary/5' 
+                                          : 'border-transparent'
+                                      }`}
+                                      onClick={() => setSelectedManagerId(m.id)}
+                                    >
+                                      <Avatar className="h-8 w-8">
+                                        <AvatarImage src={m.avatar} />
+                                        <AvatarFallback>{m.name.substring(0, 2)}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex-1">
+                                        <Label className="text-sm font-medium cursor-pointer block">
+                                          {m.name}
+                                        </Label>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{m.role}</p>
+                                      </div>
+                                      {selectedManagerId === m.id && (
+                                        <div className="h-2 w-2 rounded-full bg-primary" />
+                                      )}
+                                    </div>
+                                  ))}
+                                  {filteredManagerCandidates.length === 0 && (
+                                    <p className="text-center text-sm text-slate-500 py-4">No members found</p>
+                                  )}
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setManagerDialogOpen(false)}>Cancel</Button>
+                                <Button 
+                                  disabled={!selectedManagerId} 
+                                  onClick={handleUpdateManager}
+                                >
+                                  Update Manager
+                                </Button>
+                              </DialogFooter>
+                           </DialogContent>
+                         </Dialog>
                        </div>
                     </div>
                   </CardContent>
