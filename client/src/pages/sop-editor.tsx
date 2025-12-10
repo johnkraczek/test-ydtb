@@ -33,6 +33,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
+
 // Mock data to pre-fill if editing
 const MOCK_SOP_DATA = {
   id: "1",
@@ -45,12 +47,14 @@ const MOCK_SOP_DATA = {
     {
       id: "s1",
       title: "Initial Account Configuration",
+      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
       content: "The first step in onboarding a new client is to ensure their account is properly configured in the admin panel.\n\n• Verify the contract details in Salesforce matching the signed agreement.\n• Create the organization tenant in the Super Admin dashboard.\n• Set the user seat limit according to the plan.",
       note: "Do not activate the account until the billing method has been verified by the Finance team."
     },
     {
       id: "s2",
       title: "Welcome Email & Access Provisioning",
+      imageUrl: "",
       content: "Once the technical setup is complete, we need to welcome the client and provide them with their initial access credentials.",
       note: ""
     }
@@ -70,11 +74,11 @@ export default function SopEditorPage() {
   const [description, setDescription] = useState(isEditing ? MOCK_SOP_DATA.description : "");
   
   const [steps, setSteps] = useState(isEditing ? MOCK_SOP_DATA.steps : [
-    { id: "new-1", title: "", content: "", note: "" }
+    { id: "new-1", title: "", imageUrl: "", content: "", note: "" }
   ]);
 
   const addStep = () => {
-    setSteps([...steps, { id: `new-${Date.now()}`, title: "", content: "", note: "" }]);
+    setSteps([...steps, { id: `new-${Date.now()}`, title: "", imageUrl: "", content: "", note: "" }]);
   };
 
   const removeStep = (id: string) => {
@@ -248,8 +252,37 @@ export default function SopEditorPage() {
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><Italic className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><List className="h-3.5 w-3.5" /></Button>
                       <Separator orientation="vertical" className="h-4 mx-1" />
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500"><ImageIcon className="h-3.5 w-3.5" /></Button>
+                      
+                      <FileSelectionDialog 
+                        trigger={
+                          <Button variant={step.imageUrl ? "secondary" : "ghost"} size="icon" className={`h-7 w-7 ${step.imageUrl ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>
+                            <ImageIcon className="h-3.5 w-3.5" />
+                          </Button>
+                        }
+                        onSelect={(file) => {
+                          if (file.url) {
+                            updateStep(step.id, 'imageUrl', file.url);
+                          }
+                        }}
+                      />
                     </div>
+                    
+                    {step.imageUrl && (
+                      <div className="relative group w-fit">
+                        <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 max-w-md">
+                          <img src={step.imageUrl} alt="Step visual" className="max-h-[200px] w-auto object-cover" />
+                        </div>
+                        <Button 
+                          variant="destructive" 
+                          size="icon" 
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                          onClick={() => updateStep(step.id, 'imageUrl', "")}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+
                     <Textarea 
                       placeholder="Describe the actions required for this step..." 
                       className="min-h-[150px] resize-y"

@@ -46,6 +46,7 @@ const MOCK_SOP_DETAIL = {
     {
       id: "s1",
       title: "Initial Account Configuration",
+      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
       content: (
         <div className="space-y-4 text-slate-600 dark:text-slate-300">
           <p>
@@ -209,6 +210,11 @@ export default function SopDetailPage() {
                     </div>
                     
                     <div className={`transition-opacity duration-300 ${completedSteps.includes(step.id) ? 'opacity-50' : 'opacity-100'}`}>
+                      {step.imageUrl && (
+                        <div className="mb-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+                          <img src={step.imageUrl} alt={step.title} className="w-full h-auto object-cover max-h-[400px]" />
+                        </div>
+                      )}
                       {step.content}
                     </div>
                   </div>
