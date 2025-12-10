@@ -948,12 +948,12 @@ export default function ContactDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="messaging" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-2">
+        <TabsContent value="messaging" className="mt-6 h-[calc(100vh-280px)] min-h-[600px]">
+          <div className="grid gap-6 md:grid-cols-2 h-full">
             {/* Main Chat/Activity Stream */}
-            <div>
-              <Card className="h-[500px] border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-                <CardHeader className="flex-none border-b">
+            <div className="h-full">
+              <Card className="h-full border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+                <CardHeader className="flex-none border-b py-4">
                   <CardTitle className="text-base">Activity Stream</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto min-h-0 pt-6">
@@ -1046,21 +1046,21 @@ export default function ContactDetailPage() {
             </div>
 
             {/* Right Sidebar - Composer */}
-            <div className="">
-              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-[500px]">
-                <CardHeader>
+            <div className="h-full">
+              <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col">
+                <CardHeader className="flex-none border-b py-4">
                   <CardTitle className="text-base">Send a Message</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full">
+                <CardContent className="flex-1 flex flex-col pt-6">
+                  <Tabs defaultValue="email" onValueChange={setMessageType} className="w-full h-full flex flex-col">
                       <TabsList className="grid w-full grid-cols-2 mb-4 shrink-0">
                         <TabsTrigger value="email">Email</TabsTrigger>
                         <TabsTrigger value="sms">SMS</TabsTrigger>
                       </TabsList>
                       
-                      <div className="space-y-4">
-                        <TabsContent value="email" className="mt-0 space-y-4">
-                          <div className="space-y-2">
+                      <div className="flex-1 flex flex-col min-h-0">
+                        <TabsContent value="email" className="mt-0 space-y-4 flex-1 flex flex-col">
+                          <div className="space-y-2 flex-none">
                             <Label className="text-xs font-medium text-muted-foreground ml-1">From</Label>
                             <Select defaultValue="info@restaurant.com">
                               <SelectTrigger>
@@ -1077,17 +1077,17 @@ export default function ContactDetailPage() {
                             placeholder="Subject line..." 
                             value={messageSubject}
                             onChange={(e) => setMessageSubject(e.target.value)}
-                            className="font-medium"
+                            className="font-medium flex-none"
                           />
                           <Textarea 
                             placeholder={`Hi ${customer.firstName}, ...`}
-                            className="min-h-[150px] resize-none text-base"
+                            className="flex-1 resize-none text-base min-h-0"
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
                           />
                         </TabsContent>
                         
-                        <TabsContent value="sms" className="mt-0 space-y-4">
+                        <TabsContent value="sms" className="mt-0 space-y-4 flex-1 flex flex-col">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 shrink-0">
                             <MessageSquare className="h-3 w-3" />
                             <span>SMS to {customer.phone}</span>
@@ -1097,11 +1097,11 @@ export default function ContactDetailPage() {
                             maxLength={160}
                             value={messageBody}
                             onChange={(e) => setMessageBody(e.target.value)}
-                            className="min-h-[150px] resize-none text-base"
+                            className="flex-1 resize-none text-base min-h-0"
                           />
                         </TabsContent>
 
-                        <div className="flex justify-between items-center pt-2 mt-2">
+                        <div className="flex justify-between items-center pt-4 mt-auto flex-none border-t">
                           <div className="text-xs text-muted-foreground">
                             {messageType === 'sms' && `${messageBody.length}/160 chars`}
                           </div>
