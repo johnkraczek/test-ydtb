@@ -179,7 +179,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                       </Button>
                    </div>
                 </div>
-            ) : (
+            ) : toolId !== "settings" && (
                 <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
                     <Plus className="h-4 w-4" />
                     <span className="font-medium">
