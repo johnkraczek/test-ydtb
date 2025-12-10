@@ -480,7 +480,7 @@ export default function CustomFieldsPage() {
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                            <TableHead className="w-[25%] text-xs font-medium">Field Name</TableHead>
+                                                            <TableHead className="w-[25%] text-xs font-medium pl-6">Field Name</TableHead>
                                                             <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
                                                             <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
                                                             <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
@@ -490,7 +490,7 @@ export default function CustomFieldsPage() {
                                                     <TableBody>
                                                         {groupedFields[folder.id].map(field => (
                                                             <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
-                                                                <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                                <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
                                                                     {field.name}
                                                                 </TableCell>
                                                                 <TableCell>
@@ -559,7 +559,7 @@ export default function CustomFieldsPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                <TableHead className="w-[25%] text-xs font-medium">Field Name</TableHead>
+                                                <TableHead className="w-[25%] text-xs font-medium pl-6">Field Name</TableHead>
                                                 <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
                                                 <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
                                                 <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
@@ -569,7 +569,7 @@ export default function CustomFieldsPage() {
                                         <TableBody>
                                             {groupedFields.uncategorized.map(field => (
                                                 <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
-                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
                                                         {field.name}
                                                     </TableCell>
                                                     <TableCell>
@@ -624,7 +624,7 @@ export default function CustomFieldsPage() {
                             <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                            <SortableHeader column="name" label="Field Name" className="w-[25%] text-xs font-medium" />
+                                            <SortableHeader column="name" label="Field Name" className="w-[25%] text-xs font-medium pl-6" />
                                             <SortableHeader column="type" label="Type" className="w-[15%] text-xs font-medium" />
                                             <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
                                             <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
@@ -638,7 +638,7 @@ export default function CustomFieldsPage() {
                                                 const folderName = folders.find(f => f.id === field.folderId)?.name || 'Uncategorized';
                                                 return (
                                                     <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
                                                             {field.name}
                                                         </TableCell>
                                                         <TableCell>
