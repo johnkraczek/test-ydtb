@@ -569,7 +569,7 @@ export default function MediaPage() {
     );
   };
 
-  const CustomHeader = () => (
+  const headerContent = (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 backdrop-blur-sm px-8 py-4 transition-all duration-300">
       <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <Button 
@@ -740,7 +740,7 @@ export default function MediaPage() {
       onDragStart={handleDragStart} 
       onDragEnd={handleDragEnd}
     >
-      <DashboardLayout activeTool="media" header={<CustomHeader />}>
+      <DashboardLayout activeTool="media" header={headerContent}>
         <div className="flex h-full gap-6">
           {/* Main Content */}
           <div className="flex-1 flex flex-col gap-4 min-w-0 h-full">
