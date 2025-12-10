@@ -40,6 +40,8 @@ interface FilterBuilderProps {
 
 export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuilderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [filterName, setFilterName] = useState("");
 
   const createFilter = (logic?: FilterLogic): FilterCondition => ({
     id: Math.random().toString(36).substr(2, 9),
@@ -343,9 +345,46 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                 <h4 className="font-medium text-sm">Filters</h4>
                 <Info className="h-3.5 w-3.5 text-slate-400" />
             </div>
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-                Saved filters <ChevronDown className="h-3 w-3" />
-            </Button>
+            
+            {isSaving ? (
+                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
+                    <Input 
+                        className="h-7 text-xs w-[160px] bg-slate-50 dark:bg-slate-900" 
+                        placeholder="Filter name..." 
+                        value={filterName}
+                        onChange={(e) => setFilterName(e.target.value)}
+                        autoFocus
+                    />
+                    <Button 
+                        size="sm" 
+                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-700 text-white"
+                        onClick={() => {
+                            // Logic to save filter would go here
+                            setIsSaving(false);
+                            setFilterName("");
+                        }}
+                    >
+                        Save
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs text-slate-500"
+                        onClick={() => setIsSaving(false)}
+                    >
+                        Cancel
+                    </Button>
+                </div>
+            ) : (
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 text-xs gap-1"
+                    onClick={() => setIsSaving(true)}
+                >
+                    Save Filter
+                </Button>
+            )}
         </div>
         
         <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 min-h-[100px] max-h-[500px] overflow-y-auto space-y-3">
