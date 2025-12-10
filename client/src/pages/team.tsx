@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Link } from "wouter";
 import { 
   Search, 
   MoreVertical, 
@@ -374,57 +375,59 @@ function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid
       {view === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMembers.map((member) => (
-            <div key={member.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={member.avatar} />
-                      <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
-                    </Avatar>
-                    <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900 ${
-                      member.status === 'online' ? 'bg-green-500' : 
-                      member.status === 'busy' ? 'bg-red-500' : 
-                      member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
-                    }`} />
+            <Link key={member.id} href={`/team/member/${member.id}`}>
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md transition-shadow cursor-pointer block">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                      </Avatar>
+                      <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900 ${
+                        member.status === 'online' ? 'bg-green-500' : 
+                        member.status === 'busy' ? 'bg-red-500' : 
+                        member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">{member.name}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{member.role}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">{member.name}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{member.role}</p>
-                  </div>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
-                  {member.department}
-                </Badge>
-                {member.accessLevel === 'admin' && (
-                  <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800">
-                    Admin
+                
+                <div className="flex items-center gap-2 mb-4">
+                  <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
+                    {member.department}
                   </Badge>
-                )}
-                {member.accessLevel === 'guest' && (
-                  <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
-                    Guest
-                  </Badge>
-                )}
-              </div>
+                  {member.accessLevel === 'admin' && (
+                    <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800">
+                      Admin
+                    </Badge>
+                  )}
+                  {member.accessLevel === 'guest' && (
+                    <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
+                      Guest
+                    </Badge>
+                  )}
+                </div>
 
-              <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
-                  <MessageSquare className="h-3.5 w-3.5 mr-2" />
-                  Message
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
-                  <Mail className="h-3.5 w-3.5 mr-2" />
-                  Email
-                </Button>
+                <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={(e) => { e.preventDefault(); /* Open chat logic */ }}>
+                    <MessageSquare className="h-3.5 w-3.5 mr-2" />
+                    Message
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={(e) => { e.preventDefault(); /* Open email logic */ }}>
+                    <Mail className="h-3.5 w-3.5 mr-2" />
+                    Email
+                  </Button>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       ) : (
@@ -443,7 +446,11 @@ function TeamDirectory({ searchQuery, view }: { searchQuery: string, view: 'grid
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredMembers.map((member) => (
-                  <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr 
+                    key={member.id} 
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                    onClick={() => window.location.href = `/team/member/${member.id}`}
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">

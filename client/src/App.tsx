@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/dashboard";
 import ContactsPage from "@/pages/contacts";
 import ContactDetailPage from "@/pages/contact-detail";
 import TeamPage from "@/pages/team";
+import TeamMemberPage from "@/pages/team-member";
 import MediaPage from "@/pages/media";
 import MessagesPage from "@/pages/messages";
 import AutomationPage from "@/pages/automation";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/contacts" component={ContactsPage} />
       <Route path="/contacts/:id" component={ContactDetailPage} />
       <Route path="/team" component={TeamPage} />
+      <Route path="/team/member/:id" component={TeamMemberPage} />
       <Route path="/team/chat/:chatId" component={TeamPage} />
       <Route path="/media" component={MediaPage} />
       <Route path="/messages" component={MessagesPage} />
