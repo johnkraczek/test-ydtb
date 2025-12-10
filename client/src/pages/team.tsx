@@ -20,9 +20,25 @@ import {
   MoreHorizontal,
   CheckCircle2,
   Clock,
-  Briefcase
+  Briefcase,
+  ThumbsUp,
+  ThumbsDown,
+  Frown,
+  Heart,
+  Angry
 } from "lucide-react";
 import { useRoute } from "wouter";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Mock Data
 const TEAM_MEMBERS = [
@@ -339,6 +355,15 @@ function ChatView({ chatId }: { chatId: string }) {
     }));
   };
 
+  const REACTION_OPTIONS = [
+    { emoji: "👍", icon: ThumbsUp, label: "Thumbs Up" },
+    { emoji: "👎", icon: ThumbsDown, label: "Thumbs Down" },
+    { emoji: "😀", icon: Smile, label: "Smile" },
+    { emoji: "😢", icon: Frown, label: "Cry" },
+    { emoji: "😠", icon: Angry, label: "Angry" },
+    { emoji: "❤️", icon: Heart, label: "Heart" },
+  ];
+
   // Group messages by date
   const groupedMessages = messages.reduce((acc, message) => {
     const date = message.date;
@@ -431,15 +456,39 @@ function ChatView({ chatId }: { chatId: string }) {
                         </div>
                         
                         {/* Reaction Trigger */}
-                        <div className={`absolute top-0 ${isMe ? '-left-8' : '-right-8'} opacity-0 group-hover/message:opacity-100 transition-opacity flex flex-col gap-1`}>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shadow-sm"
-                            onClick={() => addReaction(msg.id, "👍")}
-                          >
-                            <span className="text-xs">👍</span>
-                          </Button>
+                        <div className={`absolute top-0 ${isMe ? '-left-8' : '-right-8'} opacity-100 flex flex-col gap-1`}>
+                           <TooltipProvider>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shadow-sm text-slate-400 hover:text-slate-600"
+                                >
+                                  <Smile className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-full flex items-center gap-1">
+                                {REACTION_OPTIONS.map((option) => (
+                                  <button
+                                    key={option.label}
+                                    className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-lg leading-none"
+                                    onClick={() => addReaction(msg.id, option.emoji)}
+                                    title={option.label}
+                                  >
+                                    {option.emoji}
+                                  </button>
+                                ))}
+                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-0.5" />
+                                <button
+                                  className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                  title="Add Reaction"
+                                >
+                                  <Plus className="h-4 w-4 text-slate-500" />
+                                </button>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       </div>
 
