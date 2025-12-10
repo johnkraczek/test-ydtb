@@ -639,7 +639,11 @@ export default function ContactsPage() {
                                                     onClick={() => {
                                                         setVisibleColumns(prev => {
                                                             const next = { ...prev };
-                                                            Object.keys(next).forEach(key => next[key] = false);
+                                                            Object.keys(next).forEach(key => {
+                                                                if (key !== 'name') {
+                                                                    next[key] = false;
+                                                                }
+                                                            });
                                                             return next;
                                                         });
                                                     }}
