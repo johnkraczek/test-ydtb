@@ -50,7 +50,9 @@ import {
     ArrowDown,
     ArrowUpDown,
     AlignLeft,
-    Copy
+    Copy,
+    X,
+    FolderInput
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -62,6 +64,18 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface CustomField {
     id: string;
@@ -141,6 +155,34 @@ export default function CustomFieldsPage() {
     const [movingFieldId, setMovingFieldId] = useState<string | null>(null);
     const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
+    // Selection state
+    const [selectedFields, setSelectedFields] = useState<string[]>([]);
+
+    const toggleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedFields(filteredFields.map(f => f.id));
+        } else {
+            setSelectedFields([]);
+        }
+    };
+
+    const toggleSelectField = (fieldId: string, checked: boolean) => {
+        if (checked) {
+            setSelectedFields([...selectedFields, fieldId]);
+        } else {
+            setSelectedFields(selectedFields.filter(id => id !== fieldId));
+        }
+    };
+
+    const toggleSelectGroup = (groupFields: CustomField[], checked: boolean) => {
+        const groupIds = groupFields.map(f => f.id);
+        if (checked) {
+             setSelectedFields(prev => [...new Set([...prev, ...groupIds])]);
+        } else {
+             setSelectedFields(prev => prev.filter(id => !groupIds.includes(id)));
+        }
+    };
+
     const toggleFolder = (folderId: string) => {
         if (expandedFolders.includes(folderId)) {
             setExpandedFolders(expandedFolders.filter(id => id !== folderId));
@@ -181,13 +223,31 @@ export default function CustomFieldsPage() {
         setIsMoveToFolderOpen(true);
     };
 
+    const openBulkMoveDialog = () => {
+        setMovingFieldId(null);
+        setSelectedFolderId(null);
+        setIsMoveToFolderOpen(true);
+    };
+
     const handleMoveToFolder = () => {
         if (movingFieldId) {
             setFields(fields.map(f => f.id === movingFieldId ? { ...f, folderId: selectedFolderId } : f));
-            setIsMoveToFolderOpen(false);
             setMovingFieldId(null);
-            setSelectedFolderId(null);
             toast.success("Field moved successfully");
+        } else if (selectedFields.length > 0) {
+            setFields(fields.map(f => selectedFields.includes(f.id) ? { ...f, folderId: selectedFolderId } : f));
+            setSelectedFields([]);
+            toast.success(`${selectedFields.length} fields moved successfully`);
+        }
+        setIsMoveToFolderOpen(false);
+        setSelectedFolderId(null);
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedFields.length > 0) {
+            setFields(fields.filter(f => !selectedFields.includes(f.id)));
+            setSelectedFields([]);
+            toast.success("Fields deleted successfully");
         }
     };
 
@@ -547,20 +607,36 @@ export default function CustomFieldsPage() {
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                            <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
+                                                            <TableHead className="w-[50px] pl-6">
+                                                                <Checkbox 
+                                                                    checked={groupedFields[folder.id].length > 0 && groupedFields[folder.id].every(f => selectedFields.includes(f.id))}
+                                                                    onCheckedChange={(checked) => toggleSelectGroup(groupedFields[folder.id], !!checked)}
+                                                                    aria-label={`Select all in ${folder.name}`}
+                                                                />
+                                                            </TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium">Field Name</TableHead>
                                                             <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                                             <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
-                                                            <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
-                                                            <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium">Description</TableHead>
                                                             <TableHead className="w-[5%] text-xs font-medium"></TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
-                                                        {groupedFields[folder.id].map(field => (
-                                                            <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
-                                                                <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
-                                                                    {field.name}
-                                                                </TableCell>
+                                                        {groupedFields[folder.id].map(field => {
+                                                            const isSelected = selectedFields.includes(field.id);
+                                                            return (
+                                                                <TableRow key={field.id} className={`hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 ${isSelected ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                                                    <TableCell className="pl-6">
+                                                                        <Checkbox 
+                                                                            checked={isSelected}
+                                                                            onCheckedChange={(checked) => toggleSelectField(field.id, !!checked)}
+                                                                            aria-label={`Select ${field.name}`}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                                        {field.name}
+                                                                    </TableCell>
                                                                 <TableCell>
                                                                     <Badge variant="outline" className={`font-normal text-[10px] ${
                                                                         field.category === 'contact' 
@@ -636,20 +712,36 @@ export default function CustomFieldsPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
+                                                <TableHead className="w-[50px] pl-6">
+                                                    <Checkbox 
+                                                        checked={groupedFields.uncategorized.length > 0 && groupedFields.uncategorized.every(f => selectedFields.includes(f.id))}
+                                                        onCheckedChange={(checked) => toggleSelectGroup(groupedFields.uncategorized, !!checked)}
+                                                        aria-label="Select all uncategorized"
+                                                    />
+                                                </TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium">Field Name</TableHead>
                                                 <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                                 <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
-                                                <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
-                                                <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium">Description</TableHead>
                                                 <TableHead className="w-[5%] text-xs font-medium"></TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {groupedFields.uncategorized.map(field => (
-                                                <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
-                                                    <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
-                                                        {field.name}
-                                                    </TableCell>
+                                            {groupedFields.uncategorized.map(field => {
+                                                const isSelected = selectedFields.includes(field.id);
+                                                return (
+                                                    <TableRow key={field.id} className={`hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 ${isSelected ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                                        <TableCell className="pl-6">
+                                                            <Checkbox 
+                                                                checked={isSelected}
+                                                                onCheckedChange={(checked) => toggleSelectField(field.id, !!checked)}
+                                                                aria-label={`Select ${field.name}`}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
+                                                            {field.name}
+                                                        </TableCell>
                                                     <TableCell>
                                                         <Badge variant="outline" className={`font-normal text-[10px] ${
                                                             field.category === 'contact' 
@@ -711,10 +803,17 @@ export default function CustomFieldsPage() {
                             <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                            <SortableHeader column="name" label="Field Name" className="w-[20%] text-xs font-medium pl-6" />
+                                            <TableHead className="w-[50px] pl-6">
+                                                <Checkbox 
+                                                    checked={filteredFields.length > 0 && selectedFields.length === filteredFields.length}
+                                                    onCheckedChange={(checked) => toggleSelectAll(!!checked)}
+                                                    aria-label="Select all"
+                                                />
+                                            </TableHead>
+                                            <SortableHeader column="name" label="Field Name" className="w-[20%] text-xs font-medium" />
                                             <SortableHeader column="category" label="Category" className="w-[15%] text-xs font-medium" />
                                             <SortableHeader column="type" label="Type" className="w-[10%] text-xs font-medium" />
-                                            <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
+                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
                                             <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
                                             <SortableHeader column="description" label="Description" className="w-[10%] text-xs font-medium" />
                                             <TableHead className="w-[5%] text-xs font-medium"></TableHead>
@@ -724,9 +823,17 @@ export default function CustomFieldsPage() {
                                         {filteredFields.length > 0 ? (
                                             filteredFields.map(field => {
                                                 const folderName = folders.find(f => f.id === field.folderId)?.name || 'Uncategorized';
+                                                const isSelected = selectedFields.includes(field.id);
                                                 return (
-                                                    <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
+                                                    <TableRow key={field.id} className={`hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 last:border-0 ${isSelected ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                                        <TableCell className="pl-6">
+                                                            <Checkbox 
+                                                                checked={isSelected}
+                                                                onCheckedChange={(checked) => toggleSelectField(field.id, !!checked)}
+                                                                aria-label={`Select ${field.name}`}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300">
                                                             {field.name}
                                                         </TableCell>
                                                         <TableCell>
@@ -794,6 +901,56 @@ export default function CustomFieldsPage() {
                                 </Table>
                             </div>
                     </TabsContent>
+                    
+                    {/* Floating Action Bar */}
+                    {selectedFields.length > 0 && (
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-auto min-w-[400px] max-w-[90%] z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
+                            <div className="bg-zinc-900 text-white rounded-lg shadow-xl border border-zinc-800 p-2 flex items-center gap-2">
+                                <div className="flex items-center gap-2 px-3 border-r border-zinc-700">
+                                    <div className="bg-indigo-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        {selectedFields.length}
+                                    </div>
+                                    <span className="text-sm font-medium">Selected</span>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="h-6 w-6 p-0 hover:bg-zinc-800 rounded-full ml-1 text-zinc-400 hover:text-zinc-200"
+                                        onClick={() => setSelectedFields([])}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </Button>
+                                </div>
+                                
+                                <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2" onClick={openBulkMoveDialog}>
+                                    <FolderInput className="h-4 w-4" />
+                                    Move to Folder
+                                </Button>
+
+                                <div className="h-4 w-px bg-zinc-700 mx-1 shrink-0" />
+
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2">
+                                            <Trash className="h-4 w-4 text-red-400" />
+                                            Delete
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete {selectedFields.length} Fields?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Are you sure you want to delete the selected fields? This action cannot be undone.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete}>Delete</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </DashboardLayout>
         </Tabs>
