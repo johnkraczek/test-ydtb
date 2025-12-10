@@ -81,12 +81,13 @@ const CHANNELS = [
   { id: "announcements", name: "announcements", unread: 1 }
 ];
 
-const MESSAGES = [
+const INITIAL_MESSAGES = [
   {
     id: 1,
     senderId: "1",
     content: "Hey everyone! Just pushed the new design updates.",
     timestamp: "10:30 AM",
+    date: "Today",
     reactions: [{ emoji: "👍", count: 2 }]
   },
   {
@@ -94,6 +95,7 @@ const MESSAGES = [
     senderId: "2",
     content: "Awesome, I'll take a look shortly.",
     timestamp: "10:32 AM",
+    date: "Today",
     reactions: []
   },
   {
@@ -101,6 +103,7 @@ const MESSAGES = [
     senderId: "5",
     content: "Can we sync about the navigation component later?",
     timestamp: "10:45 AM",
+    date: "Today",
     reactions: []
   },
   {
@@ -108,7 +111,96 @@ const MESSAGES = [
     senderId: "1",
     content: "Sure! How about 2pm?",
     timestamp: "10:46 AM",
+    date: "Today",
     reactions: [{ emoji: "✅", count: 1 }]
+  },
+  {
+    id: 5,
+    senderId: "3",
+    content: "The new user flow looks great, but we might need to revisit the onboarding steps.",
+    timestamp: "4:15 PM",
+    date: "Yesterday",
+    reactions: [{ emoji: "👀", count: 3 }]
+  },
+  {
+    id: 6,
+    senderId: "4",
+    content: "Agreed. I have some data from the latest user tests that support this.",
+    timestamp: "4:20 PM",
+    date: "Yesterday",
+    reactions: []
+  },
+  {
+    id: 7,
+    senderId: "1",
+    content: "Thanks for the feedback! Let's discuss this in tomorrow's standup.",
+    timestamp: "4:30 PM",
+    date: "Yesterday",
+    reactions: [{ emoji: "🙌", count: 2 }]
+  },
+  {
+    id: 8,
+    senderId: "2",
+    content: "Has anyone seen the bug report for the checkout page?",
+    timestamp: "11:00 AM",
+    date: "Yesterday",
+    reactions: []
+  },
+  {
+    id: 9,
+    senderId: "5",
+    content: "Yeah, I'm looking into it now. Seems like a state management issue.",
+    timestamp: "11:05 AM",
+    date: "Yesterday",
+    reactions: [{ emoji: "🐛", count: 1 }]
+  },
+  {
+    id: 10,
+    senderId: "3",
+    content: "Don't forget the all-hands meeting starting in 10 mins!",
+    timestamp: "9:50 AM",
+    date: "Last Week",
+    reactions: [{ emoji: "⏰", count: 4 }, { emoji: "🏃‍♂️", count: 2 }]
+  },
+  {
+    id: 11,
+    senderId: "1",
+    content: "On my way!",
+    timestamp: "9:52 AM",
+    date: "Last Week",
+    reactions: []
+  },
+  {
+    id: 12,
+    senderId: "4",
+    content: "I'll be joining remotely.",
+    timestamp: "9:55 AM",
+    date: "Last Week",
+    reactions: [{ emoji: "👍", count: 1 }]
+  },
+  {
+    id: 13,
+    senderId: "2",
+    content: "Just deployed the hotfix for the login issue.",
+    timestamp: "3:30 PM",
+    date: "Last Week",
+    reactions: [{ emoji: "🔥", count: 5 }, { emoji: "🚀", count: 3 }]
+  },
+  {
+    id: 14,
+    senderId: "5",
+    content: "Great work! Getting positive feedback already.",
+    timestamp: "3:45 PM",
+    date: "Last Week",
+    reactions: []
+  },
+  {
+    id: 15,
+    senderId: "3",
+    content: "Who is handling the release notes for this version?",
+    timestamp: "4:00 PM",
+    date: "Last Week",
+    reactions: []
   }
 ];
 
@@ -223,6 +315,40 @@ function ChatView({ chatId }: { chatId: string }) {
   // Mock data for DM user if it's a DM
   const dmUser = isDirectMessage ? TEAM_MEMBERS[0] : null;
 
+  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+
+  const addReaction = (messageId: number, emoji: string) => {
+    setMessages(msgs => msgs.map(msg => {
+      if (msg.id === messageId) {
+        const existingReaction = msg.reactions.find(r => r.emoji === emoji);
+        if (existingReaction) {
+          return {
+            ...msg,
+            reactions: msg.reactions.map(r => 
+              r.emoji === emoji ? { ...r, count: r.count + 1 } : r
+            )
+          };
+        } else {
+          return {
+            ...msg,
+            reactions: [...msg.reactions, { emoji, count: 1 }]
+          };
+        }
+      }
+      return msg;
+    }));
+  };
+
+  // Group messages by date
+  const groupedMessages = messages.reduce((acc, message) => {
+    const date = message.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(message);
+    return acc;
+  }, {} as Record<string, typeof messages>);
+
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       {/* Chat Header */}
@@ -269,52 +395,82 @@ function ChatView({ chatId }: { chatId: string }) {
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-6">
         <div className="space-y-6">
-          {/* Date Separator */}
-          <div className="flex items-center justify-center my-4">
-            <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs text-slate-500 font-medium">
-              Today
-            </div>
-          </div>
-
-          {MESSAGES.map((msg) => {
-            const sender = TEAM_MEMBERS.find(m => m.id === msg.senderId);
-            const isMe = msg.senderId === "1"; // Mock "Me" user
-            
-            return (
-              <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
-                <Avatar className="h-8 w-8 mt-1">
-                  <AvatarImage src={sender?.avatar} />
-                  <AvatarFallback>{sender?.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
-                
-                <div className={`flex flex-col gap-1 max-w-[70%] ${isMe ? 'items-end' : 'items-start'}`}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sender?.name}</span>
-                    <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
-                  </div>
-                  
-                  <div className={`p-3 rounded-2xl text-sm ${
-                    isMe 
-                      ? 'bg-primary text-primary-foreground rounded-tr-sm' 
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-sm'
-                  }`}>
-                    {msg.content}
-                  </div>
-
-                  {msg.reactions.length > 0 && (
-                    <div className="flex gap-1 mt-0.5">
-                      {msg.reactions.map((reaction, i) => (
-                        <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-1.5 py-0.5 text-[10px] flex items-center gap-1 shadow-sm">
-                          <span>{reaction.emoji}</span>
-                          <span className="text-slate-500">{reaction.count}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+          {Object.entries(groupedMessages).map(([date, msgs]) => (
+            <div key={date} className="space-y-6">
+              {/* Date Separator */}
+              <div className="flex items-center justify-center my-4 sticky top-0 z-10">
+                <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs text-slate-500 font-medium shadow-sm backdrop-blur-sm bg-opacity-90">
+                  {date}
                 </div>
               </div>
-            );
-          })}
+
+              {msgs.map((msg) => {
+                const sender = TEAM_MEMBERS.find(m => m.id === msg.senderId);
+                const isMe = msg.senderId === "1"; // Mock "Me" user
+                
+                return (
+                  <div key={msg.id} className={`flex gap-3 group ${isMe ? 'flex-row-reverse' : ''}`}>
+                    <Avatar className="h-8 w-8 mt-1">
+                      <AvatarImage src={sender?.avatar} />
+                      <AvatarFallback>{sender?.name.substring(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    
+                    <div className={`flex flex-col gap-1 max-w-[70%] ${isMe ? 'items-end' : 'items-start'}`}>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{sender?.name}</span>
+                        <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                      </div>
+                      
+                      <div className="relative group/message">
+                        <div className={`p-3 rounded-2xl text-sm ${
+                          isMe 
+                            ? 'bg-primary text-primary-foreground rounded-tr-sm' 
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-sm'
+                        }`}>
+                          {msg.content}
+                        </div>
+                        
+                        {/* Reaction Trigger */}
+                        <div className={`absolute top-0 ${isMe ? '-left-8' : '-right-8'} opacity-0 group-hover/message:opacity-100 transition-opacity flex flex-col gap-1`}>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shadow-sm"
+                            onClick={() => addReaction(msg.id, "👍")}
+                          >
+                            <span className="text-xs">👍</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {msg.reactions.length > 0 && (
+                        <div className="flex gap-1 mt-0.5 flex-wrap">
+                          {msg.reactions.map((reaction, i) => (
+                            <button 
+                              key={i} 
+                              onClick={() => addReaction(msg.id, reaction.emoji)}
+                              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-1.5 py-0.5 text-[10px] flex items-center gap-1 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                            >
+                              <span>{reaction.emoji}</span>
+                              <span className="text-slate-500">{reaction.count}</span>
+                            </button>
+                          ))}
+                          <Button 
+                             variant="ghost" 
+                             size="sm" 
+                             className="h-5 w-5 rounded-full p-0 text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200 hover:bg-white"
+                             onClick={() => addReaction(msg.id, "❤️")}
+                          >
+                             <Smile className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </ScrollArea>
 
