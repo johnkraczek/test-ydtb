@@ -52,7 +52,8 @@ import {
     AlignLeft,
     Copy,
     X,
-    FolderInput
+    FolderInput,
+    Check
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -155,6 +156,8 @@ export default function CustomFieldsPage() {
     const [movingFieldId, setMovingFieldId] = useState<string | null>(null);
     const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
     const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
+    const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+    const [editingFolderName, setEditingFolderName] = useState("");
 
     // Selection state
     const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -300,6 +303,27 @@ export default function CustomFieldsPage() {
 
     const deleteField = (id: string) => {
         setFields(fields.filter(f => f.id !== id));
+    };
+
+    const startEditingFolder = (folder: FieldFolder) => {
+        setEditingFolderId(folder.id);
+        setEditingFolderName(folder.name);
+    };
+
+    const saveFolderRename = (e: React.MouseEvent | React.KeyboardEvent) => {
+        e.stopPropagation();
+        if (editingFolderId && editingFolderName.trim()) {
+            setFolders(folders.map(f => f.id === editingFolderId ? { ...f, name: editingFolderName } : f));
+            setEditingFolderId(null);
+            setEditingFolderName("");
+            toast.success("Folder renamed successfully");
+        }
+    };
+
+    const cancelEditingFolder = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEditingFolderId(null);
+        setEditingFolderName("");
     };
 
 
@@ -592,36 +616,61 @@ export default function CustomFieldsPage() {
                                 <div key={folder.id} className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                                     <div 
                                         className="flex items-center justify-between px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
-                                        onClick={() => toggleFolder(folder.id)}
+                                        onClick={() => !editingFolderId && toggleFolder(folder.id)}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            {expandedFolders.includes(folder.id) ? (
-                                                <ChevronDown className="h-4 w-4 text-slate-500" />
+                                        <div className="flex items-center gap-2 flex-1">
+                                            {editingFolderId === folder.id ? (
+                                                <div className="flex items-center gap-2 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+                                                    <Input 
+                                                        value={editingFolderName}
+                                                        onChange={(e) => setEditingFolderName(e.target.value)}
+                                                        className="h-8 text-sm"
+                                                        autoFocus
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') saveFolderRename(e);
+                                                            if (e.key === 'Escape') cancelEditingFolder(e as any);
+                                                        }}
+                                                    />
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" onClick={saveFolderRename}>
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-500 hover:text-slate-700" onClick={cancelEditingFolder}>
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             ) : (
-                                                <ChevronRight className="h-4 w-4 text-slate-500" />
+                                                <>
+                                                    {expandedFolders.includes(folder.id) ? (
+                                                        <ChevronDown className="h-4 w-4 text-slate-500" />
+                                                    ) : (
+                                                        <ChevronRight className="h-4 w-4 text-slate-500" />
+                                                    )}
+                                                    <Folder className="h-4 w-4 text-indigo-500" />
+                                                    <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{folder.name}</span>
+                                                    <Badge variant="secondary" className="ml-2 text-[10px] h-5">
+                                                        {groupedFields[folder.id]?.length || 0} fields
+                                                    </Badge>
+                                                </>
                                             )}
-                                            <Folder className="h-4 w-4 text-indigo-500" />
-                                            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{folder.name}</span>
-                                            <Badge variant="secondary" className="ml-2 text-[10px] h-5">
-                                                {groupedFields[folder.id]?.length || 0} fields
-                                            </Badge>
                                         </div>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>Rename Folder</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-red-600" onClick={() => setFolderToDelete(folder.id)}>
-                                                    Delete Folder
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        {!editingFolderId && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => startEditingFolder(folder)}>Rename Folder</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-red-600" onClick={() => setFolderToDelete(folder.id)}>
+                                                        Delete Folder
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
                                     </div>
 
-                                    {expandedFolders.includes(folder.id) && (
+                                    {expandedFolders.includes(folder.id) && !editingFolderId && (
                                         <div className="border-t border-slate-100 dark:border-slate-800">
                                             {groupedFields[folder.id]?.length > 0 ? (
                                                 <Table>
