@@ -73,13 +73,13 @@ interface FieldFolder {
     name: string;
 }
 
-const MOCK_FOLDERS: FieldFolder[] = [
+export const MOCK_FOLDERS: FieldFolder[] = [
     { id: '1', name: 'General Info' },
     { id: '2', name: 'Sales Data' },
     { id: '3', name: 'Marketing' },
 ];
 
-const MOCK_FIELDS: CustomField[] = [
+export const MOCK_FIELDS: CustomField[] = [
     { id: '1', name: 'Job Title', slug: 'job_title', type: 'text', category: 'custom', folderId: '1', description: 'Current job title' },
     { id: '2', name: 'Company Size', slug: 'company_size', type: 'select', category: 'custom', folderId: '2', options: ['1-10', '11-50', '50+'] },
     { id: '3', name: 'Annual Revenue', slug: 'annual_revenue', type: 'number', category: 'custom', folderId: '2' },

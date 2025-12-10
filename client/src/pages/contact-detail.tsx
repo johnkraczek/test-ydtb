@@ -51,7 +51,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-import { ContactEditDrawer } from "@/components/dashboard/ContactEditDrawer";
+import { ContactEditDrawer, MOCK_FOLDERS, MOCK_FIELDS } from "@/components/dashboard/ContactEditDrawer";
 
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
@@ -85,7 +85,15 @@ export default function ContactDetailPage() {
       "Dietary Restrictions": "Gluten Free",
       "Anniversary": "06/20",
       "Kids Names": "Leo, Mia"
-    }
+    },
+    // Mock values for Custom Fields
+    job_title: "Marketing Director",
+    company_size: "50+",
+    annual_revenue: 1200000,
+    lead_source_detail: "LinkedIn Campaign",
+    interests: ["Product A", "Consulting"],
+    contract_start_date: "2024-01-15",
+    uncategorized_field: "Some value"
   });
 
   // Active Offers State
@@ -391,21 +399,87 @@ export default function ContactDetailPage() {
         <TabsContent value="details" className="mt-6 space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-6">
+              {/* Custom Fields Folders */}
+              {MOCK_FOLDERS.map(folder => {
+                const fields = MOCK_FIELDS.filter(f => f.folderId === folder.id);
+                if (fields.length === 0) return null;
+
+                return (
+                  <Card key={folder.id}>
+                    <CardHeader>
+                      <CardTitle className="text-base">{folder.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {fields.map(field => {
+                         const value = customer[field.slug as keyof typeof customer];
+                         if (value === undefined || value === null || value === '') return null;
+                         
+                         let displayValue = value;
+                         if (field.type === 'date' && value) {
+                            try {
+                                displayValue = format(new Date(value as string), "MMM d, yyyy");
+                            } catch (e) {
+                                displayValue = value;
+                            }
+                         } else if (Array.isArray(value)) {
+                             displayValue = Array.isArray(value) ? value.join(", ") : value;
+                         }
+
+                         return (
+                           <div key={field.id}>
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+                              <span className="text-sm font-medium">{displayValue}</span>
+                           </div>
+                         );
+                      })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              
+               {/* Uncategorized Fields */}
+               {(() => {
+                  const fields = MOCK_FIELDS.filter(f => f.folderId === null);
+                  const hasValues = fields.some(f => customer[f.slug as keyof typeof customer]);
+                  
+                  if (fields.length === 0 || !hasValues) return null;
+
+                   return (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Additional Info</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {fields.map(field => {
+                             const value = customer[field.slug as keyof typeof customer];
+                             if (!value) return null;
+                             return (
+                               <div key={field.id}>
+                                  <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+                                  <span className="text-sm font-medium">{value}</span>
+                               </div>
+                             );
+                          })}
+                        </CardContent>
+                      </Card>
+                   );
+               })()}
+
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Details</CardTitle>
+                  <CardTitle className="text-base">System Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Object.entries(customer.customData).map(([key, value]) => (
+                  <div>
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Join Date</span>
+                    <span className="text-sm font-medium">{customer.joinDate}</span>
+                  </div>
+                   {Object.entries(customer.customData).map(([key, value]) => (
                     <div key={key}>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider block">{key}</span>
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{key}</span>
                       <span className="text-sm font-medium">{value}</span>
                     </div>
                   ))}
-                  <div className="pt-2">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider block">Join Date</span>
-                    <span className="text-sm font-medium">{customer.joinDate}</span>
-                  </div>
                 </CardContent>
               </Card>
 
