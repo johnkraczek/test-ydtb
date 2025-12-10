@@ -565,7 +565,7 @@ export default function CustomFieldsPage() {
         }>
             <div className="h-full flex flex-col">
                     <TabsContent value="folders" className="flex-1 overflow-auto p-6 mt-0">
-                        <div className="max-w-5xl mx-auto space-y-6">
+                        <div className="max-w-7xl mx-auto space-y-6">
                             {/* Folders List */}
                             <div className="space-y-4">
                             {folders.map(folder => (
