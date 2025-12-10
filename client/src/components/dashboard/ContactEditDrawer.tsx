@@ -11,6 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { 
     X, 
     Plus, 
@@ -22,7 +30,9 @@ import {
     Calendar, 
     Tag,
     Check,
-    ChevronDown
+    ChevronDown,
+    ChevronRight,
+    Folder
 } from "lucide-react";
 import {
   Command,
@@ -45,6 +55,39 @@ interface ContactEditDrawerProps {
   contact: any; // Using any for mockup simplicity
 }
 
+interface CustomField {
+    id: string;
+    name: string;
+    slug: string;
+    type: 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'multiselect';
+    category: 'contact' | 'custom';
+    folderId: string | null;
+    description?: string;
+    options?: string[]; // For select/multiselect
+    required?: boolean;
+}
+
+interface FieldFolder {
+    id: string;
+    name: string;
+}
+
+const MOCK_FOLDERS: FieldFolder[] = [
+    { id: '1', name: 'General Info' },
+    { id: '2', name: 'Sales Data' },
+    { id: '3', name: 'Marketing' },
+];
+
+const MOCK_FIELDS: CustomField[] = [
+    { id: '1', name: 'Job Title', slug: 'job_title', type: 'text', category: 'custom', folderId: '1', description: 'Current job title' },
+    { id: '2', name: 'Company Size', slug: 'company_size', type: 'select', category: 'custom', folderId: '2', options: ['1-10', '11-50', '50+'] },
+    { id: '3', name: 'Annual Revenue', slug: 'annual_revenue', type: 'number', category: 'custom', folderId: '2' },
+    { id: '4', name: 'Lead Source Detail', slug: 'lead_source_detail', type: 'text', category: 'custom', folderId: '3' },
+    { id: '5', name: 'Interests', slug: 'interests', type: 'multiselect', category: 'custom', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
+    { id: '6', name: 'Contract Start Date', slug: 'contract_start_date', type: 'date', category: 'custom', folderId: '2' },
+    { id: '7', name: 'Uncategorized Field', slug: 'uncategorized_field', type: 'text', category: 'custom', folderId: null },
+];
+
 const AVAILABLE_TAGS = [
     "Customer", 
     "Lead", 
@@ -66,6 +109,7 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
   const [formData, setFormData] = useState<any>({});
   const [openCombobox, setOpenCombobox] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
 
   useEffect(() => {
     if (contact) {
@@ -75,8 +119,112 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
 
   if (!contact) return null;
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value });
+  };
+
+  const toggleFolder = (folderId: string) => {
+    if (expandedFolders.includes(folderId)) {
+        setExpandedFolders(expandedFolders.filter(id => id !== folderId));
+    } else {
+        setExpandedFolders([...expandedFolders, folderId]);
+    }
+  };
+
+  const getFieldsByFolder = (folderId: string | null) => {
+    return MOCK_FIELDS.filter(f => f.folderId === folderId);
+  };
+
+  const renderCustomField = (field: CustomField) => {
+    const value = formData[field.slug];
+
+    switch (field.type) {
+        case 'select':
+            return (
+                <Select 
+                    value={value || ''} 
+                    onValueChange={(val) => handleInputChange(field.slug, val)}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {field.options?.map(opt => (
+                            <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            );
+        case 'multiselect':
+            // Simplified multiselect for mockup - just a text input or comma separated
+            // Or maybe a multiple select if UI supports it, but standard Select doesn't support multiple easily without custom component
+            // Let's use a simple multiple checkbox list or just Render as checkboxes
+            return (
+                <div className="space-y-2 border rounded-md p-3">
+                    {field.options?.map(opt => {
+                        const currentValues = Array.isArray(value) ? value : [];
+                        const isChecked = currentValues.includes(opt);
+                        return (
+                            <div key={opt} className="flex items-center space-x-2">
+                                <Checkbox 
+                                    id={`${field.slug}-${opt}`} 
+                                    checked={isChecked}
+                                    onCheckedChange={(checked) => {
+                                        if (checked) {
+                                            handleInputChange(field.slug, [...currentValues, opt]);
+                                        } else {
+                                            handleInputChange(field.slug, currentValues.filter((v: string) => v !== opt));
+                                        }
+                                    }}
+                                />
+                                <Label htmlFor={`${field.slug}-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        case 'checkbox':
+            return (
+                <div className="flex items-center space-x-2 h-10">
+                    <Checkbox 
+                        id={field.slug} 
+                        checked={!!value}
+                        onCheckedChange={(checked) => handleInputChange(field.slug, !!checked)}
+                    />
+                    <Label htmlFor={field.slug} className="font-normal cursor-pointer">Yes</Label>
+                </div>
+            );
+        case 'date':
+            return (
+                <div className="relative">
+                    <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input 
+                        id={field.slug}
+                        className="pl-9"
+                        type="date"
+                        value={value ? new Date(value).toISOString().split('T')[0] : ''} 
+                        onChange={(e) => handleInputChange(field.slug, e.target.value)}
+                    />
+                </div>
+            );
+        case 'number':
+            return (
+                <Input 
+                    id={field.slug}
+                    type="number"
+                    value={value || ''} 
+                    onChange={(e) => handleInputChange(field.slug, e.target.value)}
+                />
+            );
+        default: // text
+            return (
+                <Input 
+                    id={field.slug}
+                    value={value || ''} 
+                    onChange={(e) => handleInputChange(field.slug, e.target.value)}
+                />
+            );
+    }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -293,6 +441,88 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
                             </PopoverContent>
                         </Popover>
                     </div>
+                </div>
+            </section>
+
+            <Separator />
+
+            {/* Custom Fields Section */}
+            <section className="space-y-4">
+                <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <Folder className="h-4 w-4 text-slate-400" />
+                    Custom Fields
+                </h3>
+
+                <div className="space-y-2">
+                    {/* Folders */}
+                    {MOCK_FOLDERS.map(folder => {
+                        const fields = getFieldsByFolder(folder.id);
+                        if (fields.length === 0) return null;
+                        const isExpanded = expandedFolders.includes(folder.id);
+
+                        return (
+                            <div key={folder.id} className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                                <button 
+                                    className="w-full flex items-center justify-between px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+                                    onClick={() => toggleFolder(folder.id)}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {isExpanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
+                                        <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{folder.name}</span>
+                                        <Badge variant="secondary" className="ml-2 text-[10px] h-5 bg-white dark:bg-slate-800">
+                                            {fields.length} fields
+                                        </Badge>
+                                    </div>
+                                </button>
+                                
+                                {isExpanded && (
+                                    <div className="p-4 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                                        {fields.map(field => (
+                                            <div key={field.id} className="space-y-2">
+                                                <Label htmlFor={field.slug}>{field.name}</Label>
+                                                {renderCustomField(field)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+
+                    {/* Uncategorized Fields */}
+                    {(() => {
+                        const fields = getFieldsByFolder(null);
+                        if (fields.length === 0) return null;
+                        const isExpanded = expandedFolders.includes('uncategorized');
+                        
+                        return (
+                            <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                                <button 
+                                    className="w-full flex items-center justify-between px-4 py-3 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+                                    onClick={() => toggleFolder('uncategorized')}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {isExpanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
+                                        <span className="font-medium text-sm text-slate-900 dark:text-slate-100">Uncategorized Fields</span>
+                                        <Badge variant="secondary" className="ml-2 text-[10px] h-5 bg-white dark:bg-slate-800">
+                                            {fields.length} fields
+                                        </Badge>
+                                    </div>
+                                </button>
+                                
+                                {isExpanded && (
+                                    <div className="p-4 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                                        {fields.map(field => (
+                                            <div key={field.id} className="space-y-2">
+                                                <Label htmlFor={field.slug}>{field.name}</Label>
+                                                {renderCustomField(field)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
                 </div>
             </section>
         </div>
