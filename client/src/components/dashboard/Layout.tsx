@@ -7,6 +7,8 @@ import { DashboardPageHeader } from "./headers/DashboardPageHeader";
 import { ToolIconsSidebar } from "./sidebars/ToolIconsSidebar";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 import { useThemePattern } from "@/hooks/use-theme-pattern";
+import { ContactEditDrawer } from "./ContactEditDrawer";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -19,6 +21,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const [location, setLocation] = useLocation();
   const { themePattern } = useThemePattern();
+  const [isCreateContactOpen, setIsCreateContactOpen] = useState(false);
+  const { toast } = useToast();
 
   // Sync internal state with prop if it changes
   useEffect(() => {
@@ -92,6 +96,11 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
               isOpen={isToolSidebarOpen}
               onToggle={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
               toolId={activeTool}
+              onCreateClick={() => {
+                if (activeTool === "users") {
+                  setIsCreateContactOpen(true);
+                }
+              }}
             />
 
             {/* Main Content Area */}
@@ -123,6 +132,19 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
             </div>
         </div>
       </div>
+
+      <ContactEditDrawer
+        open={isCreateContactOpen}
+        onOpenChange={setIsCreateContactOpen}
+        contact={{}}
+        onSave={(data) => {
+           toast({
+             title: "Contact Created",
+             description: `${data.firstName || 'New contact'} has been added successfully.`
+           });
+           setIsCreateContactOpen(false);
+        }}
+      />
     </div>
   );
 }

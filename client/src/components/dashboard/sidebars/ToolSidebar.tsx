@@ -84,6 +84,7 @@ interface ToolSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   toolId: string;
+  onCreateClick?: () => void;
 }
 
 
@@ -176,7 +177,7 @@ function NewConversationDialog({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
+export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSidebarProps) {
   const renderToolContent = () => {
     switch (toolId) {
       case "launchpad":
@@ -312,7 +313,10 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                 </Button>
               </NewConversationDialog>
             ) : toolId !== "settings" && (
-                <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
+                <Button 
+                    className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none"
+                    onClick={onCreateClick}
+                >
                     <Plus className="h-4 w-4" />
                     <span className="font-medium">
                     {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
