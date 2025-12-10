@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
+import { DashboardBreadcrumb } from "@/components/dashboard/layouts/DashboardBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -125,6 +126,8 @@ export default function LaunchpadPage() {
         <DashboardPageHeader
           title="Launchpad"
           description="Get your workspace ready for action."
+          actions={<></>}
+          breadcrumbs={<DashboardBreadcrumb pageName="Launchpad" />}
         />
       }
     >
