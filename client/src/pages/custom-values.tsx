@@ -915,6 +915,56 @@ export default function CustomValuesPage() {
                         </div>
                     </div>
                 </TabsContent>
+
+                {/* Floating Action Bar */}
+                {selectedValues.length > 0 && (
+                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-auto min-w-[400px] max-w-[90%] z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
+                        <div className="bg-zinc-900 text-white rounded-lg shadow-xl border border-zinc-800 p-2 flex items-center gap-2">
+                            <div className="flex items-center gap-2 px-3 border-r border-zinc-700">
+                                <div className="bg-indigo-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {selectedValues.length}
+                                </div>
+                                <span className="text-sm font-medium">Selected</span>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 w-6 p-0 hover:bg-zinc-800 rounded-full ml-1 text-zinc-400 hover:text-zinc-200"
+                                    onClick={() => setSelectedValues([])}
+                                >
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </div>
+                            
+                            <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2" onClick={openBulkMoveDialog}>
+                                <FolderInput className="h-4 w-4" />
+                                Move to Folder
+                            </Button>
+
+                            <div className="h-4 w-px bg-zinc-700 mx-1 shrink-0" />
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2">
+                                        <Trash className="h-4 w-4 text-red-400" />
+                                        Delete
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete {selectedValues.length} Values?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to delete the selected values? This action cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </div>
+                )}
             </DashboardLayout>
 
             <Dialog open={isMoveToFolderOpen} onOpenChange={setIsMoveToFolderOpen}>

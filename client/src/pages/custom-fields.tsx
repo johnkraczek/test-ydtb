@@ -973,7 +973,7 @@ export default function CustomFieldsPage() {
                     
                     {/* Floating Action Bar */}
                     {selectedFields.length > 0 && (
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-auto min-w-[400px] max-w-[90%] z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
+                        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-auto min-w-[400px] max-w-[90%] z-50 animate-in fade-in slide-in-from-bottom-4 duration-200">
                             <div className="bg-zinc-900 text-white rounded-lg shadow-xl border border-zinc-800 p-2 flex items-center gap-2">
                                 <div className="flex items-center gap-2 px-3 border-r border-zinc-700">
                                     <div className="bg-indigo-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
