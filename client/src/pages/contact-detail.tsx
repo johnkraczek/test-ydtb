@@ -68,7 +68,8 @@ import {
   GripVertical,
   Settings,
   Columns,
-  Search
+  Search,
+  Pencil
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -644,7 +645,7 @@ export default function ContactDetailPage() {
 
                // --- Custom Field Folders ---
                if (cardId.startsWith('folder-')) {
-                 const folderId = parseInt(cardId.split('-')[1]);
+                 const folderId = cardId.split('-')[1];
                  const folder = MOCK_FOLDERS.find(f => f.id === folderId);
                  const fields = MOCK_FIELDS.filter(f => f.folderId === folderId);
                  
@@ -672,9 +673,19 @@ export default function ContactDetailPage() {
                           }
 
                           return (
-                            <div key={field.id}>
-                               <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
-                               <span className="text-sm font-medium">{displayValue}</span>
+                            <div key={field.id} className="group flex items-start justify-between">
+                               <div>
+                                  <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+                                  <span className="text-sm font-medium">{displayValue}</span>
+                               </div>
+                               <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => setIsEditDrawerOpen(true)}
+                               >
+                                  <Pencil className="h-3 w-3 text-slate-400" />
+                               </Button>
                             </div>
                           );
                        })}
@@ -700,9 +711,19 @@ export default function ContactDetailPage() {
                              const value = customer[field.slug as keyof typeof customer];
                              if (!value) return null;
                              return (
-                               <div key={field.id}>
-                                  <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
-                                  <span className="text-sm font-medium">{value}</span>
+                               <div key={field.id} className="group flex items-start justify-between">
+                                  <div>
+                                     <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+                                     <span className="text-sm font-medium">{value}</span>
+                                  </div>
+                                  <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={() => setIsEditDrawerOpen(true)}
+                                  >
+                                      <Pencil className="h-3 w-3 text-slate-400" />
+                                  </Button>
                                </div>
                              );
                           })}
