@@ -132,6 +132,7 @@ export default function BillingSettingsPage() {
         <DashboardPageHeader
           title="Billing & Subscription"
           description="Manage your subscription plan and payment methods."
+          actions={<></>}
         />
       }
     >
