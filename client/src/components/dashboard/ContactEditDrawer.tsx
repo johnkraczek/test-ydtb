@@ -554,10 +554,12 @@ export function ContactEditDrawer({ open, onOpenChange, contact, onSave }: Conta
         </div>
 
         <div className="p-6 border-t bg-white dark:bg-slate-900 mt-auto flex items-center justify-between">
-            <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10">
-                <Trash className="h-4 w-4 mr-2" />
-                Delete Contact
-            </Button>
+            {formData.id ? (
+                <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10">
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete Contact
+                </Button>
+            ) : <div />}
             <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
                 <Button 
