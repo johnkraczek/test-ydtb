@@ -177,12 +177,6 @@ export function CustomizeNavigationDialog({
                 Navigation
               </TabsTrigger>
               <TabsTrigger 
-                value="themes" 
-                className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
-              >
-                Themes
-              </TabsTrigger>
-              <TabsTrigger 
                 value="general" 
                 className="h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 text-xs font-medium text-slate-500"
               >
@@ -213,117 +207,6 @@ export function CustomizeNavigationDialog({
                   </div>
                 </SortableContext>
               </DndContext>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="themes" className="p-4 m-0 h-[400px]">
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Appearance</h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div 
-                    className={`cursor-pointer rounded-lg border-2 p-1 ${theme === 'light' ? 'border-blue-600 bg-blue-50/30' : 'border-slate-200 dark:border-slate-700'}`}
-                    onClick={() => setTheme('light')}
-                  >
-                    <div className="bg-slate-100 rounded-md h-16 w-full border border-slate-200 relative overflow-hidden flex">
-                       <div className="w-6 bg-white border-r border-slate-200 h-full flex flex-col items-center gap-1 pt-2">
-                          <div className="w-3 h-3 bg-blue-500 rounded-sm" />
-                          <div className="w-3 h-3 bg-slate-200 rounded-sm" />
-                       </div>
-                       <div className="flex-1 bg-white p-2">
-                          <div className="w-12 h-2 bg-slate-200 rounded mb-2" />
-                          <div className="w-8 h-2 bg-blue-100 rounded" />
-                       </div>
-                    </div>
-                    <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Light</div>
-                  </div>
-
-                  <div 
-                    className={`cursor-pointer rounded-lg border-2 p-1 ${theme === 'dark' ? 'border-blue-600 bg-blue-50/30' : 'border-slate-200 dark:border-slate-700'}`}
-                    onClick={() => setTheme('dark')}
-                  >
-                    <div className="bg-slate-900 rounded-md h-16 w-full border border-slate-800 relative overflow-hidden flex">
-                       <div className="w-6 bg-slate-800 border-r border-slate-700 h-full flex flex-col items-center gap-1 pt-2">
-                          <div className="w-3 h-3 bg-blue-500 rounded-sm" />
-                          <div className="w-3 h-3 bg-slate-700 rounded-sm" />
-                       </div>
-                       <div className="flex-1 bg-slate-900 p-2">
-                          <div className="w-12 h-2 bg-slate-700 rounded mb-2" />
-                          <div className="w-8 h-2 bg-blue-900/30 rounded" />
-                       </div>
-                    </div>
-                    <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Dark</div>
-                  </div>
-
-                  <div 
-                    className={`cursor-pointer rounded-lg border-2 p-1 ${theme === 'system' ? 'border-blue-600 bg-blue-50/30' : 'border-slate-200 dark:border-slate-700'}`}
-                    onClick={() => setTheme('system')}
-                  >
-                     <div className="rounded-md h-16 w-full border border-slate-200 dark:border-slate-700 relative overflow-hidden flex">
-                       <div className="w-1/2 bg-white h-full flex">
-                          <div className="w-3 bg-slate-50 border-r border-slate-100 h-full flex flex-col items-center gap-1 pt-2">
-                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-[1px]" />
-                          </div>
-                          <div className="flex-1 p-1">
-                             <div className="w-4 h-1 bg-slate-200 rounded mb-1" />
-                          </div>
-                       </div>
-                       <div className="w-1/2 bg-slate-900 h-full flex">
-                          <div className="w-3 bg-slate-800 border-r border-slate-700 h-full flex flex-col items-center gap-1 pt-2">
-                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-[1px]" />
-                          </div>
-                          <div className="flex-1 p-1">
-                             <div className="w-4 h-1 bg-slate-700 rounded mb-1" />
-                          </div>
-                       </div>
-                    </div>
-                    <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Auto</div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Background Pattern</h4>
-                <div className="grid grid-cols-5 gap-2">
-                  {availableThemePatterns.map((pattern) => (
-                    <button 
-                      key={pattern.value}
-                      className={cn(
-                        "flex flex-col items-center gap-1.5 p-2 rounded-lg border bg-white dark:bg-slate-900 transition-all aspect-square justify-center",
-                        themePattern === pattern.value 
-                          ? "border-primary ring-1 ring-primary" 
-                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                      )}
-                      onClick={() => setThemePattern(pattern.value)}
-                    >
-                      <div className={`h-8 w-8 rounded border border-slate-100 dark:border-slate-800 ${pattern.preview} bg-slate-50/50 dark:bg-slate-900/50`} />
-                      <span className="text-[10px] font-medium text-slate-700 dark:text-slate-200">{pattern.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Theme Color</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {availableThemeColors.map((color) => (
-                    <button 
-                      key={color.value}
-                      className={cn(
-                        "flex items-center gap-2 p-2 rounded-lg border bg-white dark:bg-slate-900 text-left transition-all",
-                        themeColor === color.value 
-                          ? "border-primary ring-1 ring-primary" 
-                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                      )}
-                      onClick={() => setThemeColor(color.value)}
-                    >
-                      <div className={`h-6 w-6 rounded-full ${color.color}`} />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{color.name}</span>
-                      {themeColor === color.value && <Check className="ml-auto h-4 w-4 text-primary" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           </TabsContent>
 
