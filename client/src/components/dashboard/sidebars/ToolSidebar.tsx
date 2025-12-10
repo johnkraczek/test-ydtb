@@ -128,7 +128,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                 <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/10 dark:border-primary/20">
                    <div className="space-y-3">
                       <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-medium text-primary dark:text-primary">
+                        <div className="flex justify-between text-xs font-medium text-slate-900 dark:text-slate-100">
                           <span>Setup Progress</span>
                           <span>50%</span>
                         </div>
@@ -136,8 +136,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
                       </div>
                       
                       <div className="py-1">
-                        <p className="text-xs font-medium text-primary dark:text-primary-foreground">Next: Connect Payments</p>
-                        <p className="text-[10px] text-primary/80 dark:text-primary/70 leading-snug mt-0.5">
+                        <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Next: Connect Payments</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
                           Set up your payment processor to start accepting orders.
                         </p>
                       </div>
