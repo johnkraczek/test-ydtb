@@ -41,6 +41,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       setLocation("/automation");
     } else if (toolId === "pages") {
       setLocation("/pages");
+    } else if (toolId === "sop") {
+      setLocation("/sop");
     }
     // Add other routes as needed
   };
