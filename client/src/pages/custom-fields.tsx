@@ -68,6 +68,7 @@ interface CustomField {
     name: string;
     slug: string;
     type: 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'multiselect';
+    category: 'contact' | 'custom';
     folderId: string | null;
     description?: string;
     options?: string[]; // For select/multiselect
@@ -98,13 +99,22 @@ export default function CustomFieldsPage() {
     ]);
     
     const [fields, setFields] = useState<CustomField[]>([
-        { id: '1', name: 'Job Title', slug: 'job_title', type: 'text', folderId: '1', description: 'Current job title' },
-        { id: '2', name: 'Company Size', slug: 'company_size', type: 'select', folderId: '2', options: ['1-10', '11-50', '50+'] },
-        { id: '3', name: 'Annual Revenue', slug: 'annual_revenue', type: 'number', folderId: '2' },
-        { id: '4', name: 'Lead Source Detail', slug: 'lead_source_detail', type: 'text', folderId: '3' },
-        { id: '5', name: 'Interests', slug: 'interests', type: 'multiselect', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
-        { id: '6', name: 'Contract Start Date', slug: 'contract_start_date', type: 'date', folderId: '2' },
-        { id: '7', name: 'Uncategorized Field', slug: 'uncategorized_field', type: 'text', folderId: null },
+        { id: '1', name: 'Job Title', slug: 'job_title', type: 'text', category: 'custom', folderId: '1', description: 'Current job title' },
+        { id: '2', name: 'Company Size', slug: 'company_size', type: 'select', category: 'custom', folderId: '2', options: ['1-10', '11-50', '50+'] },
+        { id: '3', name: 'Annual Revenue', slug: 'annual_revenue', type: 'number', category: 'custom', folderId: '2' },
+        { id: '4', name: 'Lead Source Detail', slug: 'lead_source_detail', type: 'text', category: 'custom', folderId: '3' },
+        { id: '5', name: 'Interests', slug: 'interests', type: 'multiselect', category: 'custom', folderId: '3', options: ['Product A', 'Product B', 'Consulting'] },
+        { id: '6', name: 'Contract Start Date', slug: 'contract_start_date', type: 'date', category: 'custom', folderId: '2' },
+        { id: '7', name: 'Uncategorized Field', slug: 'uncategorized_field', type: 'text', category: 'custom', folderId: null },
+        { id: '8', name: 'First Name', slug: 'firstname', type: 'text', category: 'contact', folderId: null, description: 'Standard contact first name' },
+        { id: '9', name: 'Last Name', slug: 'lastname', type: 'text', category: 'contact', folderId: null, description: 'Standard contact last name' },
+        { id: '10', name: 'Email', slug: 'email', type: 'text', category: 'contact', folderId: null, description: 'Standard contact email address' },
+        { id: '11', name: 'Phone', slug: 'phone', type: 'text', category: 'contact', folderId: null, description: 'Standard contact phone number' },
+        { id: '12', name: 'Address', slug: 'address', type: 'text', category: 'contact', folderId: null, description: 'Standard contact address' },
+        { id: '13', name: 'City', slug: 'city', type: 'text', category: 'contact', folderId: null, description: 'Standard contact city' },
+        { id: '14', name: 'State', slug: 'state', type: 'text', category: 'contact', folderId: null, description: 'Standard contact state' },
+        { id: '15', name: 'Zip Code', slug: 'zip', type: 'text', category: 'contact', folderId: null, description: 'Standard contact zip code' },
+        { id: '16', name: 'Country', slug: 'country', type: 'text', category: 'contact', folderId: null, description: 'Standard contact country' },
     ]);
 
     const [expandedFolders, setExpandedFolders] = useState<string[]>(['1', '2', '3']);
@@ -121,6 +131,7 @@ export default function CustomFieldsPage() {
     const [fieldFormData, setFieldFormData] = useState<Partial<CustomField>>({ 
         type: 'text', 
         folderId: '1',
+        category: 'custom',
         id: '',
         slug: ''
     });
@@ -151,6 +162,7 @@ export default function CustomFieldsPage() {
         setFieldFormData({ 
             type: 'text', 
             folderId: '1',
+            category: 'custom',
             id: Math.floor(Math.random() * 0xFFFFFFF).toString(16).padStart(7, '0'),
             slug: ''
         });
@@ -189,6 +201,7 @@ export default function CustomFieldsPage() {
                     // Type is fixed on edit
                     // Slug is fixed on edit
                     folderId: fieldFormData.folderId || null,
+                    category: fieldFormData.category || 'custom',
                     description: fieldFormData.description,
                     options: fieldFormData.options,
                     required: fieldFormData.required
@@ -204,6 +217,7 @@ export default function CustomFieldsPage() {
                     slug: generatedSlug,
                     type: fieldFormData.type as any || 'text',
                     folderId: fieldFormData.folderId || null,
+                    category: fieldFormData.category || 'custom',
                     description: fieldFormData.description,
                     options: fieldFormData.options,
                     required: fieldFormData.required
@@ -533,11 +547,12 @@ export default function CustomFieldsPage() {
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                            <TableHead className="w-[25%] text-xs font-medium pl-6">Field Name</TableHead>
-                                                            <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
-                                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
-                                                            <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
-                                                            <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                                            <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
+                                                            <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                                            <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
+                                                            <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
+                                                            <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                                            <TableHead className="w-[5%] text-xs font-medium"></TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
@@ -545,6 +560,15 @@ export default function CustomFieldsPage() {
                                                             <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
                                                                 <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
                                                                     {field.name}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Badge variant="outline" className={`font-normal text-[10px] ${
+                                                                        field.category === 'contact' 
+                                                                            ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                                                            : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
+                                                                    }`}>
+                                                                        {field.category === 'contact' ? 'Contact Field' : 'Custom Field'}
+                                                                    </Badge>
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -555,10 +579,10 @@ export default function CustomFieldsPage() {
                                                                 <TableCell>
                                                                     <div 
                                                                         className="group flex items-center gap-2 cursor-pointer w-fit"
-                                                                        onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                                        onClick={() => copyToClipboard(`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`)}
                                                                     >
                                                                         <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
-                                                                            {`{{${field.slug}}}`}
+                                                                            {`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`}
                                                                         </code>
                                                                         <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                                     </div>
@@ -612,11 +636,12 @@ export default function CustomFieldsPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                                <TableHead className="w-[25%] text-xs font-medium pl-6">Field Name</TableHead>
-                                                <TableHead className="w-[15%] text-xs font-medium">Type</TableHead>
-                                                <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
-                                                <TableHead className="w-[30%] text-xs font-medium">Description</TableHead>
-                                                <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                                <TableHead className="w-[20%] text-xs font-medium pl-6">Field Name</TableHead>
+                                                <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                                <TableHead className="w-[10%] text-xs font-medium">Type</TableHead>
+                                                <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
+                                                <TableHead className="w-[25%] text-xs font-medium">Description</TableHead>
+                                                <TableHead className="w-[5%] text-xs font-medium"></TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -624,6 +649,15 @@ export default function CustomFieldsPage() {
                                                 <TableRow key={field.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
                                                     <TableCell className="font-medium text-sm text-slate-700 dark:text-slate-300 pl-6">
                                                         {field.name}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className={`font-normal text-[10px] ${
+                                                            field.category === 'contact' 
+                                                                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
+                                                        }`}>
+                                                            {field.category === 'contact' ? 'Contact Field' : 'Custom Field'}
+                                                        </Badge>
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -634,10 +668,10 @@ export default function CustomFieldsPage() {
                                                     <TableCell>
                                                         <div 
                                                             className="group flex items-center gap-2 cursor-pointer w-fit"
-                                                            onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                            onClick={() => copyToClipboard(`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`)}
                                                         >
                                                             <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
-                                                                {`{{${field.slug}}}`}
+                                                                {`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`}
                                                             </code>
                                                             <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         </div>
@@ -677,12 +711,13 @@ export default function CustomFieldsPage() {
                             <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
-                                            <SortableHeader column="name" label="Field Name" className="w-[25%] text-xs font-medium pl-6" />
-                                            <SortableHeader column="type" label="Type" className="w-[15%] text-xs font-medium" />
-                                            <TableHead className="w-[20%] text-xs font-medium">Key</TableHead>
+                                            <SortableHeader column="name" label="Field Name" className="w-[20%] text-xs font-medium pl-6" />
+                                            <TableHead className="w-[15%] text-xs font-medium">Category</TableHead>
+                                            <SortableHeader column="type" label="Type" className="w-[10%] text-xs font-medium" />
+                                            <TableHead className="w-[25%] text-xs font-medium">Key</TableHead>
                                             <SortableHeader column="folder" label="Folder" className="w-[15%] text-xs font-medium" />
-                                            <SortableHeader column="description" label="Description" className="w-[15%] text-xs font-medium" />
-                                            <TableHead className="w-[10%] text-xs font-medium"></TableHead>
+                                            <SortableHeader column="description" label="Description" className="w-[10%] text-xs font-medium" />
+                                            <TableHead className="w-[5%] text-xs font-medium"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -695,6 +730,15 @@ export default function CustomFieldsPage() {
                                                             {field.name}
                                                         </TableCell>
                                                         <TableCell>
+                                                            <Badge variant="outline" className={`font-normal text-[10px] ${
+                                                                field.category === 'contact' 
+                                                                    ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
+                                                            }`}>
+                                                                {field.category === 'contact' ? 'Contact Field' : 'Custom Field'}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell>
                                                             <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                                                 {getFieldIcon(field.type)}
                                                                 <span className="capitalize">{FIELD_TYPES.find(t => t.value === field.type)?.label || field.type}</span>
@@ -703,10 +747,10 @@ export default function CustomFieldsPage() {
                                                         <TableCell>
                                                             <div 
                                                                 className="group flex items-center gap-2 cursor-pointer w-fit"
-                                                                onClick={() => copyToClipboard(`{{${field.slug}}}`)}
+                                                                onClick={() => copyToClipboard(`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`)}
                                                             >
                                                                 <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 font-mono">
-                                                                    {`{{${field.slug}}}`}
+                                                                    {`{{${field.category === 'contact' ? 'contact' : 'custom'}.${field.slug}}}`}
                                                                 </code>
                                                                 <Copy className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                             </div>
