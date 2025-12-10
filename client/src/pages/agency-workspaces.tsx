@@ -96,41 +96,34 @@ export default function AgencyWorkspacesPage() {
           description="Manage your client sub-accounts and workspaces."
           hideBreadcrumbs={true}
           actions={
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Workspace
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input placeholder="Search workspaces..." className="pl-9" />
+              </div>
+              <Select defaultValue="active">
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4 text-slate-500" />
+              </Button>
+              <Button className="gap-2 ml-2">
+                <Plus className="h-4 w-4" />
+                Create Workspace
+              </Button>
+            </div>
           }
         />
       }
     >
       <div className="space-y-6 max-w-[1600px] mx-auto">
-        {/* Filters Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input placeholder="Search workspaces..." className="pl-9" />
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-             <Select defaultValue="active">
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="all">All Status</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4 text-slate-500" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <MoreHorizontal className="h-4 w-4 text-slate-500" />
-            </Button>
-          </div>
-        </div>
-
         {/* Workspaces List */}
         <div className="space-y-4">
           {WORKSPACES.map((workspace) => (
