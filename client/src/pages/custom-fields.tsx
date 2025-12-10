@@ -204,7 +204,7 @@ export default function CustomFieldsPage() {
         f.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const groupedFields = {
+    const groupedFields: Record<string, CustomField[]> = {
         uncategorized: filteredFields.filter(f => !f.folderId),
         ...folders.reduce((acc, folder) => ({
             ...acc,
@@ -538,8 +538,8 @@ export default function CustomFieldsPage() {
                 </TabsContent>
 
                     <TabsContent value="list" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
-                        <div className="max-w-5xl mx-auto">
-                            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div className="h-full">
+                            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-full">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-transparent border-b border-slate-100 dark:border-slate-800">
