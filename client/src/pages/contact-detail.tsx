@@ -491,10 +491,8 @@ export default function ContactDetailPage() {
                   ))}
                 </CardContent>
               </Card>
-          </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="break-inside-avoid">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                   <CardTitle className="text-base">Tags</CardTitle>
                   <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
@@ -541,7 +539,7 @@ export default function ContactDetailPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="break-inside-avoid">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                   <CardTitle className="text-base">Active Offers</CardTitle>
                   <Popover>
