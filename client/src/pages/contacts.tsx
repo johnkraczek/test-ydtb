@@ -596,12 +596,12 @@ export default function ContactsPage() {
                                             </div>
                                         </div>
 
-                                        <Collapsible defaultOpen>
-                                            <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
+                                        <Collapsible>
+                                            <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium text-slate-900 dark:text-slate-100 mb-2 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded px-1 transition-colors group">
                                                 More settings and permissions
-                                                <ChevronDown className="h-4 w-4" />
+                                                <ChevronDown className="h-4 w-4 text-slate-400 group-data-[state=open]:rotate-180 transition-transform" />
                                             </CollapsibleTrigger>
-                                            <CollapsibleContent className="space-y-4 pt-2">
+                                            <CollapsibleContent className="space-y-6 pt-2 pb-4">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="description" className="text-xs font-normal text-slate-500">Description</Label>
                                                     <Input 
@@ -646,56 +646,58 @@ export default function ContactsPage() {
                                                     </div>
                                                     <span className="text-xs text-slate-400 ml-auto">Can edit</span>
                                                 </div>
+
+                                                <Separator />
+
+                                                <div className="space-y-4">
+                                                    <Label className="text-sm font-medium">Display settings</Label>
+                                                    
+                                                    <div className="flex items-start gap-3">
+                                                        <Switch 
+                                                            id="required" 
+                                                            checked={newColumnConfig.isRequired} 
+                                                            onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isRequired: c})}
+                                                        />
+                                                        <div className="space-y-1">
+                                                            <Label htmlFor="required" className="text-sm font-medium leading-none">Required in tasks</Label>
+                                                            <p className="text-xs text-slate-500 leading-relaxed">
+                                                                Required Custom Fields must be filled out when creating tasks in all the locations where the Custom Field is used in your Workspace.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-start gap-3">
+                                                        <Switch 
+                                                            id="pinned" 
+                                                            checked={newColumnConfig.isPinned} 
+                                                            onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isPinned: c})}
+                                                        />
+                                                        <div className="space-y-1">
+                                                            <Label htmlFor="pinned" className="text-sm font-medium leading-none">Pinned</Label>
+                                                            <p className="text-xs text-slate-500 leading-relaxed">
+                                                                Pinned Custom Fields will always be displayed in Task view, even if empty.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-start gap-3">
+                                                        <Switch 
+                                                            id="guests" 
+                                                            checked={newColumnConfig.isVisibleToGuests} 
+                                                            onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isVisibleToGuests: c})}
+                                                        />
+                                                        <div className="space-y-1">
+                                                            <Label htmlFor="guests" className="text-sm font-medium leading-none">Visible to guests and limited members</Label>
+                                                            <p className="text-xs text-slate-500 leading-relaxed">
+                                                                Custom Fields can be hidden or shown to guests and limited members in your Workspace.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </CollapsibleContent>
                                         </Collapsible>
-                                        
-                                        <div className="space-y-4 pt-2">
-                                            <Label className="text-sm font-medium">Display settings</Label>
-                                            
-                                            <div className="flex items-start gap-3">
-                                                <Switch 
-                                                    id="required" 
-                                                    checked={newColumnConfig.isRequired} 
-                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isRequired: c})}
-                                                />
-                                                <div className="space-y-1">
-                                                    <Label htmlFor="required" className="text-sm font-medium leading-none">Required in tasks</Label>
-                                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                                        Required Custom Fields must be filled out when creating tasks in all the locations where the Custom Field is used in your Workspace.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <Switch 
-                                                    id="pinned" 
-                                                    checked={newColumnConfig.isPinned} 
-                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isPinned: c})}
-                                                />
-                                                <div className="space-y-1">
-                                                    <Label htmlFor="pinned" className="text-sm font-medium leading-none">Pinned</Label>
-                                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                                        Pinned Custom Fields will always be displayed in Task view, even if empty.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <Switch 
-                                                    id="guests" 
-                                                    checked={newColumnConfig.isVisibleToGuests} 
-                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isVisibleToGuests: c})}
-                                                />
-                                                <div className="space-y-1">
-                                                    <Label htmlFor="guests" className="text-sm font-medium leading-none">Visible to guests and limited members</Label>
-                                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                                        Custom Fields can be hidden or shown to guests and limited members in your Workspace.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                    <div className="p-4 border-t flex justify-end gap-2 bg-slate-50/50 dark:bg-slate-900/50">
+                                    <div className="p-4 flex justify-end gap-2 bg-white dark:bg-slate-900 mt-auto">
                                         <Button variant="outline" onClick={handleCloseCreator}>Cancel</Button>
                                         <Button 
                                             onClick={handleCreateColumn}
