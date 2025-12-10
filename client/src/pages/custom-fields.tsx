@@ -174,6 +174,16 @@ export default function CustomFieldsPage() {
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <div className="relative mr-2">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input 
+                            className="pl-9 w-[250px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" 
+                            placeholder="Search fields..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    
                     <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" className="gap-2 bg-white dark:bg-slate-900">
@@ -293,17 +303,6 @@ export default function CustomFieldsPage() {
             <div className="h-full flex flex-col">
                 <div className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6">
                     <div className="max-w-5xl mx-auto space-y-6">
-                        {/* Search */}
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <Input 
-                                className="pl-9 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800" 
-                                placeholder="Search fields..." 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-
                         {/* Folders List */}
                         <div className="space-y-4">
                             {folders.map(folder => (
