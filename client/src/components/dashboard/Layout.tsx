@@ -101,7 +101,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
               )}
 
               {/* Main content scrollable area */}
-              <div className={`flex-1 overflow-auto ${activeTool === "messages" ? "p-0" : "p-8"}`}>
+              <div className={`flex-1 overflow-auto ${activeTool === "messages" ? "p-0" : "p-8"} ${activeTool === "settings" ? "bg-dot-pattern bg-slate-50/50 dark:bg-slate-900/50" : ""}`}>
                   {children}
               </div>
               
