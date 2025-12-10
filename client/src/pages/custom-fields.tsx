@@ -125,6 +125,11 @@ export default function CustomFieldsPage() {
         slug: ''
     });
 
+    // Move to Folder state
+    const [isMoveToFolderOpen, setIsMoveToFolderOpen] = useState(false);
+    const [movingFieldId, setMovingFieldId] = useState<string | null>(null);
+    const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
     const toggleFolder = (folderId: string) => {
         if (expandedFolders.includes(folderId)) {
             setExpandedFolders(expandedFolders.filter(id => id !== folderId));
@@ -156,6 +161,22 @@ export default function CustomFieldsPage() {
         setEditingFieldId(field.id);
         setFieldFormData({ ...field });
         setIsCreateFieldOpen(true);
+    };
+
+    const openMoveToFolderDialog = (field: CustomField) => {
+        setMovingFieldId(field.id);
+        setSelectedFolderId(field.folderId);
+        setIsMoveToFolderOpen(true);
+    };
+
+    const handleMoveToFolder = () => {
+        if (movingFieldId) {
+            setFields(fields.map(f => f.id === movingFieldId ? { ...f, folderId: selectedFolderId } : f));
+            setIsMoveToFolderOpen(false);
+            setMovingFieldId(null);
+            setSelectedFolderId(null);
+            toast.success("Field moved successfully");
+        }
     };
 
     const handleSaveField = () => {
@@ -433,6 +454,38 @@ export default function CustomFieldsPage() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
+
+                    <Dialog open={isMoveToFolderOpen} onOpenChange={setIsMoveToFolderOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Move to Folder</DialogTitle>
+                                <DialogDescription>
+                                    Select a folder to move this field to.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                                <Label htmlFor="move-folder" className="mb-2 block">Select Folder</Label>
+                                <Select 
+                                    value={selectedFolderId || "uncategorized"} 
+                                    onValueChange={(val) => setSelectedFolderId(val === "uncategorized" ? null : val)}
+                                >
+                                    <SelectTrigger id="move-folder">
+                                        <SelectValue placeholder="Select folder" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                        {folders.map(folder => (
+                                            <SelectItem key={folder.id} value={folder.id}>{folder.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsMoveToFolderOpen(false)}>Cancel</Button>
+                                <Button onClick={handleMoveToFolder}>Move Field</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
         }>
@@ -675,7 +728,7 @@ export default function CustomFieldsPage() {
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
                                                                     <DropdownMenuItem onClick={() => openEditFieldDialog(field)}>Edit Field</DropdownMenuItem>
-                                                                    <DropdownMenuItem>Move to Folder</DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={() => openMoveToFolderDialog(field)}>Move to Folder</DropdownMenuItem>
                                                                     <DropdownMenuSeparator />
                                                                     <DropdownMenuItem className="text-red-600" onClick={() => deleteField(field.id)}>
                                                                         Delete Field
