@@ -223,6 +223,8 @@ export default function ContactsPage() {
   const [isColumnCreatorOpen, setIsColumnCreatorOpen] = useState(false);
   const [columnCreatorStep, setColumnCreatorStep] = useState<'field-manager' | 'type-selection' | 'configuration'>('type-selection');
   const [selectedColumnType, setSelectedColumnType] = useState<any>(null);
+  const [createFieldSearch, setCreateFieldSearch] = useState("");
+  const [existingFieldSearch, setExistingFieldSearch] = useState("");
   const [newColumnConfig, setNewColumnConfig] = useState({
     name: "",
     description: "",
@@ -522,7 +524,12 @@ export default function ContactsPage() {
                                         </div>
                                         <div className="relative">
                                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                            <Input placeholder="Search for new or existing fields" className="pl-9 bg-slate-50 dark:bg-slate-900" />
+                                            <Input 
+                                                placeholder="Search for new or existing fields" 
+                                                className="pl-9 bg-slate-50 dark:bg-slate-900" 
+                                                value={existingFieldSearch}
+                                                onChange={(e) => setExistingFieldSearch(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     
@@ -534,7 +541,7 @@ export default function ContactsPage() {
                                                 <Button variant="ghost" className="h-auto p-0 text-xs text-slate-500 font-normal hover:bg-transparent hover:text-slate-900">Hide all</Button>
                                             </div>
                                             <div className="space-y-1">
-                                                {columns.filter(col => visibleColumns[col.id]).map(col => (
+                                                {columns.filter(col => visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).map(col => (
                                                     <div key={col.id} className="flex items-center gap-3 py-2 group">
                                                         <GripVertical className="h-4 w-4 text-slate-300 cursor-move opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         <div className="flex items-center gap-2 flex-1">
@@ -564,7 +571,7 @@ export default function ContactsPage() {
                                         <div className="px-6 py-4">
                                             <h3 className="text-xs font-medium text-slate-500 mb-2">Hidden</h3>
                                             <div className="space-y-1">
-                                                {columns.filter(col => !visibleColumns[col.id]).map(col => (
+                                                {columns.filter(col => !visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).map(col => (
                                                     <div key={col.id} className="flex items-center gap-3 py-2 pl-7 group">
                                                         <div className="flex items-center gap-2 flex-1">
                                                             {col.id === 'tags' ? <Tag className="h-4 w-4 text-slate-400" /> : 
@@ -581,8 +588,8 @@ export default function ContactsPage() {
                                                         />
                                                     </div>
                                                 ))}
-                                                {columns.filter(col => !visibleColumns[col.id]).length === 0 && (
-                                                    <div className="text-xs text-slate-400 italic py-2 pl-7">No hidden fields</div>
+                                                {columns.filter(col => !visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).length === 0 && (
+                                                    <div className="text-xs text-slate-400 italic py-2 pl-7">No hidden fields found</div>
                                                 )}
                                             </div>
                                         </div>
@@ -607,25 +614,36 @@ export default function ContactsPage() {
                                         </div>
                                         <div className="relative">
                                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                            <Input placeholder="Search for new or existing fields" className="pl-9 bg-slate-50 dark:bg-slate-900" />
+                                            <Input 
+                                                placeholder="Search for new or existing fields" 
+                                                className="pl-9 bg-slate-50 dark:bg-slate-900" 
+                                                value={createFieldSearch}
+                                                onChange={(e) => setCreateFieldSearch(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex-1 overflow-y-auto py-2">
                                         <div className="px-6 pb-2 pt-2">
                                             <h3 className="text-xs font-medium text-slate-500 mb-2">Suggested</h3>
                                             <div className="space-y-1">
-                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
-                                                    <List className="h-4 w-4 text-emerald-600" /> CRM Lead Qualification Status
-                                                </Button>
-                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
-                                                    <DollarSign className="h-4 w-4 text-emerald-600" /> Opportunity Value (USD)
-                                                </Button>
-                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
-                                                    <Type className="h-4 w-4 text-blue-600" /> Client Contact Preference
-                                                </Button>
-                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
-                                                    <Sparkles className="h-4 w-4 text-purple-600" /> Next Best Action
-                                                </Button>
+                                                {[
+                                                    { icon: List, label: "CRM Lead Qualification Status", color: "text-emerald-600" },
+                                                    { icon: DollarSign, label: "Opportunity Value (USD)", color: "text-emerald-600" },
+                                                    { icon: Type, label: "Client Contact Preference", color: "text-blue-600" },
+                                                    { icon: Sparkles, label: "Next Best Action", color: "text-purple-600" }
+                                                ].filter(item => item.label.toLowerCase().includes(createFieldSearch.toLowerCase())).map((item, i) => (
+                                                    <Button key={i} variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
+                                                        <item.icon className={`h-4 w-4 ${item.color}`} /> {item.label}
+                                                    </Button>
+                                                ))}
+                                                {[
+                                                    { icon: List, label: "CRM Lead Qualification Status", color: "text-emerald-600" },
+                                                    { icon: DollarSign, label: "Opportunity Value (USD)", color: "text-emerald-600" },
+                                                    { icon: Type, label: "Client Contact Preference", color: "text-blue-600" },
+                                                    { icon: Sparkles, label: "Next Best Action", color: "text-purple-600" }
+                                                ].filter(item => item.label.toLowerCase().includes(createFieldSearch.toLowerCase())).length === 0 && (
+                                                    <div className="text-xs text-slate-400 italic px-2">No suggestions found</div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -634,7 +652,7 @@ export default function ContactsPage() {
                                         <div className="px-6 pb-2">
                                             <h3 className="text-xs font-medium text-slate-500 mb-2">AI fields</h3>
                                             <div className="space-y-1">
-                                                {fieldTypes.filter(f => f.type.startsWith('ai_')).map((field) => (
+                                                {fieldTypes.filter(f => f.type.startsWith('ai_') && f.label.toLowerCase().includes(createFieldSearch.toLowerCase())).map((field) => (
                                                     <Button 
                                                         key={field.type} 
                                                         variant="ghost" 
@@ -644,6 +662,9 @@ export default function ContactsPage() {
                                                         <field.icon className={`h-4 w-4 ${field.color}`} /> {field.label}
                                                     </Button>
                                                 ))}
+                                                {fieldTypes.filter(f => f.type.startsWith('ai_') && f.label.toLowerCase().includes(createFieldSearch.toLowerCase())).length === 0 && (
+                                                    <div className="text-xs text-slate-400 italic px-2">No AI fields found</div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -652,7 +673,7 @@ export default function ContactsPage() {
                                         <div className="px-6 pb-6">
                                             <h3 className="text-xs font-medium text-slate-500 mb-2">All</h3>
                                             <div className="space-y-1">
-                                                {fieldTypes.filter(f => !f.type.startsWith('ai_')).map((field) => (
+                                                {fieldTypes.filter(f => !f.type.startsWith('ai_') && f.label.toLowerCase().includes(createFieldSearch.toLowerCase())).map((field) => (
                                                     <Button 
                                                         key={field.type} 
                                                         variant="ghost" 
@@ -662,6 +683,9 @@ export default function ContactsPage() {
                                                         <field.icon className={`h-4 w-4 ${field.color}`} /> {field.label}
                                                     </Button>
                                                 ))}
+                                                {fieldTypes.filter(f => !f.type.startsWith('ai_') && f.label.toLowerCase().includes(createFieldSearch.toLowerCase())).length === 0 && (
+                                                    <div className="text-xs text-slate-400 italic px-2">No fields found</div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
