@@ -167,7 +167,7 @@ export default function CustomFieldsPage() {
     };
 
     return (
-        <DashboardLayout header={
+        <DashboardLayout activeTool="users" header={
             <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
                 <div>
                     <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Custom Fields</h1>
