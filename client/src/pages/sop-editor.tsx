@@ -536,28 +536,29 @@ export default function SopEditorPage() {
                              <div className="space-y-1.5">
                                 <Label className="text-xs">Color</Label>
                                 <div className="flex gap-2 items-center">
-                                  <ToggleGroup 
-                                    type="single" 
+                                  <Tabs 
                                     value={step.button.color} 
                                     onValueChange={(val) => val && updateStepButton(step.id, 'color', val)}
-                                    className="justify-start bg-transparent border-0 p-0 h-8 gap-1"
+                                    className="w-full"
                                   >
-                                    <ToggleGroupItem value="primary" aria-label="Primary" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900">
-                                      <div className="h-4 w-4 rounded-full bg-primary" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="secondary" aria-label="Secondary" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-500 ring-offset-2 dark:ring-offset-slate-900">
-                                      <div className="h-4 w-4 rounded-full bg-slate-500" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="outline" aria-label="Outline" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-300 ring-offset-2 dark:ring-offset-slate-900">
-                                      <div className="h-4 w-4 rounded-full border border-slate-300 bg-white dark:bg-slate-950" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="destructive" aria-label="Destructive" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-red-500 ring-offset-2 dark:ring-offset-slate-900">
-                                      <div className="h-4 w-4 rounded-full bg-red-500" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="custom" aria-label="Custom" className="h-6 w-6 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-400 ring-offset-2 dark:ring-offset-slate-900">
-                                      <div className="h-4 w-4 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
-                                    </ToggleGroupItem>
-                                  </ToggleGroup>
+                                    <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                      <TabsTrigger value="primary" aria-label="Primary" className="h-6 w-8 text-xs px-0">
+                                        <div className="h-4 w-4 rounded-full bg-primary" />
+                                      </TabsTrigger>
+                                      <TabsTrigger value="secondary" aria-label="Secondary" className="h-6 w-8 text-xs px-0">
+                                        <div className="h-4 w-4 rounded-full bg-slate-500" />
+                                      </TabsTrigger>
+                                      <TabsTrigger value="outline" aria-label="Outline" className="h-6 w-8 text-xs px-0">
+                                        <div className="h-4 w-4 rounded-full border border-slate-300 bg-white dark:bg-slate-950" />
+                                      </TabsTrigger>
+                                      <TabsTrigger value="destructive" aria-label="Destructive" className="h-6 w-8 text-xs px-0">
+                                        <div className="h-4 w-4 rounded-full bg-red-500" />
+                                      </TabsTrigger>
+                                      <TabsTrigger value="custom" aria-label="Custom" className="h-6 w-8 text-xs px-0">
+                                        <div className="h-4 w-4 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                                      </TabsTrigger>
+                                    </TabsList>
+                                  </Tabs>
 
                                   {step.button.color === 'custom' && (
                                     <Input 
@@ -623,39 +624,40 @@ export default function SopEditorPage() {
                                     onValueChange={(val) => val && updateStepNote(step.id, 'icon', val)}
                                     className="w-full"
                                   >
-                                    <TabsList className="grid w-full grid-cols-4 h-8 p-1 bg-white/50 dark:bg-black/20">
-                                      <TabsTrigger value="info" className="h-6 text-xs px-0"><Info className="h-3.5 w-3.5" /></TabsTrigger>
-                                      <TabsTrigger value="warning" className="h-6 text-xs px-0"><AlertTriangle className="h-3.5 w-3.5" /></TabsTrigger>
-                                      <TabsTrigger value="tip" className="h-6 text-xs px-0"><Lightbulb className="h-3.5 w-3.5" /></TabsTrigger>
-                                      <TabsTrigger value="alert" className="h-6 text-xs px-0"><AlertCircle className="h-3.5 w-3.5" /></TabsTrigger>
+                                    <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                      <TabsTrigger value="info" className="h-6 w-8 text-xs px-0"><Info className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="warning" className="h-6 w-8 text-xs px-0"><AlertTriangle className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="tip" className="h-6 w-8 text-xs px-0"><Lightbulb className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="alert" className="h-6 w-8 text-xs px-0"><AlertCircle className="h-3.5 w-3.5" /></TabsTrigger>
                                     </TabsList>
                                   </Tabs>
                                </div>
                                <div className="space-y-1.5 flex-1">
                                   <Label className="text-xs">Color</Label>
                                   <div className="flex gap-2 items-center h-8">
-                                    <ToggleGroup 
-                                      type="single" 
+                                    <Tabs 
                                       value={step.note.color} 
                                       onValueChange={(val) => val && updateStepNote(step.id, 'color', val)}
-                                      className="justify-start bg-white/50 dark:bg-black/20 border border-transparent rounded-md p-1 h-8 gap-1"
+                                      className="w-full"
                                     >
-                                      <ToggleGroupItem value="amber" aria-label="Amber" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-amber-500 ring-offset-1 ring-offset-transparent">
-                                        <div className="h-3 w-3 rounded-full bg-amber-500" />
-                                      </ToggleGroupItem>
-                                      <ToggleGroupItem value="blue" aria-label="Blue" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-blue-500 ring-offset-1 ring-offset-transparent">
-                                        <div className="h-3 w-3 rounded-full bg-blue-500" />
-                                      </ToggleGroupItem>
-                                      <ToggleGroupItem value="red" aria-label="Red" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-red-500 ring-offset-1 ring-offset-transparent">
-                                        <div className="h-3 w-3 rounded-full bg-red-500" />
-                                      </ToggleGroupItem>
-                                      <ToggleGroupItem value="green" aria-label="Green" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-green-500 ring-offset-1 ring-offset-transparent">
-                                        <div className="h-3 w-3 rounded-full bg-green-500" />
-                                      </ToggleGroupItem>
-                                      <ToggleGroupItem value="custom" aria-label="Custom" className="h-5 w-5 p-0 rounded-full hover:bg-transparent data-[state=on]:ring-2 ring-slate-400 ring-offset-1 ring-offset-transparent">
-                                        <div className="h-3 w-3 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
-                                      </ToggleGroupItem>
-                                    </ToggleGroup>
+                                      <TabsList className="flex w-fit h-8 p-1 bg-white/50 dark:bg-black/20 gap-1">
+                                        <TabsTrigger value="amber" aria-label="Amber" className="h-6 w-8 text-xs px-0">
+                                          <div className="h-3 w-3 rounded-full bg-amber-500" />
+                                        </TabsTrigger>
+                                        <TabsTrigger value="blue" aria-label="Blue" className="h-6 w-8 text-xs px-0">
+                                          <div className="h-3 w-3 rounded-full bg-blue-500" />
+                                        </TabsTrigger>
+                                        <TabsTrigger value="red" aria-label="Red" className="h-6 w-8 text-xs px-0">
+                                          <div className="h-3 w-3 rounded-full bg-red-500" />
+                                        </TabsTrigger>
+                                        <TabsTrigger value="green" aria-label="Green" className="h-6 w-8 text-xs px-0">
+                                          <div className="h-3 w-3 rounded-full bg-green-500" />
+                                        </TabsTrigger>
+                                        <TabsTrigger value="custom" aria-label="Custom" className="h-6 w-8 text-xs px-0">
+                                          <div className="h-3 w-3 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                                        </TabsTrigger>
+                                      </TabsList>
+                                    </Tabs>
                                     
                                     {step.note.color === 'custom' && (
                                       <Input 
