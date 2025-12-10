@@ -181,10 +181,28 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                             </SelectContent>
                         </Select>
                         <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 text-slate-400 hover:text-red-500 flex-shrink-0"
+                            onClick={() => handleRemove(filter.id)}
+                        >
+                            <Trash className="h-3.5 w-3.5" />
+                        </Button>
                     </div>
                 ) : (
-                    <div className="pb-2 text-sm text-slate-500 font-medium px-1">
-                        {depth === 0 ? 'Where' : 'Matches'}
+                    <div className="flex items-center justify-between pb-2 px-1">
+                        <div className="text-sm text-slate-500 font-medium">
+                            {depth === 0 ? 'Where' : 'Matches'}
+                        </div>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 text-slate-400 hover:text-red-500 flex-shrink-0"
+                            onClick={() => handleRemove(filter.id)}
+                        >
+                            <Trash className="h-3.5 w-3.5" />
+                        </Button>
                     </div>
                 )}
 
@@ -208,15 +226,6 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                             </Button>
                         </div>
                     </div>
-
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-slate-400 hover:text-red-500 flex-shrink-0 mt-2"
-                        onClick={() => handleRemove(filter.id)}
-                    >
-                        <Trash className="h-4 w-4" />
-                    </Button>
                 </div>
             </div>
           );
