@@ -9,18 +9,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Trash, Plus, Info, Filter as FilterIcon, ChevronDown } from "lucide-react";
+import { Trash, Plus, Info, Filter as FilterIcon, ChevronDown, CornerDownRight } from "lucide-react";
 
 export type FilterLogic = 'AND' | 'OR';
 export type FilterOperator = 'is' | 'is_not' | 'contains' | 'does_not_contain' | 'starts_with' | 'ends_with' | 'is_empty' | 'is_not_empty' | 'gt' | 'lt';
 
-export interface Filter {
+export interface FilterCondition {
   id: string;
+  type: 'condition';
   field: string;
   operator: FilterOperator;
   value: any;
   logic?: FilterLogic;
 }
+
+export interface FilterGroup {
+  id: string;
+  type: 'group';
+  logic?: FilterLogic;
+  items: (FilterCondition | FilterGroup)[];
+}
+
+export type Filter = FilterCondition | FilterGroup;
 
 interface FilterBuilderProps {
   columns: { id: string; label: string; type?: string }[];
@@ -31,28 +41,93 @@ interface FilterBuilderProps {
 export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuilderProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const createFilter = (logic?: FilterLogic): FilterCondition => ({
+    id: Math.random().toString(36).substr(2, 9),
+    type: 'condition',
+    field: columns[0]?.id || 'name',
+    operator: 'contains',
+    value: '',
+    logic
+  });
+
+  const createGroup = (logic?: FilterLogic): FilterGroup => ({
+    id: Math.random().toString(36).substr(2, 9),
+    type: 'group',
+    logic,
+    items: [createFilter()]
+  });
+
   const addFilter = () => {
-    const newFilter: Filter = {
-      id: Math.random().toString(36).substr(2, 9),
-      field: columns[0]?.id || 'name',
-      operator: 'contains',
-      value: '',
-      logic: filters.length > 0 ? 'AND' : undefined
-    };
-    onFiltersChange([...filters, newFilter]);
+    onFiltersChange([...filters, createFilter(filters.length > 0 ? 'AND' : undefined)]);
   };
 
-  const updateFilter = (id: string, updates: Partial<Filter>) => {
-    onFiltersChange(filters.map(f => f.id === id ? { ...f, ...updates } : f));
+  const updateFilter = (id: string, updates: Partial<FilterCondition> | Partial<FilterGroup>, items: Filter[] = filters): Filter[] => {
+    return items.map(item => {
+      if (item.id === id) {
+        return { ...item, ...updates } as Filter;
+      }
+      if (item.type === 'group') {
+        return { ...item, items: updateFilter(id, updates, item.items) } as FilterGroup;
+      }
+      return item;
+    });
   };
 
-  const removeFilter = (id: string) => {
-    const newFilters = filters.filter(f => f.id !== id);
-    // If we removed the first item, the new first item shouldn't have logic
-    if (newFilters.length > 0 && newFilters[0].logic) {
-      delete newFilters[0].logic;
+  const removeFilter = (id: string, items: Filter[] = filters): Filter[] => {
+    const newItems = items.filter(f => f.id !== id).map(item => {
+        if (item.type === 'group') {
+            return { ...item, items: removeFilter(id, item.items) };
+        }
+        return item;
+    });
+
+    // Clean up empty groups or fix logic for first items
+    if (newItems.length > 0) {
+        const firstItem = newItems[0];
+        if (firstItem.logic) {
+            // Can't directly delete optional readonly prop, so create new object
+             if (firstItem.type === 'group') {
+                 newItems[0] = { ...firstItem, logic: undefined };
+             } else {
+                 newItems[0] = { ...firstItem, logic: undefined };
+             }
+        }
     }
-    onFiltersChange(newFilters);
+    
+    return newItems.filter(item => item.type !== 'condition' || true) // Keep all for now
+           .filter(item => item.type !== 'group' || item.items.length > 0); // Remove empty groups
+  };
+  
+  const handleRemove = (id: string) => {
+      onFiltersChange(removeFilter(id));
+  };
+
+  const handleUpdate = (id: string, updates: any) => {
+      onFiltersChange(updateFilter(id, updates));
+  };
+  
+  const addNestedFilter = (groupId: string | null = null) => {
+      if (!groupId) {
+          // Add a group at the root level
+          // If we have existing filters, we need to wrap the new group in logic
+          const logic = filters.length > 0 ? 'AND' : undefined;
+          onFiltersChange([...filters, createGroup(logic)]);
+      } else {
+          // Add to specific group
+           const addToGroup = (items: Filter[]): Filter[] => {
+              return items.map(item => {
+                  if (item.id === groupId && item.type === 'group') {
+                      const logic = item.items.length > 0 ? 'AND' : undefined;
+                      return { ...item, items: [...item.items, createFilter(logic)] };
+                  }
+                  if (item.type === 'group') {
+                      return { ...item, items: addToGroup(item.items) };
+                  }
+                  return item;
+              });
+           };
+           onFiltersChange(addToGroup(filters));
+      }
   };
 
   const clearFilters = () => {
@@ -60,7 +135,6 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
   };
 
   const getOperators = (fieldType?: string) => {
-    // Simplified operators based on type
     const common = [
         { value: 'is', label: 'Is' },
         { value: 'is_not', label: 'Is not' },
@@ -85,55 +159,54 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
     ];
   };
 
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className={`h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800 ${filters.length > 0 ? 'text-indigo-600 border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20' : ''}`}>
-          <FilterIcon className="h-3.5 w-3.5" />
-          {filters.length > 0 ? `${filters.length} Filter${filters.length > 1 ? 's' : ''}` : 'Filter'}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[600px] p-0" align="start">
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <h4 className="font-medium text-sm">Filters</h4>
-                <Info className="h-3.5 w-3.5 text-slate-400" />
-            </div>
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-                Saved filters <ChevronDown className="h-3 w-3" />
-            </Button>
-        </div>
-        
-        <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 min-h-[100px] max-h-[400px] overflow-y-auto space-y-3">
-            {filters.length === 0 ? (
-                <div className="text-center py-8 text-slate-500 text-sm">
-                    No filters applied. Add a filter to narrow down your results.
-                </div>
-            ) : (
-                filters.map((filter, index) => (
-                    <div key={filter.id} className="flex items-center gap-2">
-                        <div className="w-[80px] flex-shrink-0">
-                            {index === 0 ? (
-                                <span className="text-sm text-slate-500 font-medium px-2">Where</span>
-                            ) : (
-                                <Select 
-                                    value={filter.logic} 
-                                    onValueChange={(val: FilterLogic) => updateFilter(filter.id, { logic: val })}
-                                >
-                                    <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-950">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="AND">AND</SelectItem>
-                                        <SelectItem value="OR">OR</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        </div>
-                        
+  const renderFilterItem = (filter: Filter, index: number, depth: number = 0) => {
+      const isGroup = filter.type === 'group';
+      
+      return (
+        <div key={filter.id} className={`flex flex-col gap-2 ${depth > 0 ? 'ml-8' : ''}`}>
+             <div className="flex items-center gap-2">
+                <div className="w-[80px] flex-shrink-0">
+                    {index === 0 ? (
+                        <span className="text-sm text-slate-500 font-medium px-2">
+                            {depth === 0 ? 'Where' : (filter.logic || 'Where')}
+                        </span>
+                    ) : (
                         <Select 
-                            value={filter.field} 
-                            onValueChange={(val) => updateFilter(filter.id, { field: val })}
+                            value={filter.logic} 
+                            onValueChange={(val: FilterLogic) => handleUpdate(filter.id, { logic: val })}
+                        >
+                            <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-950">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="AND">AND</SelectItem>
+                                <SelectItem value="OR">OR</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
+                </div>
+
+                {isGroup ? (
+                    <div className="flex-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 relative">
+                        <div className="absolute left-[-22px] top-[14px] w-[22px] h-[1px] bg-slate-200 dark:bg-slate-800"></div>
+                        <div className="flex flex-col gap-3">
+                            {(filter as FilterGroup).items.map((item, i) => renderFilterItem(item, i, depth + 1))}
+                            
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-xs text-slate-500 hover:text-indigo-600 self-start gap-1"
+                                onClick={() => addNestedFilter(filter.id)}
+                            >
+                                <Plus className="h-3 w-3" /> Add filter
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <Select 
+                            value={(filter as FilterCondition).field} 
+                            onValueChange={(val) => handleUpdate(filter.id, { field: val })}
                         >
                             <SelectTrigger className="h-8 text-xs w-[160px] bg-white dark:bg-slate-950">
                                 <SelectValue />
@@ -146,47 +219,94 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
                         </Select>
 
                         <Select 
-                            value={filter.operator} 
-                            onValueChange={(val: FilterOperator) => updateFilter(filter.id, { operator: val })}
+                            value={(filter as FilterCondition).operator} 
+                            onValueChange={(val: FilterOperator) => handleUpdate(filter.id, { operator: val })}
                         >
                             <SelectTrigger className="h-8 text-xs w-[140px] bg-white dark:bg-slate-950">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                {getOperators(columns.find(c => c.id === filter.field)?.type).map(op => (
+                                {getOperators(columns.find(c => c.id === (filter as FilterCondition).field)?.type).map(op => (
                                     <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
 
                         <div className="flex-1">
-                            {['is_empty', 'is_not_empty'].includes(filter.operator) ? (
+                            {['is_empty', 'is_not_empty'].includes((filter as FilterCondition).operator) ? (
                                 <div className="h-8 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700" />
                             ) : (
                                 <Input 
                                     className="h-8 text-xs bg-white dark:bg-slate-950" 
                                     placeholder="Value..." 
-                                    value={filter.value}
-                                    onChange={(e) => updateFilter(filter.id, { value: e.target.value })}
+                                    value={(filter as FilterCondition).value}
+                                    onChange={(e) => handleUpdate(filter.id, { value: e.target.value })}
                                 />
                             )}
                         </div>
+                    </>
+                )}
 
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-slate-400 hover:text-red-500"
-                            onClick={() => removeFilter(filter.id)}
-                        >
-                            <Trash className="h-4 w-4" />
-                        </Button>
-                    </div>
-                ))
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-slate-400 hover:text-red-500 flex-shrink-0"
+                    onClick={() => handleRemove(filter.id)}
+                >
+                    <Trash className="h-4 w-4" />
+                </Button>
+             </div>
+        </div>
+      );
+  };
+
+  const countFilters = (items: Filter[]): number => {
+      return items.reduce((acc, item) => {
+          if (item.type === 'group') {
+              return acc + countFilters(item.items);
+          }
+          return acc + 1;
+      }, 0);
+  };
+  
+  const totalFilters = countFilters(filters);
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className={`h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800 ${totalFilters > 0 ? 'text-indigo-600 border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20' : ''}`}>
+          <FilterIcon className="h-3.5 w-3.5" />
+          {totalFilters > 0 ? `${totalFilters} Filter${totalFilters > 1 ? 's' : ''}` : 'Filter'}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[700px] p-0" align="start">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                <h4 className="font-medium text-sm">Filters</h4>
+                <Info className="h-3.5 w-3.5 text-slate-400" />
+            </div>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                Saved filters <ChevronDown className="h-3 w-3" />
+            </Button>
+        </div>
+        
+        <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 min-h-[100px] max-h-[500px] overflow-y-auto space-y-3">
+            {filters.length === 0 ? (
+                <div className="text-center py-8 text-slate-500 text-sm">
+                    No filters applied. Add a filter to narrow down your results.
+                </div>
+            ) : (
+                filters.map((filter, index) => renderFilterItem(filter, index))
             )}
             
             {filters.length > 0 && (
-                 <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-500 hover:text-indigo-600 pl-0 ml-[80px]">
-                    Add nested filter
+                 <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-xs text-slate-500 hover:text-indigo-600 pl-0 ml-[80px] gap-1"
+                    onClick={() => addNestedFilter(null)}
+                 >
+                    <CornerDownRight className="h-3 w-3" /> Add grouped filter
                  </Button>
             )}
         </div>

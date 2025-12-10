@@ -492,21 +492,48 @@ export default function ContactsPage() {
     // Advanced filters
     if (filters.length === 0) return true;
     
-    // Evaluate filters sequentially
-    let result = checkFilter(contact, filters[0]);
-    
-    for (let i = 1; i < filters.length; i++) {
-        const filter = filters[i];
-        const matches = checkFilter(contact, filter);
+    // Evaluate filters sequentially/recursively
+    const evaluateFilters = (filterList: FilterType[], item: any): boolean => {
+        if (filterList.length === 0) return true;
         
-        if (filter.logic === 'AND') {
-            result = result && matches;
+        let result = true;
+        
+        // Process first item
+        const first = filterList[0];
+        if (first.type === 'group') {
+             // For a group, we recursively evaluate its items
+             // If the group has no logic defined for its *internal* items relation to each other,
+             // we assume the logic property of the *second* item in the group defines it?
+             // Actually, my FilterGroup definition has `items` which is a list.
+             // The list follows the same "item has logic property" pattern.
+             // But the *group itself* is treated as a single boolean result in the parent list.
+             result = evaluateFilters(first.items, item);
         } else {
-            result = result || matches;
+             result = checkFilter(item, first);
         }
-    }
+        
+        // Process remaining items
+        for (let i = 1; i < filterList.length; i++) {
+            const filter = filterList[i];
+            let matches = false;
+            
+            if (filter.type === 'group') {
+                matches = evaluateFilters(filter.items, item);
+            } else {
+                matches = checkFilter(item, filter);
+            }
+            
+            if (filter.logic === 'AND') {
+                result = result && matches;
+            } else {
+                result = result || matches;
+            }
+        }
+        
+        return result;
+    };
     
-    return result;
+    return evaluateFilters(filters, contact);
   });
 
   // Sort contacts
