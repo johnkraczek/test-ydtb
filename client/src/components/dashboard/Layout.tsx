@@ -6,6 +6,7 @@ import { DashboardMainHeader } from "./headers/DashboardMainHeader";
 import { DashboardPageHeader } from "./headers/DashboardPageHeader";
 import { ToolIconsSidebar } from "./sidebars/ToolIconsSidebar";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
+import { useThemePattern } from "@/hooks/use-theme-pattern";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
   const [activeTool, setActiveTool] = useState(initialActiveTool);
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const [location, setLocation] = useLocation();
+  const { themePattern } = useThemePattern();
 
   // Sync internal state with prop if it changes
   useEffect(() => {
@@ -50,6 +52,17 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       }
     }
     // Add other routes as needed
+  };
+
+  const getPatternClass = () => {
+    if (activeTool === "messages") return "";
+    switch (themePattern) {
+      case "dots": return "bg-dot-pattern";
+      case "grid": return "bg-grid-pattern";
+      case "graph": return "bg-graph-paper";
+      case "noise": return "bg-noise";
+      default: return "";
+    }
   };
 
   return (
@@ -101,7 +114,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
               )}
 
               {/* Main content scrollable area */}
-              <div className={`flex-1 overflow-auto ${activeTool === "messages" ? "p-0" : "p-8"} ${activeTool === "settings" ? "bg-dot-pattern bg-slate-50/50 dark:bg-slate-900/50" : ""}`}>
+              <div className={`flex-1 overflow-auto ${activeTool === "messages" ? "p-0" : "p-8"} ${getPatternClass()} ${activeTool !== "messages" ? "bg-slate-50/50 dark:bg-slate-900/50" : ""}`}>
                   {children}
               </div>
               

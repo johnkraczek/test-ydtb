@@ -52,6 +52,7 @@ function Router() {
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorProvider } from "@/hooks/use-theme-color";
+import { ThemePatternProvider } from "@/hooks/use-theme-pattern";
 import { MediaProvider } from "@/context/media-context";
 
 function App() {
@@ -59,12 +60,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem>
         <ThemeColorProvider defaultThemeColor="zinc" storageKey="vite-ui-theme-color">
-          <MediaProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-            </TooltipProvider>
-          </MediaProvider>
+          <ThemePatternProvider defaultThemePattern="dots" storageKey="vite-ui-theme-pattern">
+            <MediaProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Router />
+              </TooltipProvider>
+            </MediaProvider>
+          </ThemePatternProvider>
         </ThemeColorProvider>
       </ThemeProvider>
     </QueryClientProvider>

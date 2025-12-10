@@ -36,6 +36,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useTheme } from "next-themes";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemePattern } from "@/hooks/use-theme-pattern";
 import { cn } from "@/lib/utils";
 
 export interface ToolItem {
@@ -114,6 +115,14 @@ const availableThemeColors = [
   { name: "Violet", value: "violet", color: "bg-violet-500" },
 ] as const;
 
+const availableThemePatterns = [
+  { name: "None", value: "none", preview: "bg-white dark:bg-slate-900" },
+  { name: "Dots", value: "dots", preview: "bg-dot-pattern" },
+  { name: "Grid", value: "grid", preview: "bg-grid-pattern" },
+  { name: "Graph", value: "graph", preview: "bg-graph-paper" },
+  { name: "Noise", value: "noise", preview: "bg-noise" },
+] as const;
+
 export function CustomizeNavigationDialog({
   open,
   onOpenChange,
@@ -122,6 +131,7 @@ export function CustomizeNavigationDialog({
 }: CustomizeNavigationDialogProps) {
   const { theme, setTheme } = useTheme();
   const { themeColor, setThemeColor } = useThemeColor();
+  const { themePattern, setThemePattern } = useThemePattern();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -269,6 +279,27 @@ export function CustomizeNavigationDialog({
                     </div>
                     <div className="mt-2 text-center text-xs font-medium text-slate-700 dark:text-slate-300">Auto</div>
                   </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 mb-3">Background Pattern</h4>
+                <div className="grid grid-cols-5 gap-2">
+                  {availableThemePatterns.map((pattern) => (
+                    <button 
+                      key={pattern.value}
+                      className={cn(
+                        "flex flex-col items-center gap-1.5 p-2 rounded-lg border bg-white dark:bg-slate-900 transition-all aspect-square justify-center",
+                        themePattern === pattern.value 
+                          ? "border-primary ring-1 ring-primary" 
+                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      )}
+                      onClick={() => setThemePattern(pattern.value)}
+                    >
+                      <div className={`h-8 w-8 rounded border border-slate-100 dark:border-slate-800 ${pattern.preview} bg-slate-50/50 dark:bg-slate-900/50`} />
+                      <span className="text-[10px] font-medium text-slate-700 dark:text-slate-200">{pattern.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
