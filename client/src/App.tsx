@@ -17,6 +17,7 @@ import LaunchpadPage from "@/pages/launchpad";
 import EmailSetupPage from "@/pages/launchpad-setup/email";
 import PaymentSetupPage from "@/pages/launchpad-setup/payment";
 import SopPage from "@/pages/sop";
+import SopDetailPage from "@/pages/sop-detail";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/pages" component={PagesPage} />
       <Route path="/pages/:id/edit" component={PageEditor} />
       <Route path="/sop" component={SopPage} />
+      <Route path="/sop/:id" component={SopDetailPage} />
       <Route component={NotFound} />
     </Switch>
   );

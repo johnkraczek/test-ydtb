@@ -4,7 +4,6 @@ import DashboardLayout from "@/components/dashboard/Layout";
 import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -18,10 +17,8 @@ import {
   FileText, 
   MoreHorizontal, 
   Eye,
-  CheckCircle2,
   Filter,
   Plus,
-  Calendar,
   Clock,
   BookOpen,
   Share2,
@@ -35,6 +32,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import { Link } from "wouter";
 
 interface SOP {
   id: string;
@@ -113,83 +111,84 @@ export default function SopPage() {
             </TableHeader>
             <TableBody>
               {filteredSops.map((sop) => (
-                <TableRow 
-                  key={sop.id} 
-                  className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3 group">
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
-                        sop.status === 'published' 
-                          ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-100' 
-                          : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
-                      }`}>
-                        <BookOpen className="h-4 w-4" />
+                <Link key={sop.id} href={`/sop/${sop.id}`} className="contents">
+                  <TableRow 
+                    className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3 group">
+                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
+                          sop.status === 'published' 
+                            ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-100' 
+                            : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                        }`}>
+                          <BookOpen className="h-4 w-4" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors">{sop.title}</span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors">{sop.title}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="font-normal text-slate-600 bg-slate-50 border-slate-200">
+                        {sop.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {sop.status === "published" && (
+                        <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                          Published
+                        </Badge>
+                      )}
+                      {sop.status === "draft" && (
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-100">
+                          Draft
+                        </Badge>
+                      )}
+                       {sop.status === "review" && (
+                        <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50">
+                          In Review
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5 text-slate-500 text-xs">
+                        <Clock className="h-3 w-3" />
+                        {sop.lastModified}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-normal text-slate-600 bg-slate-50 border-slate-200">
-                      {sop.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {sop.status === "published" && (
-                      <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
-                        Published
-                      </Badge>
-                    )}
-                    {sop.status === "draft" && (
-                      <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-100">
-                        Draft
-                      </Badge>
-                    )}
-                     {sop.status === "review" && (
-                      <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50">
-                        In Review
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5 text-slate-500 text-xs">
-                      <Clock className="h-3 w-3" />
-                      {sop.lastModified}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-slate-600">{sop.author}</span>
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                           <Eye className="mr-2 h-4 w-4" /> View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FileText className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Share2 className="mr-2 h-4 w-4" /> Share
-                        </DropdownMenuItem>
-                         <DropdownMenuItem>
-                          <Download className="mr-2 h-4 w-4" /> Export PDF
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
-                          Archive
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-600">{sop.author}</span>
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                             <Eye className="mr-2 h-4 w-4" /> View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <FileText className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Share2 className="mr-2 h-4 w-4" /> Share
+                          </DropdownMenuItem>
+                           <DropdownMenuItem>
+                            <Download className="mr-2 h-4 w-4" /> Export PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600">
+                            Archive
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                </Link>
               ))}
             </TableBody>
           </Table>
