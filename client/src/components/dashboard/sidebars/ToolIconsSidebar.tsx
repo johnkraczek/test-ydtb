@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronsRight,
   Home,
@@ -117,6 +117,18 @@ export function ToolIconsSidebar({
   const [tools, setTools] = useState<ToolItem[]>(INITIAL_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  // If the active tool is hidden by the user, redirect to home (Dashboard)
+  // This handles the case where a user hides "Launchpad" while currently on the Launchpad page
+  useEffect(() => {
+    const activeToolItem = tools.find(t => t.id === activeTool);
+    if (activeToolItem && !activeToolItem.visible) {
+      // Only redirect if we are not already on home
+      if (activeTool !== "home") {
+        onToolSelect?.("home");
+      }
+    }
+  }, [tools, activeTool, onToolSelect]);
 
   // Filter visible and hidden tools
   // If a tool is active, it should be visible even if it's hidden in settings
