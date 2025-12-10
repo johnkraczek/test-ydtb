@@ -116,6 +116,7 @@ const MOCK_SOP_DETAIL = {
 
 export default function SopDetailPage() {
   const [, params] = useRoute("/sop/:id");
+  const [, setLocation] = useLocation();
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
@@ -150,7 +151,7 @@ export default function SopDetailPage() {
               <Button variant="outline" size="sm" className="gap-2">
                 <Printer className="h-4 w-4" /> Print
               </Button>
-              <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90">
+              <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90" onClick={() => setLocation(params ? `/sop/${params.id}/edit` : "/sop")}>
                 <FileText className="h-4 w-4" /> Edit SOP
               </Button>
             </div>

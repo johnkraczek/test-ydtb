@@ -78,7 +78,7 @@ export default function SopPage() {
         Filter
       </Button>
 
-      <Button size="sm" className="h-8 gap-2 bg-indigo-600 hover:bg-indigo-700 text-xs">
+      <Button size="sm" className="h-8 gap-2 bg-indigo-600 hover:bg-indigo-700 text-xs" onClick={() => setLocation("/sop/new")}>
         <Plus className="h-3.5 w-3.5" />
         New SOP
       </Button>
@@ -171,7 +171,7 @@ export default function SopPage() {
                           <DropdownMenuItem>
                              <Eye className="mr-2 h-4 w-4" /> View
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setLocation(`/sop/${sop.id}/edit`)}>
                             <FileText className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem>
