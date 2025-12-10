@@ -1087,7 +1087,7 @@ export default function ContactDetailPage() {
                           />
                         </TabsContent>
                         
-                        <TabsContent value="sms" className="mt-0 space-y-4 flex-1 flex flex-col">
+                        <TabsContent value="sms" className="mt-0 space-y-4 flex-1 flex flex-col min-h-0">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 shrink-0">
                             <MessageSquare className="h-3 w-3" />
                             <span>SMS to {customer.phone}</span>
@@ -1101,7 +1101,7 @@ export default function ContactDetailPage() {
                           />
                         </TabsContent>
 
-                        <div className="flex justify-between items-center pt-4 mt-auto flex-none border-t">
+                        <div className="flex justify-between items-center pt-4 mt-auto flex-none border-t shrink-0">
                           <div className="text-xs text-muted-foreground">
                             {messageType === 'sms' && `${messageBody.length}/160 chars`}
                           </div>
