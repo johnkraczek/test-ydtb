@@ -224,7 +224,7 @@ function ChatView({ chatId }: { chatId: string }) {
   const dmUser = isDirectMessage ? TEAM_MEMBERS[0] : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       {/* Chat Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
