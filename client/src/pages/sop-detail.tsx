@@ -150,7 +150,7 @@ export default function SopDetailPage() {
               <Button variant="outline" size="sm" className="gap-2">
                 <Printer className="h-4 w-4" /> Print
               </Button>
-              <Button size="sm" className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+              <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90">
                 <FileText className="h-4 w-4" /> Edit SOP
               </Button>
             </div>
@@ -186,7 +186,7 @@ export default function SopDetailPage() {
                 <div className="flex items-start gap-4">
                   <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border transition-colors ${
                     completedSteps.includes(step.id)
-                      ? "bg-green-100 border-green-200 text-green-700"
+                      ? "bg-primary/10 border-primary/20 text-primary"
                       : "bg-slate-100 border-slate-200 text-slate-500"
                   }`}>
                     {completedSteps.includes(step.id) ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
@@ -200,7 +200,7 @@ export default function SopDetailPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`text-xs h-7 ${completedSteps.includes(step.id) ? 'text-green-600 hover:text-green-700 hover:bg-green-50' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`text-xs h-7 ${completedSteps.includes(step.id) ? 'text-primary hover:text-primary hover:bg-primary/10' : 'text-slate-400 hover:text-slate-600'}`}
                         onClick={() => toggleStep(step.id)}
                       >
                         {completedSteps.includes(step.id) ? "Mark Incomplete" : "Mark Complete"}
@@ -222,14 +222,14 @@ export default function SopDetailPage() {
 
           <Card className="bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 mt-12">
             <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
                 <CheckCircle2 className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Procedure Completed</h3>
               <p className="text-slate-500 max-w-md">
                 You've reached the end of this SOP. Great job following the process!
               </p>
-              <Button className="mt-4 bg-indigo-600 hover:bg-indigo-700">
+              <Button className="mt-4 bg-primary hover:bg-primary/90">
                 Return to Library
               </Button>
             </CardContent>
@@ -252,7 +252,7 @@ export default function SopDetailPage() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-transform group-hover:scale-110">
                       <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center pl-1 shadow-lg">
-                        <Play className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+                        <Play className="h-5 w-5 text-primary fill-primary" />
                       </div>
                     </div>
                   </div>
@@ -277,7 +277,7 @@ export default function SopDetailPage() {
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="h-20 w-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                         <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center pl-1 shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                          <Play className="h-8 w-8 text-indigo-600 fill-indigo-600" />
+                          <Play className="h-8 w-8 text-primary fill-primary" />
                         </div>
                       </div>
                     </div>
@@ -302,7 +302,7 @@ export default function SopDetailPage() {
               </div>
               <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-6">
                 <div 
-                  className="h-full bg-indigo-600 transition-all duration-500 ease-in-out" 
+                  className="h-full bg-primary transition-all duration-500 ease-in-out" 
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -320,8 +320,8 @@ export default function SopDetailPage() {
                     <div 
                       className={`mt-0.5 h-4 w-4 rounded border flex items-center justify-center transition-colors ${
                         completedSteps.includes(step.id)
-                          ? "bg-green-500 border-green-500 text-white"
-                          : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-indigo-400"
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-primary/50"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -331,7 +331,7 @@ export default function SopDetailPage() {
                       {completedSteps.includes(step.id) && <CheckCircle2 className="h-3 w-3" />}
                     </div>
                     <span className={`text-sm leading-tight transition-colors ${
-                      completedSteps.includes(step.id) ? "text-slate-400 line-through" : "text-slate-600 dark:text-slate-300 group-hover:text-indigo-600"
+                      completedSteps.includes(step.id) ? "text-slate-400 line-through" : "text-slate-600 dark:text-slate-300 group-hover:text-primary"
                     }`}>
                       {step.title}
                     </span>
