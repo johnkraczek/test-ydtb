@@ -16,7 +16,8 @@ import {
   Briefcase,
   Building,
   CreditCard,
-  Globe
+  Globe,
+  LayoutGrid
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
