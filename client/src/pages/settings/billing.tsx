@@ -89,9 +89,9 @@ export default function BillingSettingsPage() {
   const [cardNumber, setCardNumber] = useState("4242");
   const [selectedCardId, setSelectedCardId] = useState("card_1");
   const [isAddingNewCard, setIsAddingNewCard] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<typeof INVOICES[0] | null>(null);
 
   const handleSelectPlan = (planId: string) => {
-    // ... existing handleSelectPlan logic
     if (planId === currentPlan) return;
     setIsUpdating(true);
     
@@ -136,8 +136,6 @@ export default function BillingSettingsPage() {
       }
     >
       <div className="max-w-5xl mx-auto space-y-8 pb-10">
-        
-        {/* ... existing content ... */}
         
         {/* Current Plan & Payment Method Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -291,7 +289,7 @@ export default function BillingSettingsPage() {
                           <DropdownMenuItem>
                             <Download className="h-4 w-4 mr-2" /> Download PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setSelectedInvoice(invoice)}>
                             <ArrowUpRight className="h-4 w-4 mr-2" /> View Details
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -303,6 +301,77 @@ export default function BillingSettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Invoice Details Dialog */}
+        <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Invoice Details</DialogTitle>
+              <DialogDescription>
+                Invoice {selectedInvoice?.id} for {selectedInvoice?.description}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedInvoice && (
+              <div className="space-y-6 py-4">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                  <div className="space-y-1">
+                    <div className="text-sm text-slate-500">Amount Paid</div>
+                    <div className="text-3xl font-bold">{selectedInvoice.amount}</div>
+                  </div>
+                  <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800">
+                    {selectedInvoice.status}
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-slate-500">Date Issued</div>
+                    <div>{new Date(selectedInvoice.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-slate-500">Billing Period</div>
+                    <div>{new Date(selectedInvoice.date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-slate-500">Payment Method</div>
+                    <div className="flex items-center gap-2">
+                       <CreditCard className="h-4 w-4 text-slate-400" />
+                       <span>Visa ending in 4242</span>
+                    </div>
+                  </div>
+                   <div className="space-y-1">
+                    <div className="text-sm font-medium text-slate-500">Billed To</div>
+                    <div>Acme Inc.</div>
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 p-4 space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span>{selectedInvoice.description}</span>
+                    <span className="font-medium">{selectedInvoice.amount}</span>
+                  </div>
+                   <div className="flex justify-between text-sm text-slate-500">
+                    <span>Tax (0%)</span>
+                    <span>$0.00</span>
+                  </div>
+                   <Separator />
+                   <div className="flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>{selectedInvoice.amount}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedInvoice(null)}>Close</Button>
+              <Button className="gap-2">
+                <Download className="h-4 w-4" /> Download PDF
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Change Plan Dialog */}
         <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
