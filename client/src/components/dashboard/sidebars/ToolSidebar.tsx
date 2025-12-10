@@ -33,7 +33,8 @@ import {
   Globe,
   Briefcase,
   Hash,
-  Search
+  Search,
+  Filter
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -44,6 +45,14 @@ import { Card } from "@/components/ui/card";
 import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
 import { Progress } from "@/components/ui/progress";
 import { useLocation } from "wouter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Dialog,
@@ -610,6 +619,27 @@ function MessagesSidebarContent() {
 }
 
 function ContactsSidebarContent() {
+  const [groups, setGroups] = useState([
+    { id: '1', name: 'Customers', type: 'fixed' },
+    { id: '2', name: 'Partners', type: 'fixed' },
+    { id: '3', name: 'Vendors', type: 'fixed' }
+  ]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [activeTab, setActiveTab] = useState("fixed");
+
+  const handleCreateGroup = () => {
+    if (newGroupName.trim()) {
+      setGroups([...groups, { 
+        id: Date.now().toString(), 
+        name: newGroupName, 
+        type: activeTab 
+      }]);
+      setNewGroupName("");
+      setIsDialogOpen(false);
+    }
+  };
+
   return (
     <div className="space-y-1">
       <SidebarSection title="Contacts">
@@ -618,11 +648,92 @@ function ContactsSidebarContent() {
         <SidebarItem icon={Clock} label="Recently Added" />
       </SidebarSection>
       
-      <SidebarSection title="Groups">
-        <SidebarItem icon={Folder} label="Customers" />
-        <SidebarItem icon={Folder} label="Partners" />
-        <SidebarItem icon={Folder} label="Vendors" />
-      </SidebarSection>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2 px-2">
+            <h4 className="font-semibold text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Groups</h4>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-4 w-4 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm">
+                        <Plus className="h-3 w-3 text-slate-500" />
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Group</DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="fixed" value={activeTab} onValueChange={setActiveTab} className="w-full mt-2">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="fixed">Fixed Group</TabsTrigger>
+                            <TabsTrigger value="smart">Smart Group</TabsTrigger>
+                        </TabsList>
+                        
+                        <div className="py-4 space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Group Name</Label>
+                                <Input 
+                                    id="name" 
+                                    placeholder={activeTab === 'fixed' ? "e.g. VIP Clients" : "e.g. High Value Leads"} 
+                                    value={newGroupName}
+                                    onChange={(e) => setNewGroupName(e.target.value)}
+                                />
+                            </div>
+                            
+                            {activeTab === 'smart' && (
+                                <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        <Filter className="h-4 w-4" />
+                                        <span>Filters</span>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <Select defaultValue="status">
+                                                <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                    <SelectValue placeholder="Field" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="status">Status</SelectItem>
+                                                    <SelectItem value="tags">Tags</SelectItem>
+                                                    <SelectItem value="location">Location</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Select defaultValue="is">
+                                                <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-900">
+                                                    <SelectValue placeholder="Operator" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="is">is</SelectItem>
+                                                    <SelectItem value="is_not">is not</SelectItem>
+                                                    <SelectItem value="contains">contains</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Input className="h-8 text-xs bg-white dark:bg-slate-900" placeholder="Value..." />
+                                        </div>
+                                        <Button variant="ghost" size="sm" className="w-full text-xs text-slate-500 h-7 border border-dashed border-slate-300 dark:border-slate-700">
+                                            <Plus className="h-3 w-3 mr-1" /> Add Filter
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                            <Button onClick={handleCreateGroup}>Create Group</Button>
+                        </DialogFooter>
+                    </Tabs>
+                </DialogContent>
+            </Dialog>
+        </div>
+        <div className="space-y-0.5">
+            {groups.map(group => (
+                <SidebarItem 
+                    key={group.id} 
+                    icon={group.type === 'smart' ? Zap : Folder} 
+                    label={group.name} 
+                />
+            ))}
+        </div>
+      </div>
     </div>
   );
 }
