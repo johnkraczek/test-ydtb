@@ -25,7 +25,9 @@ import {
   ThumbsDown,
   Frown,
   Heart,
-  Angry
+  Angry,
+  LayoutGrid,
+  List
 } from "lucide-react";
 import { useRoute } from "wouter";
 import {
@@ -294,6 +296,7 @@ export default function TeamPage() {
 
 function TeamDirectory() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   const filteredMembers = TEAM_MEMBERS.filter(member => 
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -326,56 +329,141 @@ function TeamDirectory() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
-           {/* Filters could go here */}
+        
+        {/* View Selector */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
+          <button
+            onClick={() => setView('grid')}
+            className={`p-1.5 rounded-md transition-all ${
+              view === 'grid' 
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+            title="Grid View"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setView('list')}
+            className={`p-1.5 rounded-md transition-all ${
+              view === 'list' 
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+            title="List View"
+          >
+            <List className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredMembers.map((member) => (
-          <div key={member.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={member.avatar} />
-                    <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900 ${
-                    member.status === 'online' ? 'bg-green-500' : 
-                    member.status === 'busy' ? 'bg-red-500' : 
-                    member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
-                  }`} />
+      {view === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredMembers.map((member) => (
+            <div key={member.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={member.avatar} />
+                      <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900 ${
+                      member.status === 'online' ? 'bg-green-500' : 
+                      member.status === 'busy' ? 'bg-red-500' : 
+                      member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
+                    }`} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">{member.name}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{member.role}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">{member.name}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{member.role}</p>
-                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-2 mb-4">
-              <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
-                {member.department}
-              </Badge>
-            </div>
+              
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-normal">
+                  {member.department}
+                </Badge>
+              </div>
 
-            <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
-                <MessageSquare className="h-3.5 w-3.5 mr-2" />
-                Message
-              </Button>
-              <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
-                <Mail className="h-3.5 w-3.5 mr-2" />
-                Email
-              </Button>
+              <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                  <MessageSquare className="h-3.5 w-3.5 mr-2" />
+                  Message
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                  <Mail className="h-3.5 w-3.5 mr-2" />
+                  Email
+                </Button>
+              </div>
             </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500 font-medium">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Member</th>
+                  <th className="px-4 py-3 font-medium">Role</th>
+                  <th className="px-4 py-3 font-medium">Department</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filteredMembers.map((member) => (
+                  <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={member.avatar} />
+                          <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{member.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{member.role}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant="secondary" className="font-normal bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        {member.department}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`h-2 w-2 rounded-full ${
+                          member.status === 'online' ? 'bg-green-500' : 
+                          member.status === 'busy' ? 'bg-red-500' : 
+                          member.status === 'away' ? 'bg-amber-500' : 'bg-slate-400'
+                        }`} />
+                        <span className="capitalize text-slate-600 dark:text-slate-400">{member.status}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
