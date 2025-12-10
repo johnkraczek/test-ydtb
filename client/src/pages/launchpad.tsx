@@ -1,4 +1,5 @@
 
+import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
@@ -15,7 +16,10 @@ import {
   ArrowRight, 
   ExternalLink,
   Settings,
-  Rocket
+  Rocket,
+  Sun,
+  Moon,
+  Monitor
 } from "lucide-react";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +32,12 @@ interface SetupTask {
   completed: boolean;
   actionLabel: string;
   actionUrl?: string; // In a real app this would link to settings
-  type: "link" | "color-picker" | "integration";
+  type: "link" | "color-picker" | "mode-picker" | "integration";
 }
 
 export default function LaunchpadPage() {
   const { themeColor, setThemeColor } = useThemeColor();
+  const { theme, setTheme } = useTheme();
   const [, setLocation] = useLocation();
   
   // Mock state for completed tasks
@@ -45,6 +50,15 @@ export default function LaunchpadPage() {
       completed: true, // Considered completed if they interacted, but for now just static
       actionLabel: "Customize",
       type: "color-picker"
+    },
+    {
+      id: "mode",
+      title: "Customize Mode",
+      description: "Choose between light, dark, or system appearance.",
+      icon: Monitor,
+      completed: true,
+      actionLabel: "Customize",
+      type: "mode-picker"
     },
     {
       id: "payment",
@@ -85,7 +99,7 @@ export default function LaunchpadPage() {
   };
 
   const handleAction = (task: SetupTask) => {
-    if (task.type === "color-picker") {
+    if (task.type === "color-picker" || task.type === "mode-picker") {
         toggleTask(task.id);
     } else if (task.actionUrl) {
         setLocation(task.actionUrl);
@@ -187,17 +201,50 @@ export default function LaunchpadPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* Specific controls for Mode Picker */}
+                  {task.type === "mode-picker" && !task.completed && (
+                    <div className="flex gap-2 mt-3 pt-2">
+                      <Button
+                        variant={theme === 'light' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTheme('light')}
+                        className={`gap-2 h-8 ${theme === 'light' ? 'bg-primary text-primary-foreground' : ''}`}
+                      >
+                        <Sun className="h-4 w-4" />
+                        Light
+                      </Button>
+                      <Button
+                        variant={theme === 'dark' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTheme('dark')}
+                        className={`gap-2 h-8 ${theme === 'dark' ? 'bg-primary text-primary-foreground' : ''}`}
+                      >
+                        <Moon className="h-4 w-4" />
+                        Dark
+                      </Button>
+                      <Button
+                        variant={theme === 'system' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTheme('system')}
+                        className={`gap-2 h-8 ${theme === 'system' ? 'bg-primary text-primary-foreground' : ''}`}
+                      >
+                        <Monitor className="h-4 w-4" />
+                        System
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action */}
                 <div className="flex-shrink-0">
-                  {task.type === "color-picker" ? (
+                  {task.type === "color-picker" || task.type === "mode-picker" ? (
                     <Button 
                       variant={task.completed ? "outline" : "default"}
                       onClick={() => handleAction(task)}
                       className={task.completed ? "bg-white" : "bg-primary hover:bg-primary/90"}
                     >
-                      {task.completed ? "Change Color" : "Save Color"}
+                      {task.completed ? (task.type === "color-picker" ? "Change Color" : "Change Mode") : "Save Changes"}
                     </Button>
                   ) : (
                     <Button 
