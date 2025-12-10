@@ -249,12 +249,20 @@ export default function SopDetailPage() {
                       {step.content}
 
                       {step.note && (
-                        <div className={`mt-4 p-4 rounded-md border text-sm flex gap-3 ${
-                          step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300' :
-                          step.note.color === 'red' ? 'bg-red-50 border-red-100 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300' :
-                          step.note.color === 'green' ? 'bg-green-50 border-green-100 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' :
-                          'bg-amber-50 border-amber-100 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300'
-                        }`}>
+                        <div 
+                          className={`mt-4 p-4 rounded-md border text-sm flex gap-3 ${
+                            step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300' :
+                            step.note.color === 'red' ? 'bg-red-50 border-red-100 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300' :
+                            step.note.color === 'green' ? 'bg-green-50 border-green-100 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' :
+                            step.note.color === 'amber' ? 'bg-amber-50 border-amber-100 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300' :
+                            '' // Custom handled via style
+                          }`}
+                          style={step.note.color === 'custom' ? {
+                            backgroundColor: `${step.note.customColor}15`,
+                            borderColor: `${step.note.customColor}40`,
+                            color: step.note.customColor
+                          } : undefined}
+                        >
                           <div className="flex-shrink-0 mt-0.5">
                             {step.note.icon === 'info' && <Info className="h-4 w-4" />}
                             {step.note.icon === 'warning' && <AlertTriangle className="h-4 w-4" />}
@@ -271,9 +279,13 @@ export default function SopDetailPage() {
                       {step.button && (
                         <div className="mt-4">
                           <Button 
-                            variant={step.button.color as any || "default"}
+                            variant={step.button.color === 'custom' ? 'default' : step.button.color as any}
                             className="gap-2"
                             onClick={() => window.open(step.button.url, '_blank')}
+                            style={step.button.color === 'custom' ? {
+                              backgroundColor: step.button.customColor,
+                              borderColor: step.button.customColor,
+                            } : undefined}
                           >
                             {step.button.text}
                           </Button>

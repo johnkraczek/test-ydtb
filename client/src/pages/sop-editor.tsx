@@ -65,14 +65,16 @@ type ImageSettings = {
 type StepNote = {
   title: string;
   content: string;
-  color: 'blue' | 'amber' | 'red' | 'green';
+  color: 'blue' | 'amber' | 'red' | 'green' | 'custom';
+  customColor?: string;
   icon: 'info' | 'warning' | 'tip' | 'alert';
 };
 
 type StepButton = {
   text: string;
   url: string;
-  color: 'primary' | 'secondary' | 'outline' | 'destructive';
+  color: 'primary' | 'secondary' | 'outline' | 'destructive' | 'custom';
+  customColor?: string;
 };
 
 interface SopStep {
@@ -167,6 +169,10 @@ export default function SopEditorPage() {
     setSteps(steps.map(s => {
       if (s.id !== id) return s;
       const currentNote = s.note || { title: 'Note:', content: '', color: 'amber', icon: 'info' };
+      // If switching to custom color for the first time, set a default
+      if (field === 'color' && value === 'custom' && !currentNote.customColor) {
+        return { ...s, note: { ...currentNote, [field]: value, customColor: '#f59e0b' } };
+      }
       return { ...s, note: { ...currentNote, [field]: value } };
     }));
   };
@@ -175,6 +181,10 @@ export default function SopEditorPage() {
     setSteps(steps.map(s => {
       if (s.id !== id) return s;
       const currentButton = s.button || { text: 'Click Here', url: '', color: 'primary' };
+      // If switching to custom color for the first time, set a default
+      if (field === 'color' && value === 'custom' && !currentButton.customColor) {
+        return { ...s, button: { ...currentButton, [field]: value, customColor: '#3b82f6' } };
+      }
       return { ...s, button: { ...currentButton, [field]: value } };
     }));
   };
@@ -520,20 +530,31 @@ export default function SopEditorPage() {
                              </div>
                              <div className="space-y-1.5">
                                 <Label className="text-xs">Color</Label>
-                                <Select 
-                                  value={step.button.color} 
-                                  onValueChange={(val) => updateStepButton(step.id, 'color', val)}
-                                >
-                                  <SelectTrigger className="h-8">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="primary">Primary (Brand)</SelectItem>
-                                    <SelectItem value="secondary">Secondary (Gray)</SelectItem>
-                                    <SelectItem value="outline">Outline</SelectItem>
-                                    <SelectItem value="destructive">Destructive (Red)</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                <div className="flex gap-2">
+                                  <Select 
+                                    value={step.button.color} 
+                                    onValueChange={(val) => updateStepButton(step.id, 'color', val)}
+                                  >
+                                    <SelectTrigger className="h-8 flex-1">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="primary">Primary (Brand)</SelectItem>
+                                      <SelectItem value="secondary">Secondary (Gray)</SelectItem>
+                                      <SelectItem value="outline">Outline</SelectItem>
+                                      <SelectItem value="destructive">Destructive (Red)</SelectItem>
+                                      <SelectItem value="custom">Custom</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  {step.button.color === 'custom' && (
+                                    <Input 
+                                      type="color" 
+                                      value={step.button.customColor}
+                                      onChange={(e) => updateStepButton(step.id, 'customColor', e.target.value)}
+                                      className="h-8 w-8 p-0 border-none rounded-md cursor-pointer"
+                                    />
+                                  )}
+                                </div>
                              </div>
                           </div>
                        </div>
@@ -541,12 +562,19 @@ export default function SopEditorPage() {
 
                     {/* Note Editor */}
                     {step.note && (
-                      <div className={`p-4 rounded-md border space-y-3 relative group ${
-                        step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800' :
-                        step.note.color === 'red' ? 'bg-red-50 border-red-100 dark:bg-red-900/10 dark:border-red-800' :
-                        step.note.color === 'green' ? 'bg-green-50 border-green-100 dark:bg-green-900/10 dark:border-green-800' :
-                        'bg-amber-50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-800'
-                      }`}>
+                      <div 
+                        className={`p-4 rounded-md border space-y-3 relative group ${
+                          step.note.color === 'blue' ? 'bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800' :
+                          step.note.color === 'red' ? 'bg-red-50 border-red-100 dark:bg-red-900/10 dark:border-red-800' :
+                          step.note.color === 'green' ? 'bg-green-50 border-green-100 dark:bg-green-900/10 dark:border-green-800' :
+                          step.note.color === 'amber' ? 'bg-amber-50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-800' :
+                          '' // Custom handled via style
+                        }`}
+                        style={step.note.color === 'custom' ? {
+                          backgroundColor: `${step.note.customColor}15`, // 15 hex = ~8% opacity
+                          borderColor: `${step.note.customColor}40` // 40 hex = ~25% opacity
+                        } : undefined}
+                      >
                          <Button 
                             variant="ghost" 
                             size="icon" 
@@ -594,20 +622,31 @@ export default function SopEditorPage() {
                                </div>
                                <div className="space-y-1.5 flex-1">
                                   <Label className="text-xs">Color</Label>
-                                  <Select 
-                                    value={step.note.color} 
-                                    onValueChange={(val) => updateStepNote(step.id, 'color', val)}
-                                  >
-                                    <SelectTrigger className="h-8 bg-white/50 dark:bg-black/20 border-transparent">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="amber">Amber</SelectItem>
-                                      <SelectItem value="blue">Blue</SelectItem>
-                                      <SelectItem value="red">Red</SelectItem>
-                                      <SelectItem value="green">Green</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <div className="flex gap-2">
+                                    <Select 
+                                      value={step.note.color} 
+                                      onValueChange={(val) => updateStepNote(step.id, 'color', val)}
+                                    >
+                                      <SelectTrigger className="h-8 bg-white/50 dark:bg-black/20 border-transparent flex-1">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="amber">Amber</SelectItem>
+                                        <SelectItem value="blue">Blue</SelectItem>
+                                        <SelectItem value="red">Red</SelectItem>
+                                        <SelectItem value="green">Green</SelectItem>
+                                        <SelectItem value="custom">Custom</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    {step.note.color === 'custom' && (
+                                      <Input 
+                                        type="color" 
+                                        value={step.note.customColor}
+                                        onChange={(e) => updateStepNote(step.id, 'customColor', e.target.value)}
+                                        className="h-8 w-8 p-0 border-none rounded-md cursor-pointer flex-shrink-0"
+                                      />
+                                    )}
+                                  </div>
                                </div>
                              </div>
                           </div>
