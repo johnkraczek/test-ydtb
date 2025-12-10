@@ -338,23 +338,18 @@ export function FilterBuilder({ columns, filters, onFiltersChange }: FilterBuild
             ) : (
                 filters.map((filter, index) => renderFilterItem(filter, index))
             )}
-            
-            {filters.length > 0 && (
-                 <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 text-xs text-slate-500 hover:text-indigo-600 pl-0 ml-[80px] gap-1"
-                    onClick={() => addNestedFilter(null)}
-                 >
-                    <CornerDownRight className="h-3 w-3" /> Add grouped filter
-                 </Button>
-            )}
         </div>
 
         <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
-            <Button variant="outline" size="sm" className="h-8 gap-1" onClick={addFilter}>
-                <Plus className="h-3.5 w-3.5" /> Add filter
-            </Button>
+            <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="h-8 gap-1" onClick={addFilter}>
+                    <Plus className="h-3.5 w-3.5" /> Add filter
+                </Button>
+                
+                <Button variant="outline" size="sm" className="h-8 gap-1" onClick={() => addNestedFilter(null)}>
+                    <CornerDownRight className="h-3.5 w-3.5" /> Add grouped filter
+                </Button>
+            </div>
             
             {filters.length > 0 && (
                 <Button variant="ghost" size="sm" className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={clearFilters}>
