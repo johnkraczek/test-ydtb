@@ -602,7 +602,6 @@ export default function CustomFieldsPage() {
                                     </TableBody>
                                 </Table>
                             </div>
-                        </div>
                     </TabsContent>
                 </div>
             </DashboardLayout>
