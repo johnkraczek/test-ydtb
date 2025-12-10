@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import DashboardLayout from "@/components/dashboard/Layout";
+import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -416,68 +417,75 @@ export default function ContactDetailPage() {
   const metrics = getFilteredMetrics();
 
   return (
-    <DashboardLayout activeTool="users">
-      <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Back Button & Header */}
-      <div className="space-y-4">
-        <Link href="/contacts">
-          <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent hover:text-primary">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Contacts
-          </Button>
-        </Link>
-        
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-              <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                {customer.firstName[0]}{customer.lastName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                {customer.firstName} {customer.lastName}
-                <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200">
-                  <Star className="h-3 w-3 mr-1 fill-current" />
-                  {customer.status}
-                </Badge>
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-1">
-                <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {customer.email}</span>
-                <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {customer.phone}</span>
-                <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {customer.location}</span>
-              </div>
+    <DashboardLayout 
+      activeTool="users"
+      header={
+        <DashboardPageHeader
+          hideBreadcrumbs={true}
+          title={
+            <div className="flex flex-col gap-2">
+                <Link href="/contacts">
+                  <Button variant="ghost" size="sm" className="pl-0 hover:bg-transparent hover:text-primary -ml-2 h-auto py-0 w-fit">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Contacts
+                  </Button>
+                </Link>
+                <div className="flex items-center gap-4 mt-2">
+                    <Avatar className="h-14 w-14 border-2 border-card shadow-sm">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
+                        {customer.firstName[0]}{customer.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                        {customer.firstName} {customer.lastName}
+                        <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200">
+                          <Star className="h-3 w-3 mr-1 fill-current" />
+                          {customer.status}
+                        </Badge>
+                      </h1>
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {customer.email}</span>
+                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {customer.phone}</span>
+                        <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {customer.location}</span>
+                      </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" onClick={() => setFormData({...customer})}>Edit Profile</Button>
-              </SheetTrigger>
-              <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>Edit Customer Profile</SheetTitle>
-                  <SheetDescription>
-                    Update customer details, contact preferences, and tags.
-                  </SheetDescription>
-                </SheetHeader>
-                
-                <CustomerFormContent formData={formData} setFormData={setFormData} />
+          }
+          actions={
+            <div className="flex items-center gap-2 pt-8">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" onClick={() => setFormData({...customer})}>Edit Profile</Button>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Edit Customer Profile</SheetTitle>
+                    <SheetDescription>
+                      Update customer details, contact preferences, and tags.
+                    </SheetDescription>
+                  </SheetHeader>
+                  
+                  <CustomerFormContent formData={formData} setFormData={setFormData} />
 
-                <SheetFooter className="pt-4 border-t">
-                  <SheetClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button onClick={handleSaveProfile}>Save Changes</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </div>
+                  <SheetFooter className="pt-4 border-t">
+                    <SheetClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Button onClick={handleSaveProfile}>Save Changes</Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
+            </div>
+          }
+        />
+      }
+    >
+      <div className="space-y-8 animate-in fade-in duration-500">
+
 
 
       <Tabs defaultValue="details" className="w-full">
