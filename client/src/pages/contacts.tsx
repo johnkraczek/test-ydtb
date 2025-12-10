@@ -86,9 +86,39 @@ import {
   CommandEmpty,
   CommandGroup,
 } from "@/components/ui/command";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose
+} from "@/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
+import { 
+  Type, 
+  Hash, 
+  Calendar as CalendarIcon, 
+  CheckSquare, 
+  List, 
+  Link as LinkIcon, 
+  Calculator, 
+  AlignLeft, 
+  PlayCircle,
+  DollarSign,
+  ChevronDown,
+  Globe,
+  Sparkles
+} from "lucide-react";
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
@@ -185,6 +215,58 @@ export default function ContactsPage() {
     dndInboundSms: false,
   });
   const [columnSearch, setColumnSearch] = useState("");
+  
+  // Custom Column Creation State
+  const [isColumnCreatorOpen, setIsColumnCreatorOpen] = useState(false);
+  const [columnCreatorStep, setColumnCreatorStep] = useState<'type-selection' | 'configuration'>('type-selection');
+  const [selectedColumnType, setSelectedColumnType] = useState<any>(null);
+  const [newColumnConfig, setNewColumnConfig] = useState({
+    name: "",
+    description: "",
+    defaultValue: "",
+    isRequired: false,
+    isPinned: false,
+    isVisibleToGuests: true
+  });
+
+  const fieldTypes = [
+    { icon: List, label: "Dropdown", type: "dropdown", color: "text-emerald-600" },
+    { icon: Type, label: "Text", type: "text", color: "text-blue-600" },
+    { icon: CalendarIcon, label: "Date", type: "date", color: "text-amber-600" },
+    { icon: AlignLeft, label: "Text area (Long Text)", type: "textarea", color: "text-blue-600" },
+    { icon: Hash, label: "Number", type: "number", color: "text-teal-600" },
+    { icon: Tag, label: "Labels", type: "labels", color: "text-emerald-600" },
+    { icon: CheckSquare, label: "Checkbox", type: "checkbox", color: "text-pink-600" },
+    { icon: DollarSign, label: "Money", type: "money", color: "text-emerald-600" },
+    { icon: Globe, label: "Website", type: "website", color: "text-red-600" },
+    { icon: Calculator, label: "Formula", type: "formula", color: "text-emerald-600" },
+    { icon: Sparkles, label: "Custom Text", type: "ai_text", color: "text-purple-600" },
+    { icon: Sparkles, label: "Summary", type: "ai_summary", color: "text-purple-600" },
+    { icon: Sparkles, label: "Progress Updates", type: "ai_progress", color: "text-purple-600" },
+  ];
+
+  const handleSelectType = (type: any) => {
+    setSelectedColumnType(type);
+    setColumnCreatorStep('configuration');
+    setNewColumnConfig({ ...newColumnConfig, name: "" }); // Reset name
+  };
+
+  const handleCreateColumn = () => {
+    // Here we would actually create the column
+    // For mockup, we just close the sheet and reset
+    setIsColumnCreatorOpen(false);
+    setColumnCreatorStep('type-selection');
+    setSelectedColumnType(null);
+    // Maybe add a toast here
+  };
+
+  const handleCloseCreator = () => {
+    setIsColumnCreatorOpen(false);
+    setTimeout(() => {
+        setColumnCreatorStep('type-selection');
+        setSelectedColumnType(null);
+    }, 300);
+  };
 
   const columns = [
     { id: "name", label: "Name" },
@@ -389,7 +471,243 @@ export default function ContactsPage() {
                 {visibleColumns.dndInboundCalls && <SortableHeader column="dndInboundCalls" label="DND Inbound Calls" />}
                 {visibleColumns.dndInboundSms && <SortableHeader column="dndInboundSms" label="DND Inbound SMS" />}
                 {visibleColumns.tags && <TableHead>Tags</TableHead>}
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[50px] text-right pr-2">
+                    <Sheet open={isColumnCreatorOpen} onOpenChange={setIsColumnCreatorOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent className="w-[400px] sm:w-[450px] overflow-y-auto p-0">
+                            {columnCreatorStep === 'type-selection' ? (
+                                <div className="h-full flex flex-col">
+                                    <div className="px-6 py-4 border-b">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setIsColumnCreatorOpen(false)}>
+                                                <ArrowLeft className="h-4 w-4" />
+                                            </Button>
+                                            <h2 className="text-lg font-semibold">Create field</h2>
+                                        </div>
+                                        <div className="relative">
+                                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                            <Input placeholder="Search for new or existing fields" className="pl-9 bg-slate-50 dark:bg-slate-900" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto py-2">
+                                        <div className="px-6 pb-2 pt-2">
+                                            <h3 className="text-xs font-medium text-slate-500 mb-2">Suggested</h3>
+                                            <div className="space-y-1">
+                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
+                                                    <List className="h-4 w-4 text-emerald-600" /> CRM Lead Qualification Status
+                                                </Button>
+                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
+                                                    <DollarSign className="h-4 w-4 text-emerald-600" /> Opportunity Value (USD)
+                                                </Button>
+                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
+                                                    <Type className="h-4 w-4 text-blue-600" /> Client Contact Preference
+                                                </Button>
+                                                <Button variant="ghost" className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300">
+                                                    <Sparkles className="h-4 w-4 text-purple-600" /> Next Best Action
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <Separator className="my-2" />
+
+                                        <div className="px-6 pb-2">
+                                            <h3 className="text-xs font-medium text-slate-500 mb-2">AI fields</h3>
+                                            <div className="space-y-1">
+                                                {fieldTypes.filter(f => f.type.startsWith('ai_')).map((field) => (
+                                                    <Button 
+                                                        key={field.type} 
+                                                        variant="ghost" 
+                                                        className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300"
+                                                        onClick={() => handleSelectType(field)}
+                                                    >
+                                                        <field.icon className={`h-4 w-4 ${field.color}`} /> {field.label}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <Separator className="my-2" />
+
+                                        <div className="px-6 pb-6">
+                                            <h3 className="text-xs font-medium text-slate-500 mb-2">All</h3>
+                                            <div className="space-y-1">
+                                                {fieldTypes.filter(f => !f.type.startsWith('ai_')).map((field) => (
+                                                    <Button 
+                                                        key={field.type} 
+                                                        variant="ghost" 
+                                                        className="w-full justify-start gap-3 h-9 font-normal text-slate-700 dark:text-slate-300"
+                                                        onClick={() => handleSelectType(field)}
+                                                    >
+                                                        <field.icon className={`h-4 w-4 ${field.color}`} /> {field.label}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 border-t mt-auto">
+                                        <Button variant="outline" className="w-full gap-2 text-primary border-primary/20 bg-primary/5 hover:bg-primary/10">
+                                            <Plus className="h-4 w-4" /> Add existing fields
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="h-full flex flex-col">
+                                    <div className="px-6 py-4 border-b">
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => setColumnCreatorStep('type-selection')}>
+                                                <ArrowLeft className="h-4 w-4" />
+                                            </Button>
+                                            <div className="flex items-center gap-2">
+                                                {selectedColumnType && <selectedColumnType.icon className={`h-4 w-4 ${selectedColumnType.color}`} />}
+                                                <h2 className="text-lg font-semibold">{selectedColumnType?.label}</h2>
+                                                <ChevronDown className="h-4 w-4 text-slate-400" />
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="ml-auto h-8 w-8" onClick={handleCloseCreator}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="field-name">Field name <span className="text-red-500">*</span></Label>
+                                            <Input 
+                                                id="field-name" 
+                                                placeholder="Enter name..." 
+                                                value={newColumnConfig.name}
+                                                onChange={(e) => setNewColumnConfig({...newColumnConfig, name: e.target.value})}
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label>Fill method</Label>
+                                            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                                                <Button variant="ghost" size="sm" className="flex-1 bg-white dark:bg-slate-700 shadow-sm rounded-md h-8 text-xs font-medium">
+                                                    Manual fill
+                                                </Button>
+                                                <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs font-medium text-slate-500 gap-1.5">
+                                                    <Sparkles className="h-3 w-3 text-purple-500" /> Fill with AI
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <Collapsible defaultOpen>
+                                            <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
+                                                More settings and permissions
+                                                <ChevronDown className="h-4 w-4" />
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent className="space-y-4 pt-2">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="description" className="text-xs font-normal text-slate-500">Description</Label>
+                                                    <Input 
+                                                        id="description" 
+                                                        placeholder="Tell other users how to use this field" 
+                                                        value={newColumnConfig.description}
+                                                        onChange={(e) => setNewColumnConfig({...newColumnConfig, description: e.target.value})}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="default-value" className="text-xs font-normal text-slate-500">Default value</Label>
+                                                    <Input 
+                                                        id="default-value" 
+                                                        placeholder="Text" 
+                                                        value={newColumnConfig.defaultValue}
+                                                        onChange={(e) => setNewColumnConfig({...newColumnConfig, defaultValue: e.target.value})}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs font-normal text-slate-500">Baseline permissions</Label>
+                                                    <div className="flex gap-2">
+                                                        <Button variant="outline" className="flex-1 justify-between font-normal text-slate-600">
+                                                            <span className="flex items-center gap-2"><User className="h-3.5 w-3.5" /> Default</span>
+                                                            <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                                                        </Button>
+                                                        <Button variant="outline" className="flex-none font-normal text-slate-600">
+                                                            Make private
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="pt-2 flex items-center gap-2">
+                                                    <Avatar className="h-6 w-6">
+                                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                                        <AvatarFallback>JD</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="text-xs">
+                                                        <span className="font-medium text-slate-900 dark:text-slate-100">John Doe</span>
+                                                        <Badge variant="secondary" className="ml-2 text-[10px] h-4 px-1 bg-indigo-50 text-indigo-600 border-indigo-100">creator</Badge>
+                                                    </div>
+                                                    <span className="text-xs text-slate-400 ml-auto">Can edit</span>
+                                                </div>
+                                            </CollapsibleContent>
+                                        </Collapsible>
+                                        
+                                        <div className="space-y-4 pt-2">
+                                            <Label className="text-sm font-medium">Display settings</Label>
+                                            
+                                            <div className="flex items-start gap-3">
+                                                <Switch 
+                                                    id="required" 
+                                                    checked={newColumnConfig.isRequired} 
+                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isRequired: c})}
+                                                />
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="required" className="text-sm font-medium leading-none">Required in tasks</Label>
+                                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                                        Required Custom Fields must be filled out when creating tasks in all the locations where the Custom Field is used in your Workspace.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Switch 
+                                                    id="pinned" 
+                                                    checked={newColumnConfig.isPinned} 
+                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isPinned: c})}
+                                                />
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="pinned" className="text-sm font-medium leading-none">Pinned</Label>
+                                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                                        Pinned Custom Fields will always be displayed in Task view, even if empty.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Switch 
+                                                    id="guests" 
+                                                    checked={newColumnConfig.isVisibleToGuests} 
+                                                    onCheckedChange={(c) => setNewColumnConfig({...newColumnConfig, isVisibleToGuests: c})}
+                                                />
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="guests" className="text-sm font-medium leading-none">Visible to guests and limited members</Label>
+                                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                                        Custom Fields can be hidden or shown to guests and limited members in your Workspace.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 border-t flex justify-end gap-2 bg-slate-50/50 dark:bg-slate-900/50">
+                                        <Button variant="outline" onClick={handleCloseCreator}>Cancel</Button>
+                                        <Button 
+                                            onClick={handleCreateColumn}
+                                            disabled={!newColumnConfig.name}
+                                            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                        >
+                                            Create
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </SheetContent>
+                    </Sheet>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
