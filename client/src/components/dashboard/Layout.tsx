@@ -59,14 +59,6 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       }
     } else if (toolId === "agency-settings") {
       setLocation("/agency/settings/profile"); // Default to profile if someone clicks settings
-    } else if (toolId === "agency-profile") {
-      setLocation("/agency/settings/profile");
-    } else if (toolId === "agency-team") {
-      setLocation("/agency/settings/team");
-    } else if (toolId === "agency-billing") {
-      setLocation("/agency/settings/billing");
-    } else if (toolId === "agency-white-label") {
-      setLocation("/agency/settings/white-label");
     }
     // Add other routes as needed
   };

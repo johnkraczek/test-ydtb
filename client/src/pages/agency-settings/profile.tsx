@@ -11,7 +11,7 @@ export default function AgencyProfilePage() {
   return (
     <DashboardLayout 
       mode="agency" 
-      activeTool="agency-profile"
+      activeTool="agency-settings"
       header={
         <DashboardPageHeader 
           title="Agency Profile" 

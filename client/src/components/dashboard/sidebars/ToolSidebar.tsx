@@ -38,7 +38,8 @@ import {
   Pencil,
   Trash,
   Edit,
-  X
+  X,
+  Building
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -200,6 +201,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return <SopSidebarContent />;
       case "settings":
         return <SettingsSidebarContent />;
+      case "agency-settings":
+        return <AgencySettingsSidebarContent />;
       default:
         return <DefaultSidebarContent />;
     }
@@ -227,6 +230,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return "SOP Library";
       case "settings":
         return "Settings";
+      case "agency-settings":
+        return "Agency Settings";
       default:
         return "Menu";
     }
@@ -485,6 +490,51 @@ function SidebarItem({ icon: Icon, label, badge, active, actions }: { icon: any,
             )}
         </div>
     )
+}
+
+function AgencySettingsSidebarContent() {
+  const [location, setLocation] = useLocation();
+
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="General">
+        <div onClick={() => setLocation("/agency/settings/profile")}>
+          <SidebarItem 
+            icon={Building} 
+            label="Agency Profile" 
+            active={location === "/agency/settings/profile"} 
+          />
+        </div>
+        <div onClick={() => setLocation("/agency/settings/team")}>
+          <SidebarItem 
+            icon={Users} 
+            label="Team Management" 
+            active={location === "/agency/settings/team"} 
+          />
+        </div>
+      </SidebarSection>
+      
+      <SidebarSection title="Subscription">
+        <div onClick={() => setLocation("/agency/settings/billing")}>
+          <SidebarItem 
+            icon={CreditCard} 
+            label="Billing" 
+            active={location === "/agency/settings/billing"} 
+          />
+        </div>
+      </SidebarSection>
+      
+      <SidebarSection title="System">
+        <div onClick={() => setLocation("/agency/settings/white-label")}>
+          <SidebarItem 
+            icon={Globe} 
+            label="White Label" 
+            active={location === "/agency/settings/white-label"} 
+          />
+        </div>
+      </SidebarSection>
+    </div>
+  );
 }
 
 function LaunchpadSidebarContent() {

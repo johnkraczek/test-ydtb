@@ -12,7 +12,7 @@ export default function AgencyWhiteLabelPage() {
   return (
     <DashboardLayout 
       mode="agency" 
-      activeTool="agency-white-label"
+      activeTool="agency-settings"
       header={
         <DashboardPageHeader 
           title="White Label" 

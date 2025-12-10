@@ -8,7 +8,7 @@ export default function AgencyTeamPage() {
   return (
     <DashboardLayout 
       mode="agency" 
-      activeTool="agency-team"
+      activeTool="agency-settings"
       header={
         <DashboardPageHeader 
           title="Team Management" 

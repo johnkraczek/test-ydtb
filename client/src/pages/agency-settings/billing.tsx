@@ -8,7 +8,7 @@ export default function AgencyBillingPage() {
   return (
     <DashboardLayout 
       mode="agency" 
-      activeTool="agency-billing"
+      activeTool="agency-settings"
       header={
         <DashboardPageHeader 
           title="Billing" 

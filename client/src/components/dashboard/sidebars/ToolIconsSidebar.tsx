@@ -134,30 +134,6 @@ const AGENCY_TOOLS: ToolItem[] = [
     label: "Agency Dashboard",
     visible: true,
   },
-  {
-    id: "agency-profile",
-    icon: Building,
-    label: "Agency Profile",
-    visible: true,
-  },
-  {
-    id: "agency-team",
-    icon: Users,
-    label: "Team Management",
-    visible: true,
-  },
-  {
-    id: "agency-billing",
-    icon: CreditCard,
-    label: "Billing",
-    visible: true,
-  },
-  {
-    id: "agency-white-label",
-    icon: Globe,
-    label: "White Label",
-    visible: true,
-  },
 ];
 
 export function ToolIconsSidebar({
