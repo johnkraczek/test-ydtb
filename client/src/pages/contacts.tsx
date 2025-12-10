@@ -121,7 +121,66 @@ import {
   GripVertical,
   ArrowLeft
 } from "lucide-react";
+import {
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Label } from "@/components/ui/label";
+
+// Sortable Item Component
+function SortableColumnItem({ id, column, visibleColumns, setVisibleColumns }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative' as 'relative',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`flex items-center gap-3 py-2 group ${isDragging ? 'opacity-50' : ''}`}>
+      <div {...attributes} {...listeners} className="cursor-move touch-none">
+         <GripVertical className="h-4 w-4 text-slate-300 hover:text-slate-500 transition-colors" />
+      </div>
+      <div className="flex items-center gap-2 flex-1">
+          {column.id === 'tags' ? <Tag className="h-4 w-4 text-slate-400" /> : 
+           column.id === 'phone' ? <List className="h-4 w-4 text-slate-400" /> :
+           column.id === 'dob' || column.id === 'created' ? <CalendarIcon className="h-4 w-4 text-slate-400" /> :
+           <Type className="h-4 w-4 text-slate-400" />}
+          <span className="text-sm text-slate-700 dark:text-slate-300">{column.label}</span>
+      </div>
+      <Switch 
+          checked={true}
+          onCheckedChange={(checked) => {
+              if (column.id === 'name') return;
+              setVisibleColumns((prev: any) => ({ ...prev, [column.id]: checked }))
+          }}
+          disabled={column.id === 'name'}
+      />
+    </div>
+  );
+}
 
 // Mock data for contacts
 const generateContacts = (count: number) => {
@@ -302,7 +361,7 @@ export default function ContactsPage() {
     }, 300);
   };
 
-  const columns = [
+  const initialColumns = [
     { id: "name", label: "Name" },
     { id: "phone", label: "Phone" },
     { id: "email", label: "Email" },
@@ -319,6 +378,28 @@ export default function ContactsPage() {
     { id: "dndInboundSms", label: "DND Inbound SMS" },
     { id: "contactId", label: "Contact Id" },
   ];
+
+  const [columns, setColumns] = useState(initialColumns);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setColumns((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   const filteredColumns = columns.filter(col => 
     col.label.toLowerCase().includes(columnSearch.toLowerCase())
@@ -492,21 +573,11 @@ export default function ContactsPage() {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                {visibleColumns.name && <SortableHeader column="name" label="Name" />}
-                {visibleColumns.phone && <SortableHeader column="phone" label="Phone" />}
-                {visibleColumns.email && <SortableHeader column="email" label="Email" />}
-                {visibleColumns.created && <SortableHeader column="created" label="Created" />}
-                {visibleColumns.lastActive && <SortableHeader column="lastActive" label="Last Activity" />}
-                {visibleColumns.dob && <SortableHeader column="dob" label="Date of Birth" />}
-                {visibleColumns.source && <SortableHeader column="source" label="Source" />}
-                {visibleColumns.type && <SortableHeader column="type" label="Type" />}
-                {visibleColumns.dndEmail && <SortableHeader column="dndEmail" label="DND Email" />}
-                {visibleColumns.dndSms && <SortableHeader column="dndSms" label="DND SMS" />}
-                {visibleColumns.dndCall && <SortableHeader column="dndCall" label="DND Calls" />}
-                {visibleColumns.dndInboundCalls && <SortableHeader column="dndInboundCalls" label="DND Inbound Calls" />}
-                {visibleColumns.dndInboundSms && <SortableHeader column="dndInboundSms" label="DND Inbound SMS" />}
-                {visibleColumns.contactId && <SortableHeader column="contactId" label="Contact Id" />}
-                {visibleColumns.tags && <TableHead>Tags</TableHead>}
+                {columns.filter(col => visibleColumns[col.id]).map(col => {
+                  if (col.id === 'name') return visibleColumns.name && <SortableHeader key={col.id} column="name" label="Name" />;
+                  if (col.id === 'tags') return visibleColumns.tags && <TableHead key={col.id}>Tags</TableHead>;
+                  return <SortableHeader key={col.id} column={col.id} label={col.label} />;
+                })}
                 <TableHead className="w-[50px] text-right pr-2">
                     <Sheet open={isColumnCreatorOpen} onOpenChange={setIsColumnCreatorOpen}>
                         <SheetTrigger asChild>
@@ -545,27 +616,26 @@ export default function ContactsPage() {
                                                 <Button variant="ghost" className="h-auto p-0 text-xs text-slate-500 font-normal hover:bg-transparent hover:text-slate-900">Hide all</Button>
                                             </div>
                                             <div className="space-y-1">
-                                                {columns.filter(col => visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).map(col => (
-                                                    <div key={col.id} className="flex items-center gap-3 py-2 group">
-                                                        <GripVertical className="h-4 w-4 text-slate-300 cursor-move opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                        <div className="flex items-center gap-2 flex-1">
-                                                            {/* We could map types to icons here if we had that info in columns array */}
-                                                            {col.id === 'tags' ? <Tag className="h-4 w-4 text-slate-400" /> : 
-                                                             col.id === 'phone' ? <List className="h-4 w-4 text-slate-400" /> :
-                                                             col.id === 'dob' || col.id === 'created' ? <CalendarIcon className="h-4 w-4 text-slate-400" /> :
-                                                             <Type className="h-4 w-4 text-slate-400" />}
-                                                            <span className="text-sm text-slate-700 dark:text-slate-300">{col.label}</span>
-                                                        </div>
-                                                        <Switch 
-                                                            checked={true}
-                                                            onCheckedChange={(checked) => {
-                                                                if (col.id === 'name') return;
-                                                                setVisibleColumns(prev => ({ ...prev, [col.id]: checked }))
-                                                            }}
-                                                            disabled={col.id === 'name'}
-                                                        />
-                                                    </div>
-                                                ))}
+                                                <DndContext 
+                                                    sensors={sensors}
+                                                    collisionDetection={closestCenter}
+                                                    onDragEnd={handleDragEnd}
+                                                >
+                                                    <SortableContext 
+                                                        items={columns.filter(col => visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).map(col => col.id)}
+                                                        strategy={verticalListSortingStrategy}
+                                                    >
+                                                        {columns.filter(col => visibleColumns[col.id] && col.label.toLowerCase().includes(existingFieldSearch.toLowerCase())).map(col => (
+                                                            <SortableColumnItem 
+                                                                key={col.id}
+                                                                id={col.id}
+                                                                column={col}
+                                                                visibleColumns={visibleColumns}
+                                                                setVisibleColumns={setVisibleColumns}
+                                                            />
+                                                        ))}
+                                                    </SortableContext>
+                                                </DndContext>
                                             </div>
                                         </div>
 
