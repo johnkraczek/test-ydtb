@@ -684,7 +684,7 @@ export default function CustomFieldsPage() {
                                                                     </DropdownMenu>
                                                                 </TableCell>
                                                             </TableRow>
-                                                        ))}
+                                                        )})}
                                                     </TableBody>
                                                 </Table>
                                             ) : (
@@ -789,7 +789,7 @@ export default function CustomFieldsPage() {
                                                         </DropdownMenu>
                                                     </TableCell>
                                                 </TableRow>
-                                            ))}
+                                            )})}
                                         </TableBody>
                                     </Table>
                                 </div>
