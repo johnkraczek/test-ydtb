@@ -213,24 +213,30 @@ export default function CustomFieldsPage() {
     };
 
     return (
-        <DashboardLayout activeTool="users" header={
-            <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Custom Fields</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative mr-2">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                            className="pl-9 w-[250px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" 
-                            placeholder="Search fields..." 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+        <Tabs defaultValue="list" className="h-full flex flex-col">
+            <DashboardLayout activeTool="users" header={
+                <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Custom Fields</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize custom data fields for your contacts</p>
                     </div>
-                    
-                    <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+                    <div className="flex items-center gap-3">
+                        <TabsList className="mr-2">
+                            <TabsTrigger value="list" className="px-3"><List className="h-4 w-4" /></TabsTrigger>
+                            <TabsTrigger value="folders" className="px-3"><Folder className="h-4 w-4" /></TabsTrigger>
+                        </TabsList>
+
+                        <div className="relative mr-2">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Input 
+                                className="pl-9 w-[250px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" 
+                                placeholder="Search fields..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        
+                        <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" className="gap-2 bg-white dark:bg-slate-900">
                                 <FolderPlus className="h-4 w-4" />
@@ -373,14 +379,6 @@ export default function CustomFieldsPage() {
             </div>
         }>
             <div className="h-full flex flex-col">
-                <Tabs defaultValue="folders" className="flex-1 flex flex-col">
-                    <div className="px-6 pt-4">
-                        <TabsList>
-                            <TabsTrigger value="folders">Folders View</TabsTrigger>
-                            <TabsTrigger value="list">All Fields</TabsTrigger>
-                        </TabsList>
-                    </div>
-
                     <TabsContent value="folders" className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-900/30 p-6 mt-0">
                         <div className="max-w-5xl mx-auto space-y-6">
                             {/* Folders List */}
@@ -607,8 +605,8 @@ export default function CustomFieldsPage() {
                             </div>
                         </div>
                     </TabsContent>
-                </Tabs>
-            </div>
-        </DashboardLayout>
+                </div>
+            </DashboardLayout>
+        </Tabs>
     );
 }
