@@ -139,6 +139,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Label } from "@/components/ui/label";
+import { FilterBuilder, Filter as FilterType } from "@/components/dashboard/FilterBuilder";
 
 // Sortable Item Component
 function SortableColumnItem({ id, column, visibleColumns, setVisibleColumns }: any) {
@@ -278,6 +279,51 @@ export default function ContactsPage() {
     contactId: false,
   });
   const [columnSearch, setColumnSearch] = useState("");
+  const [filters, setFilters] = useState<FilterType[]>([]);
+
+  // Filter Logic
+  const checkFilter = (contact: any, filter: FilterType) => {
+    let value = contact[filter.field];
+    
+    // Handle special fields
+    if (filter.field === 'tags') {
+      value = contact.tags.join(' ');
+    } else if (filter.field === 'created' || filter.field === 'dob' || filter.field === 'lastActive') {
+      // For date comparisons, we might want to normalize or convert
+      // For simplicity in this mockup, we'll convert dates to strings or timestamps if needed
+      // But let's stick to string comparison/simple checks for now
+      value = new Date(value).toISOString(); 
+    } else if (typeof value === 'number') {
+        value = value.toString();
+    } else if (value === undefined || value === null) {
+        value = '';
+    } else {
+        value = String(value).toLowerCase();
+    }
+    
+    const filterValue = String(filter.value).toLowerCase();
+    
+    switch (filter.operator) {
+      case 'contains':
+        return value.includes(filterValue);
+      case 'does_not_contain':
+        return !value.includes(filterValue);
+      case 'is':
+        return value === filterValue;
+      case 'is_not':
+        return value !== filterValue;
+      case 'starts_with':
+        return value.startsWith(filterValue);
+      case 'ends_with':
+        return value.endsWith(filterValue);
+      case 'is_empty':
+        return !value || value.length === 0;
+      case 'is_not_empty':
+        return value && value.length > 0;
+      default:
+        return true;
+    }
+  };
   
   // Custom Column Creation State
   const [isColumnCreatorOpen, setIsColumnCreatorOpen] = useState(false);
@@ -435,10 +481,33 @@ export default function ContactsPage() {
   };
 
   // Filter contacts
-  const filteredContacts = allContacts.filter(contact => 
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredContacts = allContacts.filter(contact => {
+    // Search query filter
+    const matchesSearch = 
+      contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    if (!matchesSearch) return false;
+    
+    // Advanced filters
+    if (filters.length === 0) return true;
+    
+    // Evaluate filters sequentially
+    let result = checkFilter(contact, filters[0]);
+    
+    for (let i = 1; i < filters.length; i++) {
+        const filter = filters[i];
+        const matches = checkFilter(contact, filter);
+        
+        if (filter.logic === 'AND') {
+            result = result && matches;
+        } else {
+            result = result || matches;
+        }
+    }
+    
+    return result;
+  });
 
   // Sort contacts
   if (sortColumn) {
@@ -512,6 +581,12 @@ export default function ContactsPage() {
           }}
         />
       </div>
+
+      <FilterBuilder 
+        columns={columns} 
+        filters={filters} 
+        onFiltersChange={setFilters} 
+      />
       
       <Button variant="outline" size="sm" className="h-8 gap-2 bg-white text-xs border-slate-200 dark:border-slate-800">
         <Download className="h-3.5 w-3.5" />
