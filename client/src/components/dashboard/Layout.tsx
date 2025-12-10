@@ -57,6 +57,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
       if (!location.startsWith("/settings")) {
         setLocation("/settings/account");
       }
+    } else if (toolId === "agency-settings") {
+      setLocation("/agency/settings");
     }
     // Add other routes as needed
   };

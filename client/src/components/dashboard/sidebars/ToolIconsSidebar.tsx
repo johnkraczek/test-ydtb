@@ -93,7 +93,7 @@ const INITIAL_TOOLS: ToolItem[] = [
 ];
 
 // Always fixed at the bottom
-const BOTTOM_TOOLS = [
+const CLIENT_BOTTOM_TOOLS = [
   {
     id: "integrations",
     icon: Layers,
@@ -103,6 +103,14 @@ const BOTTOM_TOOLS = [
     id: "settings",
     icon: Settings,
     label: "Settings",
+  },
+];
+
+const AGENCY_BOTTOM_TOOLS = [
+  {
+    id: "agency-settings",
+    icon: Settings,
+    label: "Agency Settings",
   },
 ];
 
@@ -133,6 +141,7 @@ export function ToolIconsSidebar({
   mode = "client",
 }: ToolIconsSidebarProps) {
   const [tools, setTools] = useState<ToolItem[]>(mode === "agency" ? AGENCY_TOOLS : INITIAL_TOOLS);
+  const bottomTools = mode === "agency" ? AGENCY_BOTTOM_TOOLS : CLIENT_BOTTOM_TOOLS;
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
@@ -278,7 +287,7 @@ export function ToolIconsSidebar({
           <div className="w-6 h-px bg-slate-200 mx-auto mb-2" />
 
           {/* Bottom Tools (Fixed) */}
-          {BOTTOM_TOOLS.map((tool) => {
+          {bottomTools.map((tool) => {
             const Icon = tool.icon;
             const isActive = tool.id === activeTool;
 

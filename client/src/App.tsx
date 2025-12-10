@@ -27,12 +27,14 @@ import BillingSettingsPage from "@/pages/settings/billing";
 import CustomFieldsPage from "@/pages/custom-fields";
 import CustomValuesPage from "@/pages/custom-values";
 import AgencyDashboardPage from "@/pages/agency-dashboard";
+import AgencySettingsPage from "@/pages/agency-settings";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={DashboardPage} />
       <Route path="/agency" component={AgencyDashboardPage} />
+      <Route path="/agency/settings" component={AgencySettingsPage} />
       <Route path="/launchpad" component={LaunchpadPage} />
       <Route path="/launchpad/email" component={EmailSetupPage} />
       <Route path="/launchpad/payment" component={PaymentSetupPage} />
