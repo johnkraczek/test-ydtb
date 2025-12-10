@@ -237,14 +237,18 @@ function EditableField({
               if (e.key === 'Enter') handleSave();
               if (e.key === 'Escape') handleCancel();
             }}
+            onBlur={handleCancel}
             autoFocus
             className="h-8 text-sm"
           />
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" onClick={handleSave}>
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" 
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handleSave}
+          >
             <Check className="h-4 w-4" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={handleCancel}>
-            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
