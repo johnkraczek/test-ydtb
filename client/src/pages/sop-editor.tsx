@@ -53,6 +53,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { FileSelectionDialog } from "@/components/media/FileSelectionDialog";
 
@@ -617,25 +618,18 @@ export default function SopEditorPage() {
                              <div className="flex gap-2">
                                <div className="space-y-1.5 flex-1">
                                   <Label className="text-xs">Icon</Label>
-                                  <ToggleGroup 
-                                    type="single" 
+                                  <Tabs 
                                     value={step.note.icon} 
                                     onValueChange={(val) => val && updateStepNote(step.id, 'icon', val)}
-                                    className="justify-start bg-white/50 dark:bg-black/20 border border-transparent rounded-md p-1 h-8 gap-1"
+                                    className="w-full"
                                   >
-                                    <ToggleGroupItem value="info" aria-label="Info" className="h-6 w-6 p-0 data-[state=on]:bg-white dark:data-[state=on]:bg-slate-700 shadow-sm rounded-sm">
-                                      <Info className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="warning" aria-label="Warning" className="h-6 w-6 p-0 data-[state=on]:bg-white dark:data-[state=on]:bg-slate-700 shadow-sm rounded-sm">
-                                      <AlertTriangle className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="tip" aria-label="Tip" className="h-6 w-6 p-0 data-[state=on]:bg-white dark:data-[state=on]:bg-slate-700 shadow-sm rounded-sm">
-                                      <Lightbulb className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="alert" aria-label="Alert" className="h-6 w-6 p-0 data-[state=on]:bg-white dark:data-[state=on]:bg-slate-700 shadow-sm rounded-sm">
-                                      <AlertCircle className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                  </ToggleGroup>
+                                    <TabsList className="grid w-full grid-cols-4 h-8 p-1 bg-white/50 dark:bg-black/20">
+                                      <TabsTrigger value="info" className="h-6 text-xs px-0"><Info className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="warning" className="h-6 text-xs px-0"><AlertTriangle className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="tip" className="h-6 text-xs px-0"><Lightbulb className="h-3.5 w-3.5" /></TabsTrigger>
+                                      <TabsTrigger value="alert" className="h-6 text-xs px-0"><AlertCircle className="h-3.5 w-3.5" /></TabsTrigger>
+                                    </TabsList>
+                                  </Tabs>
                                </div>
                                <div className="space-y-1.5 flex-1">
                                   <Label className="text-xs">Color</Label>
