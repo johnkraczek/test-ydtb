@@ -11,17 +11,61 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Plus, Save, Trash, User, Mail, Phone as PhoneIcon, MapPin, Calendar, Tag } from "lucide-react";
+import { 
+    X, 
+    Plus, 
+    Save, 
+    Trash, 
+    User, 
+    Mail, 
+    Phone as PhoneIcon, 
+    Calendar, 
+    Tag,
+    Check,
+    ChevronDown
+} from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface ContactEditDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  contact: any; // Using any for mockup simplicity, ideally strictly typed
+  contact: any; // Using any for mockup simplicity
 }
+
+const AVAILABLE_TAGS = [
+    "Customer", 
+    "Lead", 
+    "VIP", 
+    "Partner", 
+    "Vendor", 
+    "New", 
+    "Inactive", 
+    "Referral", 
+    "Enterprise", 
+    "Small Business",
+    "Qualified",
+    "Negotiation",
+    "Lost",
+    "Churned"
+];
 
 export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDrawerProps) {
   const [formData, setFormData] = useState<any>({});
-  const [newTag, setNewTag] = useState("");
+  const [openCombobox, setOpenCombobox] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     if (contact) {
@@ -42,15 +86,21 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
     });
   };
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+  const handleAddTag = (tag: string) => {
+    if (tag.trim() && !formData.tags.includes(tag.trim())) {
       setFormData({
         ...formData,
-        tags: [...(formData.tags || []), newTag.trim()]
+        tags: [...(formData.tags || []), tag.trim()]
       });
-      setNewTag("");
+      setSearchValue("");
+      setOpenCombobox(false);
     }
   };
+
+  const filteredTags = AVAILABLE_TAGS.filter(tag => 
+    !formData.tags?.includes(tag) && 
+    tag.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -84,7 +134,7 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
                 <div className="grid grid-cols-1 gap-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName">Name</Label>
+                            <Label htmlFor="name">Name</Label>
                             <Input 
                                 id="name" 
                                 value={formData.name || ''} 
@@ -188,22 +238,60 @@ export function ContactEditDrawer({ open, onOpenChange, contact }: ContactEditDr
                     </div>
                     
                     <div className="flex gap-2">
-                        <Input 
-                            placeholder="Add a new tag..." 
-                            value={newTag}
-                            onChange={(e) => setNewTag(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-                            className="h-8 text-sm bg-white dark:bg-slate-950"
-                        />
-                        <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="h-8"
-                            onClick={handleAddTag}
-                            disabled={!newTag.trim()}
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
+                        <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={openCombobox}
+                                    className="justify-between text-slate-500 font-normal w-full"
+                                >
+                                    Add a tag...
+                                    <Plus className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[300px] p-0" align="start">
+                                <Command>
+                                    <CommandInput 
+                                        placeholder="Search tags..." 
+                                        value={searchValue}
+                                        onValueChange={setSearchValue}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty className="py-2 px-2">
+                                            {searchValue ? (
+                                                <button 
+                                                    className="flex items-center gap-2 text-sm text-indigo-600 w-full p-2 hover:bg-indigo-50 rounded-md transition-colors"
+                                                    onClick={() => handleAddTag(searchValue)}
+                                                >
+                                                    <Plus className="h-3.5 w-3.5" />
+                                                    Create tag: <span className="font-medium">"{searchValue}"</span>
+                                                </button>
+                                            ) : (
+                                                <span className="text-sm text-slate-500 p-2">No tags found.</span>
+                                            )}
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                            {filteredTags.map((tag) => (
+                                                <CommandItem
+                                                    key={tag}
+                                                    value={tag}
+                                                    onSelect={() => handleAddTag(tag)}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            formData.tags?.includes(tag) ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {tag}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
             </section>
