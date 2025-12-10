@@ -132,7 +132,7 @@ export default function CustomFieldsPage() {
         { id: '16', name: 'Country', slug: 'country', type: 'text', category: 'contact', folderId: null, description: 'Standard contact country' },
     ]);
 
-    const [expandedFolders, setExpandedFolders] = useState<string[]>(['1', '2', '3']);
+    const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
     const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
     const [isCreateFieldOpen, setIsCreateFieldOpen] = useState(false);
     const [newFolderName, setNewFolderName] = useState("");
