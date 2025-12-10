@@ -836,8 +836,8 @@ export default function ContactsPage() {
               </Popover>
 
               <Button variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 gap-2 shrink-0">
-                <Copy className="h-4 w-4" />
-                Copy
+                <Users className="h-4 w-4" />
+                Create Group
               </Button>
 
               <AlertDialog>
