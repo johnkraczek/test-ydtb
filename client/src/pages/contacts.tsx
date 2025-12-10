@@ -519,9 +519,6 @@ export default function ContactsPage() {
                                                 </Button>
                                                 <h2 className="text-lg font-semibold">Fields</h2>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsColumnCreatorOpen(false)}>
-                                                <X className="h-4 w-4" />
-                                            </Button>
                                         </div>
                                         <div className="relative">
                                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -607,9 +604,6 @@ export default function ContactsPage() {
                                             <div className="flex items-center gap-2">
                                                 <h2 className="text-lg font-semibold">Create field</h2>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsColumnCreatorOpen(false)}>
-                                                <X className="h-4 w-4" />
-                                            </Button>
                                         </div>
                                         <div className="relative">
                                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
