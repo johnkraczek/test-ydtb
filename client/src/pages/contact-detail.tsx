@@ -8,6 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Popover,
   PopoverContent,
@@ -54,19 +63,115 @@ import {
   PenLine,
   StickyNote,
   X,
-  Check
+  Check,
+  LayoutGrid,
+  GripVertical,
+  Settings,
+  Columns,
+  Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import {
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { ContactEditDrawer, MOCK_FOLDERS, MOCK_FIELDS } from "@/components/dashboard/ContactEditDrawer";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+// Sortable Card Item Component
+function SortableCardItem({ id, label, visible, onVisibilityChange }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative' as 'relative',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={cn("flex items-center gap-3 py-2 group px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50", isDragging ? 'opacity-50 bg-slate-100 dark:bg-slate-800' : '')}>
+      <div {...attributes} {...listeners} className="cursor-move touch-none text-slate-400 hover:text-slate-600 outline-none">
+         <GripVertical className="h-4 w-4" />
+      </div>
+      <span className="text-sm font-medium flex-1 truncate">{label}</span>
+      <Switch 
+          checked={visible}
+          onCheckedChange={onVisibilityChange}
+      />
+    </div>
+  );
+}
+
 export default function ContactDetailPage() {
   const [, params] = useRoute("/contacts/:id");
   const id = params?.id;
   const { toast } = useToast();
+
+  // Layout Configuration State
+  const [layoutConfigOpen, setLayoutConfigOpen] = useState(false);
+  const [columnCount, setColumnCount] = useState(3);
+  const [fieldSearch, setFieldSearch] = useState("");
+
+  const allCards = [
+    ...MOCK_FOLDERS.map(f => ({ id: `folder-${f.id}`, label: f.name })),
+    { id: 'card-additional', label: 'Additional Info' },
+    { id: 'card-system', label: 'System Details' },
+    { id: 'card-tags', label: 'Tags' },
+    { id: 'card-offers', label: 'Active Offers' }
+  ];
+
+  const [visibleCards, setVisibleCards] = useState<Record<string, boolean>>({
+    ...Object.fromEntries(allCards.map(c => [c.id, true]))
+  });
+
+  const [cardOrder, setCardOrder] = useState<string[]>(allCards.map(c => c.id));
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (active.id !== over?.id) {
+      setCardOrder((items) => {
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over?.id as string);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const toggleCardVisibility = (id: string, visible: boolean) => {
+    setVisibleCards(prev => ({ ...prev, [id]: visible }));
+  };
 
   // Mock Data based on ID (In a real app, fetch this)
   const [customer, setCustomer] = useState({
@@ -370,6 +475,127 @@ export default function ContactDetailPage() {
           }
           actions={
             <div className="flex items-center gap-2 pt-8">
+              <Sheet open={layoutConfigOpen} onOpenChange={setLayoutConfigOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <Settings className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[360px] sm:w-[360px] p-0 flex flex-col h-full">
+                  <SheetHeader className="px-4 py-3 border-b flex-none">
+                    <SheetTitle className="text-base font-medium">Customize view</SheetTitle>
+                  </SheetHeader>
+                  
+                  <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {/* Column Count */}
+                    <div className="space-y-3">
+                       <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Layout</Label>
+                       <div className="grid grid-cols-3 gap-2">
+                          {[1, 2, 3].map(count => (
+                            <Button 
+                              key={count}
+                              variant={columnCount === count ? "default" : "outline"}
+                              className="flex flex-col items-center justify-center h-16 gap-1"
+                              onClick={() => setColumnCount(count)}
+                            >
+                              <Columns className="h-4 w-4" />
+                              <span className="text-xs">{count} Col</span>
+                            </Button>
+                          ))}
+                       </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    {/* Card Management */}
+                    <div className="space-y-3">
+                       <div className="flex items-center justify-between">
+                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cards</Label>
+                         <Button 
+                           variant="ghost" 
+                           className="h-auto p-0 text-xs text-muted-foreground font-normal hover:bg-transparent hover:text-foreground"
+                           onClick={() => {
+                               setVisibleCards(prev => {
+                                   const next = { ...prev };
+                                   Object.keys(next).forEach(key => next[key] = false);
+                                   return next;
+                               });
+                           }}
+                         >
+                           Hide all
+                         </Button>
+                       </div>
+                       
+                       {/* Search */}
+                       <div className="relative">
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                              placeholder="Search cards..." 
+                              className="pl-9 h-9" 
+                              value={fieldSearch}
+                              onChange={(e) => setFieldSearch(e.target.value)}
+                          />
+                       </div>
+
+                       {/* Shown Cards (Sortable) */}
+                       <div className="space-y-1">
+                          <div className="text-xs font-medium text-muted-foreground mb-2">Shown</div>
+                          <DndContext 
+                              sensors={sensors}
+                              collisionDetection={closestCenter}
+                              onDragEnd={handleDragEnd}
+                          >
+                              <SortableContext 
+                                  items={cardOrder.filter(id => visibleCards[id])}
+                                  strategy={verticalListSortingStrategy}
+                              >
+                                  {cardOrder.filter(id => {
+                                      const card = allCards.find(c => c.id === id);
+                                      return visibleCards[id] && card?.label.toLowerCase().includes(fieldSearch.toLowerCase());
+                                  }).map(id => {
+                                      const card = allCards.find(c => c.id === id);
+                                      return (
+                                          <SortableCardItem 
+                                              key={id}
+                                              id={id}
+                                              label={card?.label}
+                                              visible={true}
+                                              onVisibilityChange={(checked: boolean) => toggleCardVisibility(id, checked)}
+                                          />
+                                      );
+                                  })}
+                              </SortableContext>
+                          </DndContext>
+                       </div>
+                       
+                       {/* Hidden Cards */}
+                       <div className="space-y-1 pt-2">
+                          <div className="text-xs font-medium text-muted-foreground mb-2">Hidden</div>
+                          {cardOrder.filter(id => {
+                              const card = allCards.find(c => c.id === id);
+                              return !visibleCards[id] && card?.label.toLowerCase().includes(fieldSearch.toLowerCase());
+                          }).map(id => {
+                              const card = allCards.find(c => c.id === id);
+                              return (
+                                  <div key={id} className="flex items-center gap-3 py-2 px-2 group">
+                                       <div className="w-4 h-4" /> {/* Spacer for grip */}
+                                       <span className="text-sm font-medium flex-1 text-muted-foreground">{card?.label}</span>
+                                       <Switch 
+                                            checked={false}
+                                            onCheckedChange={(checked) => toggleCardVisibility(id, checked)}
+                                        />
+                                  </div>
+                              );
+                          })}
+                          {cardOrder.filter(id => !visibleCards[id]).length === 0 && (
+                             <div className="text-xs text-muted-foreground italic px-2">No hidden cards</div>
+                          )}
+                       </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
               <Button variant="outline" onClick={() => setIsEditDrawerOpen(true)}>Edit Profile</Button>
               <ContactEditDrawer
                 open={isEditDrawerOpen}
@@ -407,54 +633,65 @@ export default function ContactDetailPage() {
         </TabsList>
 
         <TabsContent value="details" className="mt-6 space-y-6">
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-              {/* Custom Fields Folders */}
-              {MOCK_FOLDERS.map(folder => {
-                const fields = MOCK_FIELDS.filter(f => f.folderId === folder.id);
-                if (fields.length === 0) return null;
+          <div className={cn(
+            "gap-6 space-y-6",
+            columnCount === 1 ? "columns-1" : 
+            columnCount === 2 ? "columns-1 md:columns-2" : 
+            "columns-1 md:columns-2 lg:columns-3"
+          )}>
+            {cardOrder.map(cardId => {
+               if (!visibleCards[cardId]) return null;
 
-                return (
-                  <Card key={folder.id} className="break-inside-avoid">
-                    <CardHeader>
-                      <CardTitle className="text-base">{folder.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {fields.map(field => {
-                         const value = customer[field.slug as keyof typeof customer];
-                         if (value === undefined || value === null || value === '') return null;
-                         
-                         let displayValue = value;
-                         if (field.type === 'date' && value) {
-                            try {
-                                displayValue = format(new Date(value as string), "MMM d, yyyy");
-                            } catch (e) {
-                                displayValue = value;
-                            }
-                         } else if (Array.isArray(value)) {
-                             displayValue = Array.isArray(value) ? value.join(", ") : value;
-                         }
+               // --- Custom Field Folders ---
+               if (cardId.startsWith('folder-')) {
+                 const folderId = parseInt(cardId.split('-')[1]);
+                 const folder = MOCK_FOLDERS.find(f => f.id === folderId);
+                 const fields = MOCK_FIELDS.filter(f => f.folderId === folderId);
+                 
+                 if (!folder || fields.length === 0) return null;
 
-                         return (
-                           <div key={field.id}>
-                              <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
-                              <span className="text-sm font-medium">{displayValue}</span>
-                           </div>
-                         );
-                      })}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-              
-               {/* Uncategorized Fields */}
-               {(() => {
+                 return (
+                   <Card key={cardId} className="break-inside-avoid mb-6">
+                     <CardHeader>
+                       <CardTitle className="text-base">{folder.name}</CardTitle>
+                     </CardHeader>
+                     <CardContent className="space-y-4">
+                       {fields.map(field => {
+                          const value = customer[field.slug as keyof typeof customer];
+                          if (value === undefined || value === null || value === '') return null;
+                          
+                          let displayValue = value;
+                          if (field.type === 'date' && value) {
+                             try {
+                                 displayValue = format(new Date(value as string), "MMM d, yyyy");
+                             } catch (e) {
+                                 displayValue = value;
+                             }
+                          } else if (Array.isArray(value)) {
+                              displayValue = Array.isArray(value) ? value.join(", ") : value;
+                          }
+
+                          return (
+                            <div key={field.id}>
+                               <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{field.name}</span>
+                               <span className="text-sm font-medium">{displayValue}</span>
+                            </div>
+                          );
+                       })}
+                     </CardContent>
+                   </Card>
+                 );
+               }
+               
+               // --- Additional Info (Uncategorized) ---
+               if (cardId === 'card-additional') {
                   const fields = MOCK_FIELDS.filter(f => f.folderId === null);
                   const hasValues = fields.some(f => customer[f.slug as keyof typeof customer]);
                   
                   if (fields.length === 0 || !hasValues) return null;
 
                    return (
-                      <Card className="break-inside-avoid">
+                      <Card key={cardId} className="break-inside-avoid mb-6">
                         <CardHeader>
                           <CardTitle className="text-base">Additional Info</CardTitle>
                         </CardHeader>
@@ -472,123 +709,141 @@ export default function ContactDetailPage() {
                         </CardContent>
                       </Card>
                    );
-               })()}
+               }
 
-              <Card className="break-inside-avoid">
-                <CardHeader>
-                  <CardTitle className="text-base">System Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Join Date</span>
-                    <span className="text-sm font-medium">{customer.joinDate}</span>
-                  </div>
-                   {Object.entries(customer.customData).map(([key, value]) => (
-                    <div key={key}>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{key}</span>
-                      <span className="text-sm font-medium">{value}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card className="break-inside-avoid">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-base">Tags</CardTitle>
-                  <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0 w-80" align="end">
-                      <Command>
-                        <CommandInput placeholder="Search tags..." value={tagSearch} onValueChange={setTagSearch} />
-                        <CommandList>
-                          <CommandEmpty>No tag found.</CommandEmpty>
-                          <CommandGroup heading="Available Tags">
-                            {allTags.filter(t => !customer.tags.includes(t)).map(tag => (
-                              <CommandItem 
-                                key={tag}
-                                onSelect={() => handleAddTag(tag)}
-                              >
-                                <Tag className="mr-2 h-3 w-3" />
-                                {tag}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {customer.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="group pr-1">
-                        {tag}
-                        <button 
-                          onClick={() => handleRemoveTag(tag)}
-                          className="ml-1 h-3 w-3 rounded-full hover:bg-slate-200 inline-flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-2 w-2" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="break-inside-avoid">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-base">Active Offers</CardTitle>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0 w-80" align="end">
-                      <Command>
-                        <CommandInput placeholder="Search offers..." />
-                        <CommandList>
-                          <CommandEmpty>No offers found.</CommandEmpty>
-                          <CommandGroup heading="Available Offers">
-                            {availableOffers.map(offer => (
-                              <CommandItem 
-                                key={offer.id}
-                                onSelect={() => handleAddOffer(offer)}
-                                className="flex flex-col items-start gap-1 p-2"
-                              >
-                                <span className="font-medium">{offer.title}</span>
-                                <span className="text-xs text-muted-foreground">{offer.description}</span>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {activeOffers.map(offer => (
-                    <div key={offer.id} className="flex items-center justify-between p-2 rounded-lg border bg-slate-50 dark:bg-slate-900/50">
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "h-8 w-8 rounded-full flex items-center justify-center",
-                          offer.status === 'active' ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-500"
-                        )}>
-                          <Gift className="h-4 w-4" />
-                        </div>
+               // --- System Details ---
+               if (cardId === 'card-system') {
+                 return (
+                    <Card key={cardId} className="break-inside-avoid mb-6">
+                      <CardHeader>
+                        <CardTitle className="text-base">System Details</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
                         <div>
-                          <p className="text-sm font-medium">{offer.title}</p>
-                          <p className="text-xs text-muted-foreground">{offer.description}</p>
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Join Date</span>
+                          <span className="text-sm font-medium">{customer.joinDate}</span>
                         </div>
+                         {Object.entries(customer.customData).map(([key, value]) => (
+                          <div key={key}>
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">{key}</span>
+                            <span className="text-sm font-medium">{value}</span>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+                 );
+               }
+
+               // --- Tags ---
+               if (cardId === 'card-tags') {
+                 return (
+                  <Card key={cardId} className="break-inside-avoid mb-6">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <CardTitle className="text-base">Tags</CardTitle>
+                      <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0 w-80" align="end">
+                          <Command>
+                            <CommandInput placeholder="Search tags..." value={tagSearch} onValueChange={setTagSearch} />
+                            <CommandList>
+                              <CommandEmpty>No tag found.</CommandEmpty>
+                              <CommandGroup heading="Available Tags">
+                                {allTags.filter(t => !customer.tags.includes(t)).map(tag => (
+                                  <CommandItem 
+                                    key={tag}
+                                    onSelect={() => handleAddTag(tag)}
+                                  >
+                                    <Tag className="mr-2 h-3 w-3" />
+                                    {tag}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {customer.tags.map(tag => (
+                          <Badge key={tag} variant="secondary" className="group pr-1">
+                            {tag}
+                            <button 
+                              onClick={() => handleRemoveTag(tag)}
+                              className="ml-1 h-3 w-3 rounded-full hover:bg-slate-200 inline-flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-2 w-2" />
+                            </button>
+                          </Badge>
+                        ))}
                       </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                 );
+               }
+
+               // --- Active Offers ---
+               if (cardId === 'card-offers') {
+                 return (
+                  <Card key={cardId} className="break-inside-avoid mb-6">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <CardTitle className="text-base">Active Offers</CardTitle>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0 w-80" align="end">
+                          <Command>
+                            <CommandInput placeholder="Search offers..." />
+                            <CommandList>
+                              <CommandEmpty>No offers found.</CommandEmpty>
+                              <CommandGroup heading="Available Offers">
+                                {availableOffers.map(offer => (
+                                  <CommandItem 
+                                    key={offer.id}
+                                    onSelect={() => handleAddOffer(offer)}
+                                    className="flex flex-col items-start gap-1 p-2"
+                                  >
+                                    <span className="font-medium">{offer.title}</span>
+                                    <span className="text-xs text-muted-foreground">{offer.description}</span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {activeOffers.map(offer => (
+                        <div key={offer.id} className="flex items-center justify-between p-2 rounded-lg border bg-slate-50 dark:bg-slate-900/50">
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "h-8 w-8 rounded-full flex items-center justify-center",
+                              offer.status === 'active' ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-500"
+                            )}>
+                              <Gift className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{offer.title}</p>
+                              <p className="text-xs text-muted-foreground">{offer.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                 );
+               }
+
+               return null;
+            })}
           </div>
         </TabsContent>
 
