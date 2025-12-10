@@ -281,10 +281,10 @@
   }
 
   .bg-dot-pattern {
-    background-image: radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px);
-    background-size: 16px 16px;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px), linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.08) 100%);
+    background-size: 16px 16px, 100% 100%;
   }
   .dark .bg-dot-pattern {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.08) 100%);
   }
 }
