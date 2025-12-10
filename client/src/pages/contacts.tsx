@@ -264,10 +264,6 @@ export default function ContactsPage() {
 
   const handleCloseCreator = () => {
     setIsColumnCreatorOpen(false);
-    setTimeout(() => {
-        setColumnCreatorStep('type-selection');
-        setSelectedColumnType(null);
-    }, 300);
   };
 
   const columns = [
@@ -474,7 +470,7 @@ export default function ContactsPage() {
                 {visibleColumns.dndInboundSms && <SortableHeader column="dndInboundSms" label="DND Inbound SMS" />}
                 {visibleColumns.tags && <TableHead>Tags</TableHead>}
                 <TableHead className="w-[50px] text-right pr-2">
-                    <Sheet open={isColumnCreatorOpen} onOpenChange={setIsColumnCreatorOpen}>
+                    <Sheet open={isColumnCreatorOpen} onOpenChange={(open) => open ? setIsColumnCreatorOpen(true) : handleCloseCreator()}>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800">
                                 <Plus className="h-4 w-4" />
@@ -568,9 +564,6 @@ export default function ContactsPage() {
                                                 <h2 className="text-lg font-semibold">{selectedColumnType?.label}</h2>
                                                 <ChevronDown className="h-4 w-4 text-slate-400" />
                                             </div>
-                                            <Button variant="ghost" size="icon" className="ml-auto h-8 w-8" onClick={handleCloseCreator}>
-                                                <X className="h-4 w-4" />
-                                            </Button>
                                         </div>
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
