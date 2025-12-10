@@ -40,6 +40,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { DashboardPageHeader } from "@/components/dashboard/headers/DashboardPageHeader";
+
 // Mock Data
 const TEAM_MEMBERS = [
   {
@@ -225,8 +227,62 @@ export default function TeamPage() {
   const isChatView = match;
   const chatId = params?.chatId;
 
+  let header = null;
+
+  if (isChatView && chatId) {
+    const isChannel = CHANNELS.find(c => c.id === chatId);
+    const isDirectMessage = !isChannel;
+    const dmUser = isDirectMessage ? TEAM_MEMBERS[0] : null;
+
+    header = (
+      <DashboardPageHeader
+        hideBreadcrumbs
+        title={
+          <div className="flex items-center gap-3">
+            {isChannel ? (
+              <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <Hash className="h-5 w-5 text-slate-500" />
+              </div>
+            ) : (
+              <div className="relative">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={dmUser?.avatar} />
+                  <AvatarFallback>{dmUser?.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-green-500" />
+              </div>
+            )}
+            
+            <div className="flex flex-col">
+              <div className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                {isChannel ? chatId : dmUser?.name}
+                {isChannel && <Badge variant="outline" className="text-[10px] h-4 font-normal">Channel</Badge>}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
+                {isChannel ? `${TEAM_MEMBERS.length} members` : dmUser?.role}
+              </p>
+            </div>
+          </div>
+        }
+        actions={
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+              <Phone className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+              <Video className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        }
+      />
+    );
+  }
+
   return (
-    <DashboardLayout activeTool="team">
+    <DashboardLayout activeTool="team" header={header}>
       {isChatView && chatId ? (
         <ChatView chatId={chatId} />
       ) : (
@@ -376,47 +432,7 @@ function ChatView({ chatId }: { chatId: string }) {
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          {isChannel ? (
-            <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-              <Hash className="h-5 w-5 text-slate-500" />
-            </div>
-          ) : (
-            <div className="relative">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={dmUser?.avatar} />
-                <AvatarFallback>{dmUser?.name.substring(0, 2)}</AvatarFallback>
-              </Avatar>
-              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-green-500" />
-            </div>
-          )}
-          
-          <div>
-            <h2 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              {isChannel ? chatId : dmUser?.name}
-              {isChannel && <Badge variant="outline" className="text-[10px] h-4 font-normal">Channel</Badge>}
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {isChannel ? `${TEAM_MEMBERS.length} members` : dmUser?.role}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
-            <Phone className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
-            <Video className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
+      
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-6">
         <div className="space-y-6">
