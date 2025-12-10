@@ -21,12 +21,27 @@ import {
   Smartphone,
   Fingerprint,
   Trash2,
-  Laptop
+  Laptop,
+  ArrowRight,
+  QrCode
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 export default function AccountSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,12 +52,37 @@ export default function AccountSettingsPage() {
   const [passkeys, setPasskeys] = useState<Array<{id: string, name: string, addedAt: string}>>([]);
   const [isAddingPasskey, setIsAddingPasskey] = useState(false);
 
+  // 2FA State
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [is2FADialogOpen, setIs2FADialogOpen] = useState(false);
+  const [twoFAStep, setTwoFAStep] = useState<1 | 2>(1);
+  const [otpCode, setOtpCode] = useState("");
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+
   const handleSaveProfile = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Profile updated successfully");
     }, 1000);
+  };
+
+  const handleSetup2FA = () => {
+    setTwoFAStep(1);
+    setOtpCode("");
+    setIs2FADialogOpen(true);
+  };
+
+  const handleVerifyOTP = () => {
+    if (otpCode.length !== 6) return;
+    
+    setIsVerifying2FA(true);
+    setTimeout(() => {
+        setIsVerifying2FA(false);
+        setIs2FAEnabled(true);
+        setIs2FADialogOpen(false);
+        toast.success("Two-Factor Authentication enabled successfully");
+    }, 1500);
   };
 
   const handleAddPasskey = () => {
@@ -229,15 +269,26 @@ export default function AccountSettingsPage() {
               </h3>
               <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-lg">
                 <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center shrink-0">
-                    <Smartphone className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${is2FAEnabled ? "bg-green-100 dark:bg-green-900/30" : "bg-indigo-50 dark:bg-indigo-900/20"}`}>
+                    <Smartphone className={`h-5 w-5 ${is2FAEnabled ? "text-green-600 dark:text-green-400" : "text-indigo-600 dark:text-indigo-400"}`} />
                   </div>
                   <div>
-                    <div className="font-medium text-slate-900 dark:text-slate-100">Authenticator App</div>
+                    <div className="flex items-center gap-2">
+                        <div className="font-medium text-slate-900 dark:text-slate-100">Authenticator App</div>
+                        {is2FAEnabled && (
+                            <Badge variant="outline" className="text-[10px] h-4 px-1 bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                                Active
+                            </Badge>
+                        )}
+                    </div>
                     <p className="text-sm text-slate-500">Secure your account with TOTP (Google Authenticator, Authy).</p>
                   </div>
                 </div>
-                <Button variant="outline">Setup</Button>
+                {is2FAEnabled ? (
+                    <Button variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20" onClick={() => setIs2FAEnabled(false)}>Disable</Button>
+                ) : (
+                    <Button variant="outline" onClick={handleSetup2FA}>Setup</Button>
+                )}
               </div>
             </div>
 
@@ -341,6 +392,92 @@ export default function AccountSettingsPage() {
         </Card>
 
       </div>
+
+        {/* 2FA Setup Dialog */}
+        <Dialog open={is2FADialogOpen} onOpenChange={setIs2FADialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>{twoFAStep === 1 ? "Set up Authenticator" : "Verify Authentication"}</DialogTitle>
+                    <DialogDescription>
+                        {twoFAStep === 1 
+                            ? "Scan the QR code with your authenticator app to get started." 
+                            : "Enter the 6-digit code from your authenticator app."
+                        }
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="py-6">
+                    {twoFAStep === 1 ? (
+                        <div className="flex flex-col items-center space-y-6">
+                            <div className="relative h-48 w-48 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
+                                <QrCode className="h-32 w-32 text-slate-900" strokeWidth={1.5} />
+                                {/* Placeholder for actual QR code */}
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div className="h-40 w-40 border-2 border-slate-900/10 rounded-lg"></div>
+                                </div>
+                            </div>
+                            <div className="text-center space-y-2">
+                                <p className="text-sm text-slate-500">
+                                    Open your authenticator app (like Google Authenticator or Authy) and scan the QR code.
+                                </p>
+                                <Button variant="link" className="text-xs h-auto p-0 text-primary">
+                                    Can't scan? Enter code manually
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center space-y-6">
+                             <div className="flex justify-center w-full">
+                                <InputOTP
+                                    maxLength={6}
+                                    value={otpCode}
+                                    onChange={(value) => setOtpCode(value)}
+                                >
+                                    <InputOTPGroup>
+                                        <InputOTPSlot index={0} />
+                                        <InputOTPSlot index={1} />
+                                        <InputOTPSlot index={2} />
+                                    </InputOTPGroup>
+                                    <div className="w-4" /> {/* Spacer */}
+                                    <InputOTPGroup>
+                                        <InputOTPSlot index={3} />
+                                        <InputOTPSlot index={4} />
+                                        <InputOTPSlot index={5} />
+                                    </InputOTPGroup>
+                                </InputOTP>
+                            </div>
+                            <p className="text-xs text-center text-slate-500">
+                                Enter the 6-digit code generated by your app to verify the connection.
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <DialogFooter className="flex items-center justify-between sm:justify-between">
+                    {twoFAStep === 2 ? (
+                        <Button variant="ghost" onClick={() => setTwoFAStep(1)}>Back</Button>
+                    ) : (
+                        <div /> 
+                    )}
+                    
+                    {twoFAStep === 1 ? (
+                        <Button onClick={() => setTwoFAStep(2)}>
+                            Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    ) : (
+                        <Button onClick={handleVerifyOTP} disabled={otpCode.length !== 6 || isVerifying2FA}>
+                            {isVerifying2FA ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...
+                                </>
+                            ) : (
+                                "Finish Setup"
+                            )}
+                        </Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </DashboardLayout>
   );
 }
