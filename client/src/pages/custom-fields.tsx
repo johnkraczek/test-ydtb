@@ -125,7 +125,7 @@ export default function CustomFieldsPage() {
 
     const handleCreateFolder = () => {
         if (newFolderName.trim()) {
-            setFolders([...folders, { id: Math.random().toString(36).substr(2, 9), name: newFolderName }]);
+            setFolders([...folders, { id: Math.floor(Math.random() * 0xFFFFFFF).toString(16).padStart(7, '0'), name: newFolderName }]);
             setNewFolderName("");
             setIsCreateFolderOpen(false);
         }
@@ -136,7 +136,7 @@ export default function CustomFieldsPage() {
         setFieldFormData({ 
             type: 'text', 
             folderId: '1',
-            id: Math.random().toString(36).substr(2, 9),
+            id: Math.floor(Math.random() * 0xFFFFFFF).toString(16).padStart(7, '0'),
             slug: ''
         });
         setIsCreateFieldOpen(true);
@@ -168,7 +168,7 @@ export default function CustomFieldsPage() {
                 const generatedSlug = fieldFormData.slug || fieldFormData.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
                 
                 setFields([...fields, { 
-                    id: fieldFormData.id || Math.random().toString(36).substr(2, 9), 
+                    id: fieldFormData.id || Math.floor(Math.random() * 0xFFFFFFF).toString(16).padStart(7, '0'), 
                     name: fieldFormData.name,
                     slug: generatedSlug,
                     type: fieldFormData.type as any || 'text',
