@@ -537,23 +537,6 @@ export default function CustomValuesPage() {
             }>
                 <TabsContent value="list" className="flex-1 p-0 m-0 outline-none">
                     <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-                        {selectedValues.length > 0 && (
-                            <div className="flex items-center justify-between px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/50">
-                                <div className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
-                                    {selectedValues.length} values selected
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button variant="outline" size="sm" className="h-8 border-indigo-200 hover:bg-indigo-100 text-indigo-700" onClick={openBulkMoveDialog}>
-                                        <Folder className="mr-2 h-3.5 w-3.5" />
-                                        Move to Folder
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="h-8 border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700" onClick={handleBulkDelete}>
-                                        <Trash className="mr-2 h-3.5 w-3.5" />
-                                        Delete
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
