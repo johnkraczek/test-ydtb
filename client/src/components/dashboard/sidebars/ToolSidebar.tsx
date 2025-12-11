@@ -40,7 +40,9 @@ import {
   Edit,
   X,
   Building,
-  Users
+  Users,
+  AlertTriangle,
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -580,6 +582,13 @@ function AgencyWorkspacesSidebarContent() {
         <SidebarItem icon={Folder} label="Enterprise Clients" badge="5" />
         <SidebarItem icon={Folder} label="Local Business" badge="12" />
         <SidebarItem icon={Folder} label="Churn Risk" badge="2" />
+      </SidebarSection>
+
+      <SidebarSection title="Smart Filters">
+        <SidebarItem icon={Zap} label="High Value Clients" />
+        <SidebarItem icon={AlertTriangle} label="At Risk" />
+        <SidebarItem icon={Clock} label="Trialing" />
+        <SidebarItem icon={MapPin} label="Local Only" />
       </SidebarSection>
 
       <Dialog open={isCreateGroupOpen} onOpenChange={setIsCreateGroupOpen}>
