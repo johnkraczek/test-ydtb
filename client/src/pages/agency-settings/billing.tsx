@@ -16,9 +16,20 @@ import {
   Calendar,
   History,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Shield,
+  Star
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock Data
 const CURRENT_PLAN = {
@@ -94,7 +105,65 @@ const USAGE_STATS = [
   { label: "Email Sends", used: 45200, limit: 100000, percent: 45 }
 ];
 
+const AVAILABLE_PLANS = [
+  {
+    id: "starter",
+    name: "Agency Starter",
+    price: "$97",
+    period: "month",
+    description: "Perfect for new agencies getting started.",
+    features: [
+      "Up to 3 Sub-Accounts",
+      "Unlimited Team Members",
+      "Standard Support",
+      "API Access"
+    ]
+  },
+  {
+    id: "unlimited",
+    name: "Agency Unlimited",
+    price: "$297",
+    period: "month",
+    description: "Scale your agency without limits.",
+    popular: true,
+    features: [
+      "Unlimited Sub-Accounts",
+      "Unlimited Team Members",
+      "Priority Support",
+      "API Access",
+      "White Label Dashboard",
+      "Custom Domains"
+    ]
+  },
+  {
+    id: "pro",
+    name: "Agency Pro",
+    price: "$497",
+    period: "month",
+    description: "Advanced features for power users.",
+    features: [
+      "Everything in Unlimited",
+      "SaaS Configurator",
+      "Advanced API Access",
+      "Dedicated Account Manager",
+      "Early Access to Features"
+    ]
+  }
+];
+
 export default function AgencyBillingPage() {
+  const { toast } = useToast();
+  const [isManageSubscriptionOpen, setIsManageSubscriptionOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("unlimited");
+
+  const handleUpdatePlan = () => {
+    setIsManageSubscriptionOpen(false);
+    toast({
+      title: "Plan Updated",
+      description: "Your subscription has been updated successfully.",
+    });
+  };
+
   return (
     <DashboardLayout 
       mode="agency" 
@@ -161,7 +230,11 @@ export default function AgencyBillingPage() {
                     <span className="ml-2 font-medium text-slate-900 dark:text-slate-100">{CURRENT_PLAN.nextBilling}</span>
                   </div>
                 </div>
-                <Button variant="link" className="text-primary h-auto p-0">
+                <Button 
+                  variant="link" 
+                  className="text-primary h-auto p-0"
+                  onClick={() => setIsManageSubscriptionOpen(true)}
+                >
                   Manage Subscription <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
@@ -312,6 +385,81 @@ export default function AgencyBillingPage() {
         </Card>
 
       </div>
+
+      <Dialog open={isManageSubscriptionOpen} onOpenChange={setIsManageSubscriptionOpen}>
+        <DialogContent className="max-w-[900px]">
+          <DialogHeader>
+            <DialogTitle>Manage Subscription</DialogTitle>
+            <DialogDescription>
+              Upgrade or downgrade your agency plan. Changes take effect immediately.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6">
+            {AVAILABLE_PLANS.map((plan) => (
+              <div 
+                key={plan.id}
+                className={`
+                  relative rounded-xl border p-6 cursor-pointer transition-all duration-200
+                  ${selectedPlan === plan.id 
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary shadow-sm' 
+                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 hover:shadow-sm'
+                  }
+                `}
+                onClick={() => setSelectedPlan(plan.id)}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-primary text-primary-foreground hover:bg-primary">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+                
+                <div className="mb-4">
+                  <h3 className="font-semibold text-lg">{plan.name}</h3>
+                  <div className="flex items-baseline gap-1 mt-2">
+                    <span className="text-3xl font-bold">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">/{plan.period}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
+                  {plan.features.map((feature, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <Check className={`h-4 w-4 mt-0.5 ${selectedPlan === plan.id ? 'text-primary' : 'text-slate-400'}`} />
+                      <span className="text-slate-600 dark:text-slate-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {selectedPlan === plan.id && (
+                  <div className="absolute top-4 right-4">
+                    <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="flex justify-between items-center sm:justify-between">
+            <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50">
+              Cancel Subscription
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setIsManageSubscriptionOpen(false)}>
+                Close
+              </Button>
+              <Button onClick={handleUpdatePlan}>
+                Update Plan
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
