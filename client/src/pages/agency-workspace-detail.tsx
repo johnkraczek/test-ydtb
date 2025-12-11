@@ -87,11 +87,11 @@ const WORKSPACE_DATA = {
 };
 
 const AVAILABLE_USERS = [
-  { value: "sarah", label: "Sarah Wilson", email: "sarah@example.com" },
-  { value: "michael", label: "Michael Chen", email: "michael@example.com" },
-  { value: "emma", label: "Emma Rodriguez", email: "emma@example.com" },
-  { value: "james", label: "James Kim", email: "james@example.com" },
-  { value: "alex", label: "Alex Turner", email: "alex@example.com" },
+  { value: "sarah", label: "Sarah Wilson", email: "sarah@example.com", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" },
+  { value: "michael", label: "Michael Chen", email: "michael@example.com", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Michael" },
+  { value: "emma", label: "Emma Rodriguez", email: "emma@example.com", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" },
+  { value: "james", label: "James Kim", email: "james@example.com", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=James" },
+  { value: "alex", label: "Alex Turner", email: "alex@example.com", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" },
 ];
 
 const PERMISSIONS_SCHEMA = [
@@ -616,9 +616,17 @@ export default function AgencyWorkspaceDetailPage() {
                            aria-expanded={open}
                            className="w-full justify-between"
                          >
-                           {value
-                             ? AVAILABLE_USERS.find((user) => user.value === value)?.label
-                             : "Select user..."}
+                           {value ? (
+                             <div className="flex items-center gap-2">
+                               <Avatar className="h-5 w-5">
+                                 <AvatarImage src={AVAILABLE_USERS.find((user) => user.value === value)?.avatar} />
+                                 <AvatarFallback>{AVAILABLE_USERS.find((user) => user.value === value)?.label.substring(0, 2)}</AvatarFallback>
+                               </Avatar>
+                               {AVAILABLE_USERS.find((user) => user.value === value)?.label}
+                             </div>
+                           ) : (
+                             "Select user..."
+                           )}
                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                          </Button>
                        </PopoverTrigger>
@@ -643,9 +651,15 @@ export default function AgencyWorkspaceDetailPage() {
                                        value === user.value ? "opacity-100" : "opacity-0"
                                      )}
                                    />
-                                   <div className="flex flex-col">
-                                     <span>{user.label}</span>
-                                     <span className="text-xs text-muted-foreground">{user.email}</span>
+                                   <div className="flex items-center gap-2">
+                                     <Avatar className="h-6 w-6">
+                                       <AvatarImage src={user.avatar} />
+                                       <AvatarFallback>{user.label.substring(0, 2)}</AvatarFallback>
+                                     </Avatar>
+                                     <div className="flex flex-col">
+                                       <span>{user.label}</span>
+                                       <span className="text-xs text-muted-foreground">{user.email}</span>
+                                     </div>
                                    </div>
                                  </CommandItem>
                                ))}
