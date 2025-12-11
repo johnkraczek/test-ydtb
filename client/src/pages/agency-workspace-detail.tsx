@@ -28,10 +28,17 @@ import {
   CheckCircle2,
   AlertCircle,
   Building,
-  Key
+  Key,
+  LayoutGrid,
+  Briefcase,
+  MessageSquare,
+  Image,
+  FileText,
+  Zap
 } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Mock data for the workspace detail
 const WORKSPACE_DATA = {
@@ -63,10 +70,123 @@ const WORKSPACE_DATA = {
   ]
 };
 
+const PERMISSIONS_SCHEMA = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    description: "Access to main overview and analytics",
+    icon: LayoutGrid,
+    permissions: [
+      { id: "view_dashboard", label: "View Dashboard" },
+      { id: "view_analytics", label: "View Analytics" },
+      { id: "export_reports", label: "Export Reports" }
+    ]
+  },
+  {
+    id: "contacts",
+    label: "Contacts",
+    description: "Manage customer and lead data",
+    icon: Users,
+    permissions: [
+      { id: "view_contacts", label: "View Contacts" },
+      { id: "edit_contacts", label: "Edit Contacts" },
+      { id: "delete_contacts", label: "Delete Contacts" },
+      { id: "export_contacts", label: "Export Data" }
+    ]
+  },
+  {
+    id: "team",
+    label: "Team Directory",
+    description: "Access to team member information",
+    icon: Briefcase,
+    permissions: [
+      { id: "view_team", label: "View Directory" },
+      { id: "invite_members", label: "Invite Members" },
+      { id: "manage_roles", label: "Manage Roles" }
+    ]
+  },
+  {
+    id: "messages",
+    label: "Messages",
+    description: "Access to inbox and communication tools",
+    icon: MessageSquare,
+    permissions: [
+      { id: "view_messages", label: "View Messages" },
+      { id: "send_messages", label: "Send Messages" },
+      { id: "manage_inboxes", label: "Manage Inboxes" }
+    ]
+  },
+  {
+    id: "media",
+    label: "Media Library",
+    description: "Manage files and assets",
+    icon: Image,
+    permissions: [
+      { id: "view_media", label: "View Files" },
+      { id: "upload_media", label: "Upload Files" },
+      { id: "delete_media", label: "Delete Files" }
+    ]
+  },
+  {
+    id: "pages",
+    label: "Pages",
+    description: "Manage website pages and content",
+    icon: FileText,
+    permissions: [
+      { id: "view_pages", label: "View Pages" },
+      { id: "edit_pages", label: "Edit Content" },
+      { id: "publish_pages", label: "Publish Changes" }
+    ]
+  },
+  {
+    id: "automation",
+    label: "Automation",
+    description: "Manage workflows and integrations",
+    icon: Zap,
+    permissions: [
+      { id: "view_workflows", label: "View Workflows" },
+      { id: "edit_workflows", label: "Edit Workflows" },
+      { id: "run_workflows", label: "Run Manually" }
+    ]
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    description: "Global application settings",
+    icon: Settings,
+    permissions: [
+      { id: "view_settings", label: "View Settings" },
+      { id: "manage_billing", label: "Manage Billing" },
+      { id: "manage_security", label: "Security Settings" }
+    ]
+  }
+];
+
 export default function AgencyWorkspaceDetailPage() {
   const [, setLocation] = useLocation();
   const [match, params] = useRoute("/agency/workspaces/:id");
   const id = params?.id;
+  
+  // Mock state for permissions
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({
+    view_dashboard: true,
+    view_analytics: true,
+    view_contacts: true,
+    edit_contacts: true,
+    view_team: true,
+    view_messages: true,
+    send_messages: true,
+    view_media: true,
+    upload_media: true,
+    view_pages: true
+  });
+
+  const togglePermission = (id: string) => {
+    setPermissions(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   // In a real app, fetch data based on ID
   const workspace = WORKSPACE_DATA; 
@@ -382,27 +502,74 @@ export default function AgencyWorkspaceDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <Accordion type="single" collapsible className="w-full space-y-4">
                     {[1, 2, 3].map((user) => (
-                      <div key={user} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <Avatar>
-                            <AvatarFallback>U{user}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-sm">User Name {user}</p>
-                            <p className="text-xs text-muted-foreground">user{user}@example.com</p>
+                      <AccordionItem key={user} value={`user-${user}`} className="border rounded-lg px-4">
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex items-center gap-4 w-full">
+                            <Avatar>
+                              <AvatarFallback>U{user}</AvatarFallback>
+                            </Avatar>
+                            <div className="text-left">
+                              <p className="font-medium text-sm">User Name {user}</p>
+                              <p className="text-xs text-muted-foreground">user{user}@example.com</p>
+                            </div>
+                            <div className="ml-auto flex items-center gap-4 mr-4">
+                              <Badge variant="outline">Admin</Badge>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <Badge variant="outline">Admin</Badge>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-6">
+                           <Separator className="mb-6" />
+                           <div className="grid grid-cols-1 gap-4">
+                             {PERMISSIONS_SCHEMA.map((tool) => (
+                               <Card key={tool.id} className="overflow-hidden border shadow-sm">
+                                 <div className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                   <div className="flex items-center gap-3">
+                                     <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500">
+                                       <tool.icon className="h-4 w-4" />
+                                     </div>
+                                     <div>
+                                       <h3 className="font-medium text-slate-900 dark:text-slate-100">{tool.label}</h3>
+                                       <p className="text-xs text-slate-500">{tool.description}</p>
+                                     </div>
+                                   </div>
+                                   <Switch 
+                                     checked={tool.permissions.every(p => permissions[p.id])} 
+                                     onCheckedChange={(checked) => {
+                                       const newPerms = { ...permissions };
+                                       tool.permissions.forEach(p => {
+                                         newPerms[p.id] = checked;
+                                       });
+                                       setPermissions(newPerms);
+                                     }}
+                                   />
+                                 </div>
+                                 <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                   {tool.permissions.map((perm) => (
+                                     <div key={perm.id} className="flex items-center space-x-2">
+                                       <Switch 
+                                         id={`${user}-${perm.id}`} 
+                                         checked={permissions[perm.id] || false}
+                                         onCheckedChange={() => togglePermission(perm.id)}
+                                         className="scale-90"
+                                       />
+                                       <Label htmlFor={`${user}-${perm.id}`} className="text-sm font-normal cursor-pointer">
+                                         {perm.label}
+                                       </Label>
+                                     </div>
+                                   ))}
+                                 </div>
+                               </Card>
+                             ))}
+                           </div>
+                           <div className="flex justify-end mt-6">
+                             <Button size="sm">Save Permissions</Button>
+                           </div>
+                        </AccordionContent>
+                      </AccordionItem>
                     ))}
-                  </div>
+                  </Accordion>
                 </CardContent>
               </Card>
 
