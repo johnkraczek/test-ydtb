@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast"; // Import toast
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -186,10 +187,25 @@ const PERMISSIONS_SCHEMA = [
   }
 ];
 
+interface WorkspaceUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+}
+
 export default function AgencyWorkspaceDetailPage() {
   const [, setLocation] = useLocation();
   const [match, params] = useRoute("/agency/workspaces/:id");
   const id = params?.id;
+  const { toast } = useToast();
+
+  const [workspaceUsers, setWorkspaceUsers] = useState<WorkspaceUser[]>([
+    { id: 1, name: "User Name 1", email: "user1@example.com", role: "admin", avatar: "" },
+    { id: 2, name: "User Name 2", email: "user2@example.com", role: "admin", avatar: "" },
+    { id: 3, name: "User Name 3", email: "user3@example.com", role: "admin", avatar: "" },
+  ]);
   
   // Mock state for permissions
   const [permissions, setPermissions] = useState<Record<string, boolean>>({
@@ -207,12 +223,46 @@ export default function AgencyWorkspaceDetailPage() {
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  const [selectedRole, setSelectedRole] = useState("member");
 
   const togglePermission = (id: string) => {
     setPermissions(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const handleAddUser = () => {
+    if (!value) return;
+    
+    const selectedUser = AVAILABLE_USERS.find(user => user.value === value);
+    if (!selectedUser) return;
+
+    // Check if user already exists
+    if (workspaceUsers.some(u => u.email === selectedUser.email)) {
+      toast({
+        title: "User already added",
+        description: `${selectedUser.label} is already a member of this workspace.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newUser: WorkspaceUser = {
+      id: workspaceUsers.length + 1,
+      name: selectedUser.label,
+      email: selectedUser.email,
+      role: selectedRole,
+      avatar: selectedUser.avatar
+    };
+
+    setWorkspaceUsers([...workspaceUsers, newUser]);
+    setValue("");
+    
+    toast({
+      title: "User added",
+      description: `${selectedUser.label} has been added to the workspace as ${selectedRole}.`,
+    });
   };
 
   // In a real app, fetch data based on ID
@@ -530,19 +580,20 @@ export default function AgencyWorkspaceDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible className="w-full space-y-4">
-                    {[1, 2, 3].map((user) => (
-                      <AccordionItem key={user} value={`user-${user}`} className="border rounded-lg px-4">
+                    {workspaceUsers.map((user) => (
+                      <AccordionItem key={user.id} value={`user-${user.id}`} className="border rounded-lg px-4">
                         <AccordionTrigger className="hover:no-underline py-4">
                           <div className="flex items-center gap-4 w-full">
                             <Avatar>
-                              <AvatarFallback>U{user}</AvatarFallback>
+                              <AvatarImage src={user.avatar} />
+                              <AvatarFallback>{user.name.substring(0, 2)}</AvatarFallback>
                             </Avatar>
                             <div className="text-left">
-                              <p className="font-medium text-sm">User Name {user}</p>
-                              <p className="text-xs text-muted-foreground">user{user}@example.com</p>
+                              <p className="font-medium text-sm">{user.name}</p>
+                              <p className="text-xs text-muted-foreground">{user.email}</p>
                             </div>
                             <div className="ml-auto flex items-center gap-4 mr-4">
-                              <Badge variant="outline">Admin</Badge>
+                              <Badge variant="outline" className="capitalize">{user.role}</Badge>
                             </div>
                           </div>
                         </AccordionTrigger>
@@ -576,12 +627,12 @@ export default function AgencyWorkspaceDetailPage() {
                                    {tool.permissions.map((perm) => (
                                      <div key={perm.id} className="flex items-center space-x-2">
                                        <Switch 
-                                         id={`${user}-${perm.id}`} 
+                                         id={`${user.id}-${perm.id}`} 
                                          checked={permissions[perm.id] || false}
                                          onCheckedChange={() => togglePermission(perm.id)}
                                          className="scale-90"
                                        />
-                                       <Label htmlFor={`${user}-${perm.id}`} className="text-sm font-normal cursor-pointer">
+                                       <Label htmlFor={`${user.id}-${perm.id}`} className="text-sm font-normal cursor-pointer">
                                          {perm.label}
                                        </Label>
                                      </div>
@@ -671,7 +722,7 @@ export default function AgencyWorkspaceDetailPage() {
                    </div>
                    <div className="space-y-2">
                      <Label>Role</Label>
-                     <Select defaultValue="member">
+                     <Select value={selectedRole} onValueChange={setSelectedRole}>
                        <SelectTrigger>
                          <SelectValue placeholder="Select role" />
                        </SelectTrigger>
@@ -682,7 +733,7 @@ export default function AgencyWorkspaceDetailPage() {
                        </SelectContent>
                      </Select>
                    </div>
-                   <Button className="w-full gap-2">
+                   <Button className="w-full gap-2" onClick={handleAddUser} disabled={!value}>
                      <Users className="h-4 w-4" />
                      Add to Workspace
                    </Button>
