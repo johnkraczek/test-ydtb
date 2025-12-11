@@ -106,43 +106,47 @@ export default function AgencyWorkspaceCreatePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Steps Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="relative">
-              {/* Vertical line connecting steps */}
-              <div className="absolute left-4 top-4 bottom-4 w-px bg-slate-200 dark:bg-slate-800" />
-              
-              <div className="space-y-8 relative">
-                {STEPS.map((step) => {
-                  const isActive = step.id === currentStep;
-                  const isCompleted = step.id < currentStep;
+            <Card className="h-full">
+              <CardContent className="pt-6">
+                <div className="relative">
+                  {/* Vertical line connecting steps */}
+                  <div className="absolute left-4 top-4 bottom-4 w-px bg-slate-200 dark:bg-slate-800" />
                   
-                  return (
-                    <div key={step.id} className="flex items-start gap-4">
-                      <div 
-                        className={cn(
-                          "relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors duration-200",
-                          isActive ? "border-primary bg-primary text-primary-foreground" : 
-                          isCompleted ? "border-primary bg-primary text-primary-foreground" : 
-                          "border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-950"
-                        )}
-                      >
-                        {isCompleted ? <Check className="h-4 w-4" /> : <step.icon className="h-4 w-4" />}
-                      </div>
-                      <div className="pt-1">
-                        <p className={cn(
-                          "text-sm font-medium leading-none",
-                          isActive ? "text-primary" : 
-                          isCompleted ? "text-slate-900 dark:text-slate-100" : 
-                          "text-slate-500 dark:text-slate-400"
-                        )}>
-                          {step.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                  <div className="space-y-8 relative">
+                    {STEPS.map((step) => {
+                      const isActive = step.id === currentStep;
+                      const isCompleted = step.id < currentStep;
+                      
+                      return (
+                        <div key={step.id} className="flex items-start gap-4">
+                          <div 
+                            className={cn(
+                              "relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors duration-200",
+                              isActive ? "border-primary bg-primary text-primary-foreground" : 
+                              isCompleted ? "border-primary bg-primary text-primary-foreground" : 
+                              "border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-950"
+                            )}
+                          >
+                            {isCompleted ? <Check className="h-4 w-4" /> : <step.icon className="h-4 w-4" />}
+                          </div>
+                          <div className="pt-1">
+                            <p className={cn(
+                              "text-sm font-medium leading-none",
+                              isActive ? "text-primary" : 
+                              isCompleted ? "text-slate-900 dark:text-slate-100" : 
+                              "text-slate-500 dark:text-slate-400"
+                            )}>
+                              {step.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">{step.description}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Form Content */}
