@@ -129,7 +129,7 @@ export default function AgencyWorkspaceDetailPage() {
     >
       <div className="max-w-[1600px] mx-auto space-y-8 pb-12">
         <Tabs defaultValue="overview" className="w-full">
-          <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 sm:-mx-8 sm:px-8">
+          <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 sm:-mx-8 sm:px-8 -mt-8">
             <TabsList className="w-full justify-start border-b-0 rounded-none h-auto p-0 bg-transparent space-x-6">
               <TabsTrigger 
                 value="overview" 
