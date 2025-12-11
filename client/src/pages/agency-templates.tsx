@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLocation } from "wouter";
 
 const MOCK_TEMPLATES = [
   {
@@ -66,6 +67,7 @@ const MOCK_TEMPLATES = [
 
 export default function AgencyTemplatesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
 
   const filteredTemplates = MOCK_TEMPLATES.filter(template => 
     template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -134,7 +136,11 @@ export default function AgencyTemplatesPage() {
           <TabsContent value="all" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredTemplates.map((template) => (
-                <Card key={template.id} className="group hover:shadow-md transition-all duration-200">
+                <Card 
+                  key={template.id} 
+                  className="group hover:shadow-md transition-all duration-200 cursor-pointer"
+                  onClick={() => setLocation(`/agency/templates/${template.id}`)}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-3">
@@ -142,15 +148,20 @@ export default function AgencyTemplatesPage() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-slate-400 hover:text-slate-600">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 -mr-2 text-slate-400 hover:text-slate-600"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                             <Copy className="mr-2 h-4 w-4" /> Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-rose-600 focus:text-rose-600">
+                          <DropdownMenuItem className="text-rose-600 focus:text-rose-600" onClick={(e) => e.stopPropagation()}>
                             <Trash className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
