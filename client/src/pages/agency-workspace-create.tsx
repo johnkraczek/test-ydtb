@@ -119,6 +119,7 @@ export default function AgencyWorkspaceCreatePage() {
                     {STEPS.map((step) => {
                       const isActive = step.id === currentStep;
                       const isCompleted = step.id < currentStep;
+                      const StepIcon = step.icon;
                       
                       return (
                         <div key={step.id} className="flex items-start gap-4">
@@ -130,7 +131,7 @@ export default function AgencyWorkspaceCreatePage() {
                               "border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-950"
                             )}
                           >
-                            {isCompleted ? <Check className="h-4 w-4" /> : <step.icon className="h-4 w-4" />}
+                            {isCompleted ? <Check className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
                           </div>
                           <div className="pt-1">
                             <p className={cn(
