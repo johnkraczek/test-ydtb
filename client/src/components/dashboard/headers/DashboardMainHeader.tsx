@@ -833,7 +833,10 @@ export function DashboardMainHeader() {
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer rounded-md">
+            <DropdownMenuItem 
+              className="cursor-pointer rounded-md"
+              onClick={() => setLocation("/settings/account")}
+            >
               <User className="mr-2 h-4 w-4 text-slate-500" />
               <span>Profile</span>
             </DropdownMenuItem>
