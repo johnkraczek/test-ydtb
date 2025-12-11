@@ -691,7 +691,11 @@ export function DashboardMainHeader() {
 
             {/* Create Workspace */}
             <div className="p-2">
-              <Button className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/20" size="sm">
+              <Button 
+                className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/20" 
+                size="sm"
+                onClick={() => setLocation("/agency/workspaces/create")}
+              >
                 <Plus className="h-4 w-4" />
                 Create Workspace
               </Button>
