@@ -29,6 +29,7 @@ import CustomValuesPage from "@/pages/custom-values";
 import AgencyDashboardPage from "@/pages/agency-dashboard";
 import AgencyWorkspacesPage from "@/pages/agency-workspaces";
 import AgencyWorkspaceDetailPage from "@/pages/agency-workspace-detail";
+import AgencyWorkspaceCreatePage from "@/pages/agency-workspace-create";
 import AgencyTemplatesPage from "@/pages/agency-templates";
 import AgencyTemplateDetailPage from "@/pages/agency-template-detail";
 import AgencySettingsPage from "@/pages/agency-settings";
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/" component={DashboardPage} />
       <Route path="/agency" component={AgencyDashboardPage} />
       <Route path="/agency/workspaces" component={AgencyWorkspacesPage} />
+      <Route path="/agency/workspaces/create" component={AgencyWorkspaceCreatePage} />
       <Route path="/agency/workspaces/:id" component={AgencyWorkspaceDetailPage} />
       <Route path="/agency/templates" component={AgencyTemplatesPage} />
       <Route path="/agency/templates/:id" component={AgencyTemplateDetailPage} />

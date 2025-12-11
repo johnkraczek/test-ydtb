@@ -368,7 +368,10 @@ export default function AgencyWorkspacesPage() {
                 </PopoverContent>
               </Popover>
 
-              <Button className="gap-2 ml-2">
+              <Button 
+                className="gap-2 ml-2"
+                onClick={() => setLocation("/agency/workspaces/create")}
+              >
                 <Plus className="h-4 w-4" />
                 Create Workspace
               </Button>
