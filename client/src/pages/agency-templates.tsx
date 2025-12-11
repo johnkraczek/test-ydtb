@@ -73,39 +73,42 @@ export default function AgencyTemplatesPage() {
   );
 
   return (
-    <DashboardLayout mode="agency" activeTool="agency-templates">
+    <DashboardLayout 
+      mode="agency" 
+      activeTool="agency-templates"
+      header={
+        <div className="flex flex-col gap-4 px-8 pt-8 pb-6 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Templates</h1>
+              <p className="text-slate-500 dark:text-slate-400 mt-1">
+                Create and manage snapshots to deploy settings across sub-accounts.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+                <div className="relative w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input 
+                    placeholder="Search templates..." 
+                    className="pl-9 bg-white dark:bg-slate-950"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Button variant="outline" className="gap-2 bg-white dark:bg-slate-950">
+                  <Settings className="h-4 w-4" />
+                  Filter
+                </Button>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create Template
+                </Button>
+            </div>
+          </div>
+        </div>
+      }
+    >
       <div className="max-w-[1600px] mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Templates</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1">
-              Create and manage snapshots to deploy settings across sub-accounts.
-            </p>
-          </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Template
-          </Button>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input 
-              placeholder="Search templates..." 
-              className="pl-9 bg-white dark:bg-slate-950"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2 bg-white dark:bg-slate-950">
-              <Settings className="h-4 w-4" />
-              Filter
-            </Button>
-          </div>
-        </div>
-
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent space-x-6 mb-6">
             <TabsTrigger 
