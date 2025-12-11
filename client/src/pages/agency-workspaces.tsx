@@ -19,7 +19,11 @@ import {
   BarChart2,
   ExternalLink,
   Wallet,
-  Check
+  Check,
+  CheckCheck,
+  Trash,
+  Archive,
+  Ban
 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +32,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Mock data for workspaces
 const WORKSPACES = [
@@ -139,6 +145,25 @@ export default function AgencyWorkspacesPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input placeholder="Search workspaces..." className="pl-9" />
               </div>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0 ? "secondary" : "outline"} 
+                      size="icon" 
+                      onClick={toggleSelectAll}
+                      className={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0 ? "bg-slate-100 dark:bg-slate-800" : ""}
+                    >
+                      <CheckCheck className="h-4 w-4 text-slate-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Select All Workspaces</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <Select defaultValue="active">
                 <SelectTrigger className="w-[130px]">
                   <SelectValue placeholder="Status" />
@@ -230,30 +255,7 @@ export default function AgencyWorkspacesPage() {
         />
       }
     >
-      <div className="space-y-6 max-w-[1600px] mx-auto">
-        {/* Selection Bar */}
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-3">
-             <Checkbox 
-                id="select-all" 
-                checked={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0}
-                onCheckedChange={toggleSelectAll}
-             />
-             <Label htmlFor="select-all" className="cursor-pointer font-medium text-slate-600 dark:text-slate-400">Select All</Label>
-          </div>
-          
-          <Select disabled={selectedWorkspaces.length === 0}>
-            <SelectTrigger className="w-[180px] h-9">
-              <SelectValue placeholder="Bulk Actions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="activate">Activate Selected</SelectItem>
-              <SelectItem value="deactivate">Deactivate Selected</SelectItem>
-              <SelectItem value="delete" className="text-rose-600">Delete Selected</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
+      <div className="space-y-6 max-w-[1600px] mx-auto pb-24">
         {/* Workspaces List */}
         <div className="space-y-4">
           {WORKSPACES.map((workspace) => (
@@ -267,6 +269,50 @@ export default function AgencyWorkspacesPage() {
           ))}
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedWorkspaces.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl z-50 px-4"
+          >
+            <div className="bg-slate-900 text-slate-50 rounded-xl shadow-2xl border border-slate-800 p-3 flex items-center justify-between">
+              <div className="flex items-center gap-4 px-3">
+                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-500 text-white font-medium text-sm">
+                  {selectedWorkspaces.length}
+                </div>
+                <span className="font-medium text-sm">Selected</span>
+              </div>
+              
+              <div className="h-8 w-px bg-slate-800 mx-2" />
+              
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-800">
+                  <Archive className="h-4 w-4 mr-2" />
+                  Deactivate
+                </Button>
+                <Button variant="ghost" size="sm" className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/30">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+
+              <div className="h-8 w-px bg-slate-800 mx-2" />
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
+                onClick={() => setSelectedWorkspaces([])}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 }
