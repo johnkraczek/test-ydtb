@@ -546,6 +546,16 @@ function AgencySettingsSidebarContent() {
 }
 
 function AgencyWorkspacesSidebarContent() {
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+
+  const handleCreateGroup = () => {
+    // In a real app, this would create the group
+    console.log("Creating group:", newGroupName);
+    setIsCreateGroupOpen(false);
+    setNewGroupName("");
+  };
+
   return (
     <div className="space-y-1">
       <SidebarSection title="Views">
@@ -557,7 +567,12 @@ function AgencyWorkspacesSidebarContent() {
       <SidebarSection 
         title="Groups"
         action={
-          <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-primary p-0">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-4 w-4 text-slate-400 hover:text-primary p-0"
+            onClick={() => setIsCreateGroupOpen(true)}
+          >
              <Plus className="h-3 w-3" />
           </Button>
         }
@@ -566,6 +581,34 @@ function AgencyWorkspacesSidebarContent() {
         <SidebarItem icon={Folder} label="Local Business" badge="12" />
         <SidebarItem icon={Folder} label="Churn Risk" badge="2" />
       </SidebarSection>
+
+      <Dialog open={isCreateGroupOpen} onOpenChange={setIsCreateGroupOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create Group</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="group-name">Group Name</Label>
+              <Input 
+                id="group-name" 
+                value={newGroupName} 
+                onChange={(e) => setNewGroupName(e.target.value)} 
+                placeholder="e.g. Enterprise Clients"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newGroupName) {
+                    handleCreateGroup();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateGroupOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateGroup} disabled={!newGroupName}>Create Group</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
