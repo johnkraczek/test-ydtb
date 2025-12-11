@@ -76,7 +76,7 @@ export default function AgencyWorkspaceDetailPage() {
       mode="agency" 
       activeTool="agency-workspaces"
       header={
-        <div className="flex flex-col gap-4 pb-6">
+        <div className="flex flex-col gap-4 px-8 pt-8 pb-6 border-b border-slate-200 dark:border-slate-800">
           <Button 
             variant="ghost" 
             size="sm" 
