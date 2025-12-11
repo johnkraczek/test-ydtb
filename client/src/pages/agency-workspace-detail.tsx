@@ -129,32 +129,34 @@ export default function AgencyWorkspaceDetailPage() {
     >
       <div className="max-w-[1600px] mx-auto space-y-8 pb-12">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent space-x-6">
-            <TabsTrigger 
-              value="overview" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
-            >
-              Workspace Settings
-            </TabsTrigger>
-            <TabsTrigger 
-              value="users" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
-            >
-              Users & Permissions
-            </TabsTrigger>
-            <TabsTrigger 
-              value="integrations" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
-            >
-              Integrations
-            </TabsTrigger>
-          </TabsList>
+          <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 sm:-mx-8 sm:px-8">
+            <TabsList className="w-full justify-start border-b-0 rounded-none h-auto p-0 bg-transparent space-x-6">
+              <TabsTrigger 
+                value="overview" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="settings" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
+              >
+                Workspace Settings
+              </TabsTrigger>
+              <TabsTrigger 
+                value="users" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
+              >
+                Users & Permissions
+              </TabsTrigger>
+              <TabsTrigger 
+                value="integrations" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3"
+              >
+                Integrations
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
