@@ -44,7 +44,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FilterBuilder, Filter as FilterType } from "@/components/dashboard/FilterBuilder";
+import { useLocation } from "wouter";
+import { FilterBuilder, Filter as FilterType, FilterCondition } from "@/components/dashboard/FilterBuilder";
 
 // Mock data for workspaces
 const WORKSPACES = [
@@ -108,6 +109,7 @@ const WORKSPACES = [
 ];
 
 export default function AgencyWorkspacesPage() {
+  const [, setLocation] = useLocation();
   const [visibleMetrics, setVisibleMetrics] = useState({
     activeUsers: true,
     calls: true,
@@ -136,6 +138,8 @@ export default function AgencyWorkspacesPage() {
   ];
 
   const checkFilter = (item: any, filter: FilterType) => {
+    if (filter.type !== 'condition') return true;
+
     let value = item[filter.field];
     
     if (typeof value === 'number') {
@@ -383,6 +387,7 @@ export default function AgencyWorkspacesPage() {
               visibleMetrics={visibleMetrics}
               isSelected={selectedWorkspaces.includes(workspace.id)}
               onToggleSelection={() => toggleWorkspaceSelection(workspace.id)}
+              onNavigate={() => setLocation(`/agency/workspaces/${workspace.id}`)}
             />
           ))}
           {filteredWorkspaces.length === 0 && (
@@ -487,7 +492,7 @@ export default function AgencyWorkspacesPage() {
   );
 }
 
-function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelection }: { workspace: any, visibleMetrics: any, isSelected: boolean, onToggleSelection: () => void }) {
+function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelection, onNavigate }: { workspace: any, visibleMetrics: any, isSelected: boolean, onToggleSelection: () => void, onNavigate: () => void }) {
   // Count active metrics to adjust grid columns if needed
   const activeMetricCount = Object.values(visibleMetrics).filter(Boolean).length;
   
@@ -510,9 +515,9 @@ function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelectio
                  )}
               </div>
               
-              <div>
+              <div className="cursor-pointer" onClick={onNavigate}>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">{workspace.name}</h3>
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100 hover:text-primary transition-colors">{workspace.name}</h3>
                   <Badge variant={workspace.status === 'Active' ? 'default' : 'secondary'} className="h-5 px-1.5 text-[10px]">
                     {workspace.status}
                   </Badge>
@@ -532,7 +537,7 @@ function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelectio
           </div>
 
           {/* Middle Column: Metrics Grid */}
-          <div className={`flex-1 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-8 ${activeMetricCount === 0 ? 'hidden lg:hidden' : ''}`}>
+          <div className={`flex-1 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-8 ${activeMetricCount === 0 ? 'hidden lg:hidden' : ''}`} onClick={onNavigate} style={{cursor: 'pointer'}}>
             {visibleMetrics.activeUsers && (
               <MetricItem label="Active Users" value={workspace.metrics.activeUsers.value} change={workspace.metrics.activeUsers.change} icon={Users} />
             )}
@@ -576,7 +581,7 @@ function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelectio
         </div>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button size="sm" className="gap-2 w-full sm:w-auto">
+          <Button size="sm" className="gap-2 w-full sm:w-auto" onClick={onNavigate}>
             <ExternalLink className="h-3.5 w-3.5" />
             Switch to Workspace
           </Button>
