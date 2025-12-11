@@ -563,6 +563,9 @@ export default function AgencyWorkspaceDetailPage() {
                     <CardTitle>Danger Zone</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
+                    <Button variant="outline" className="w-full text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200">
+                      Suspend Workspace
+                    </Button>
                     <Button variant="outline" className="w-full text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200">
                       Reset Data
                     </Button>
