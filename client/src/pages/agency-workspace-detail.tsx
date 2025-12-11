@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -38,7 +39,12 @@ const WORKSPACE_DATA = {
   name: "5 Element Energy",
   status: "Active",
   type: "Business",
-  address: "1037 S 650 W, Salt Lake City, UT",
+  address: "1037 S 650 W",
+  city: "Farmington",
+  state: "Utah",
+  zip: "84025",
+  country: "United States",
+  timezone: "GMT-07:00 America/Denver (MST)",
   phone: "+1 801-828-0283",
   email: "contact@5element.com",
   website: "www.5elementenergy.com",
@@ -97,7 +103,7 @@ export default function AgencyWorkspaceDetailPage() {
                 <div className="mt-1 flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5" />
-                    {workspace.address}
+                    {workspace.address}, {workspace.city}, {workspace.state}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Globe className="h-3.5 w-3.5" />
@@ -252,26 +258,67 @@ export default function AgencyWorkspaceDetailPage() {
                   <CardDescription>Update the workspace's business details.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="ws-name">Workspace Name</Label>
+                      <Label htmlFor="ws-name">Business Name <span className="text-red-500">*</span></Label>
                       <Input id="ws-name" defaultValue={workspace.name} />
                     </div>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="ws-phone">Business Phone</Label>
-                      <Input id="ws-phone" defaultValue={workspace.phone} />
+                      <Label htmlFor="ws-address">Street Address</Label>
+                      <Input id="ws-address" defaultValue={workspace.address} />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ws-email">Business Email</Label>
-                      <Input id="ws-email" defaultValue={workspace.email} />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="ws-city">City</Label>
+                        <Input id="ws-city" defaultValue={workspace.city} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ws-country">Country <span className="text-red-500">*</span></Label>
+                        <Select defaultValue={workspace.country}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="United States">United States</SelectItem>
+                            <SelectItem value="Canada">Canada</SelectItem>
+                            <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                            <SelectItem value="Australia">Australia</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="ws-zip">Zip / Postal Code</Label>
+                        <Input id="ws-zip" defaultValue={workspace.zip} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ws-state">State / Prov / Region</Label>
+                        <Input id="ws-state" defaultValue={workspace.state} />
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="ws-website">Website</Label>
                       <Input id="ws-website" defaultValue={workspace.website} />
                     </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label htmlFor="ws-address">Address</Label>
-                      <Input id="ws-address" defaultValue={workspace.address} />
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ws-timezone">Time Zone</Label>
+                      <Select defaultValue={workspace.timezone}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Time Zone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="GMT-07:00 America/Denver (MST)">GMT-07:00 America/Denver (MST)</SelectItem>
+                          <SelectItem value="GMT-05:00 America/New_York (EST)">GMT-05:00 America/New_York (EST)</SelectItem>
+                          <SelectItem value="GMT-06:00 America/Chicago (CST)">GMT-06:00 America/Chicago (CST)</SelectItem>
+                          <SelectItem value="GMT-08:00 America/Los_Angeles (PST)">GMT-08:00 America/Los_Angeles (PST)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </CardContent>
