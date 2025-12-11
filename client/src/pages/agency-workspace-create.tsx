@@ -107,7 +107,10 @@ export default function AgencyWorkspaceCreatePage() {
           {/* Steps Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             <Card className="h-full">
-              <CardContent className="pt-6">
+              <CardHeader>
+                <CardTitle>Steps</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
                 <div className="relative">
                   {/* Vertical line connecting steps */}
                   <div className="absolute left-4 top-4 bottom-4 w-px bg-slate-200 dark:bg-slate-800" />
