@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   CreditCard, 
   Check, 
@@ -18,7 +20,8 @@ import {
   Plus,
   ArrowRight,
   Shield,
-  Star
+  Star,
+  Lock
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -154,13 +157,41 @@ const AVAILABLE_PLANS = [
 export default function AgencyBillingPage() {
   const { toast } = useToast();
   const [isManageSubscriptionOpen, setIsManageSubscriptionOpen] = useState(false);
+  const [isAddPaymentMethodOpen, setIsAddPaymentMethodOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("unlimited");
+
+  // New payment method state
+  const [newCard, setNewCard] = useState({
+    name: "",
+    number: "",
+    expiry: "",
+    cvc: ""
+  });
 
   const handleUpdatePlan = () => {
     setIsManageSubscriptionOpen(false);
     toast({
       title: "Plan Updated",
       description: "Your subscription has been updated successfully.",
+    });
+  };
+
+  const handleAddPaymentMethod = () => {
+    // Basic validation
+    if (!newCard.name || !newCard.number || !newCard.expiry || !newCard.cvc) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all card details.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsAddPaymentMethodOpen(false);
+    setNewCard({ name: "", number: "", expiry: "", cvc: "" });
+    toast({
+      title: "Payment Method Added",
+      description: "Your new card has been added successfully.",
     });
   };
 
@@ -273,7 +304,7 @@ export default function AgencyBillingPage() {
                   <CardTitle>Payment Methods</CardTitle>
                   <CardDescription>Manage your credit cards and payment details.</CardDescription>
                 </div>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => setIsAddPaymentMethodOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" /> Add Method
                 </Button>
               </div>
@@ -457,6 +488,74 @@ export default function AgencyBillingPage() {
                 Update Plan
               </Button>
             </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Payment Method Dialog */}
+      <Dialog open={isAddPaymentMethodOpen} onOpenChange={setIsAddPaymentMethodOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Payment Method</DialogTitle>
+            <DialogDescription>
+              Add a new credit card to your account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name on Card</Label>
+              <Input
+                id="name"
+                placeholder="John Doe"
+                value={newCard.name}
+                onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="number">Card Number</Label>
+              <div className="relative">
+                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  id="number"
+                  placeholder="0000 0000 0000 0000"
+                  className="pl-9"
+                  value={newCard.number}
+                  onChange={(e) => setNewCard({ ...newCard, number: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="expiry">Expiry Date</Label>
+                <Input
+                  id="expiry"
+                  placeholder="MM/YY"
+                  value={newCard.expiry}
+                  onChange={(e) => setNewCard({ ...newCard, expiry: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cvc">CVC</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    id="cvc"
+                    placeholder="123"
+                    className="pl-9"
+                    value={newCard.cvc}
+                    onChange={(e) => setNewCard({ ...newCard, cvc: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+              <Shield className="h-3.5 w-3.5" />
+              <span>Your payment information is securely encrypted.</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddPaymentMethodOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddPaymentMethod}>Add Card</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
