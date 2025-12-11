@@ -44,6 +44,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FilterBuilder, Filter as FilterType } from "@/components/dashboard/FilterBuilder";
 
 // Mock data for workspaces
 const WORKSPACES = [
@@ -120,6 +121,102 @@ export default function AgencyWorkspacesPage() {
   const [selectedWorkspaces, setSelectedWorkspaces] = useState<number[]>([]);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Filter state
+  const [filters, setFilters] = useState<FilterType[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const filterColumns = [
+    { id: "name", label: "Name", type: "text" },
+    { id: "status", label: "Status", type: "text" },
+    { id: "revenue", label: "Revenue", type: "text" },
+    { id: "address", label: "Address", type: "text" },
+    { id: "phone", label: "Phone", type: "text" },
+  ];
+
+  const checkFilter = (item: any, filter: FilterType) => {
+    let value = item[filter.field];
+    
+    if (typeof value === 'number') {
+        value = value.toString();
+    } else if (value === undefined || value === null) {
+        value = '';
+    } else {
+        value = String(value).toLowerCase();
+    }
+    
+    const filterValue = String(filter.value).toLowerCase();
+    
+    switch (filter.operator) {
+      case 'contains':
+        return value.includes(filterValue);
+      case 'does_not_contain':
+        return !value.includes(filterValue);
+      case 'is':
+        return value === filterValue;
+      case 'is_not':
+        return value !== filterValue;
+      case 'starts_with':
+        return value.startsWith(filterValue);
+      case 'ends_with':
+        return value.endsWith(filterValue);
+      case 'is_empty':
+        return !value || value.length === 0;
+      case 'is_not_empty':
+        return value && value.length > 0;
+      default:
+        return true;
+    }
+  };
+
+  const filteredWorkspaces = WORKSPACES.filter(workspace => {
+    // Search query filter
+    const matchesSearch = 
+      workspace.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      workspace.address.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    if (!matchesSearch) return false;
+    
+    // Advanced filters
+    if (filters.length === 0) return true;
+    
+    const evaluateFilters = (filterList: FilterType[], item: any): boolean => {
+        if (filterList.length === 0) return true;
+        
+        let result = true;
+        
+        // Process first item
+        const first = filterList[0];
+        if (first.type === 'group') {
+             result = evaluateFilters(first.items, item);
+        } else {
+             result = checkFilter(item, first);
+        }
+        
+        // Process remaining items
+        for (let i = 1; i < filterList.length; i++) {
+            const filter = filterList[i];
+            let matches = false;
+            
+            if (filter.type === 'group') {
+                matches = evaluateFilters(filter.items, item);
+            } else {
+                matches = checkFilter(item, filter);
+            }
+            
+            if (filter.logic === 'AND') {
+                result = result && matches;
+            } else {
+                result = result || matches;
+            }
+        }
+        
+        return result;
+    };
+    
+    return evaluateFilters(filters, workspace);
+  });
 
   const toggleMetric = (key: keyof typeof visibleMetrics) => {
     setVisibleMetrics(prev => ({
@@ -135,10 +232,10 @@ export default function AgencyWorkspacesPage() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedWorkspaces.length === WORKSPACES.length) {
+    if (selectedWorkspaces.length === filteredWorkspaces.length) {
       setSelectedWorkspaces([]);
     } else {
-      setSelectedWorkspaces(WORKSPACES.map(w => w.id));
+      setSelectedWorkspaces(filteredWorkspaces.map(w => w.id));
     }
   };
 
@@ -162,17 +259,22 @@ export default function AgencyWorkspacesPage() {
             <div className="flex items-center gap-2">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input placeholder="Search workspaces..." className="pl-9" />
+                <Input 
+                  placeholder="Search workspaces..." 
+                  className="pl-9" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
 
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button 
-                      variant={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0 ? "secondary" : "outline"} 
+                      variant={selectedWorkspaces.length === filteredWorkspaces.length && filteredWorkspaces.length > 0 ? "secondary" : "outline"} 
                       size="icon" 
                       onClick={toggleSelectAll}
-                      className={selectedWorkspaces.length === WORKSPACES.length && WORKSPACES.length > 0 ? "bg-slate-100 dark:bg-slate-800" : ""}
+                      className={selectedWorkspaces.length === filteredWorkspaces.length && filteredWorkspaces.length > 0 ? "bg-slate-100 dark:bg-slate-800" : ""}
                     >
                       <CheckCheck className="h-4 w-4 text-slate-500" />
                     </Button>
@@ -183,21 +285,18 @@ export default function AgencyWorkspacesPage() {
                 </Tooltip>
               </TooltipProvider>
 
-              <Select defaultValue="active">
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="all">All Status</SelectItem>
-                </SelectContent>
-              </Select>
+              <FilterBuilder 
+                columns={filterColumns} 
+                filters={filters} 
+                onFiltersChange={setFilters}
+                open={isFilterOpen}
+                onOpenChange={setIsFilterOpen}
+              />
               
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="icon" className="relative">
-                    <Filter className="h-4 w-4 text-slate-500" />
+                    <MoreHorizontal className="h-4 w-4 text-slate-500" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-56 p-2">
@@ -277,7 +376,7 @@ export default function AgencyWorkspacesPage() {
       <div className="space-y-6 max-w-[1600px] mx-auto pb-24">
         {/* Workspaces List */}
         <div className="space-y-4">
-          {WORKSPACES.map((workspace) => (
+          {filteredWorkspaces.map((workspace) => (
             <WorkspaceCard 
               key={workspace.id} 
               workspace={workspace} 
@@ -286,6 +385,20 @@ export default function AgencyWorkspacesPage() {
               onToggleSelection={() => toggleWorkspaceSelection(workspace.id)}
             />
           ))}
+          {filteredWorkspaces.length === 0 && (
+            <div className="text-center py-12 text-slate-500">
+              <p>No workspaces found matching your filters.</p>
+              <Button 
+                variant="link" 
+                onClick={() => {
+                  setFilters([]);
+                  setSearchQuery("");
+                }}
+              >
+                Clear all filters
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
