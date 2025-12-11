@@ -204,6 +204,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return <SettingsSidebarContent />;
       case "agency-settings":
         return <AgencySettingsSidebarContent />;
+      case "agency-workspaces":
+        return <AgencyWorkspacesSidebarContent />;
       default:
         return <DefaultSidebarContent />;
     }
@@ -233,6 +235,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return "Settings";
       case "agency-settings":
         return "Agency Settings";
+      case "agency-workspaces":
+        return "Workspaces";
       default:
         return "Menu";
     }
@@ -533,6 +537,28 @@ function AgencySettingsSidebarContent() {
             active={location === "/agency/settings/white-label"} 
           />
         </div>
+      </SidebarSection>
+    </div>
+  );
+}
+
+function AgencyWorkspacesSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Views">
+        <SidebarItem icon={LayoutGrid} label="All Workspaces" active />
+        <SidebarItem icon={Star} label="Favorites" />
+        <SidebarItem icon={Clock} label="Recently Active" />
+      </SidebarSection>
+      
+      <SidebarSection title="Groups">
+        <SidebarItem icon={Folder} label="Enterprise Clients" badge="5" />
+        <SidebarItem icon={Folder} label="Local Business" badge="12" />
+        <SidebarItem icon={Folder} label="Churn Risk" badge="2" />
+        <Button className="w-full justify-start gap-2 h-8 px-2.5 text-slate-400 hover:text-primary mt-1" variant="ghost">
+            <Plus className="h-3 w-3" />
+            <span className="text-xs font-medium">Create Group</span>
+        </Button>
       </SidebarSection>
     </div>
   );
