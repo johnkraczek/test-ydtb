@@ -265,6 +265,14 @@ export default function AgencyWorkspaceDetailPage() {
     });
   };
 
+  const handleRemoveUser = (userId: number) => {
+    setWorkspaceUsers(workspaceUsers.filter(u => u.id !== userId));
+    toast({
+      title: "User removed",
+      description: "The user has been removed from the workspace.",
+    });
+  };
+
   // In a real app, fetch data based on ID
   const workspace = WORKSPACE_DATA; 
 
@@ -641,7 +649,14 @@ export default function AgencyWorkspaceDetailPage() {
                                </Card>
                              ))}
                            </div>
-                           <div className="flex justify-end mt-6">
+                           <div className="flex justify-between mt-6">
+                             <Button 
+                               variant="destructive" 
+                               size="sm"
+                               onClick={() => handleRemoveUser(user.id)}
+                             >
+                               Remove User
+                             </Button>
                              <Button size="sm">Save Permissions</Button>
                            </div>
                         </AccordionContent>
