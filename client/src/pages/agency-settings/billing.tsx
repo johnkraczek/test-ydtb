@@ -205,10 +205,7 @@ export default function AgencyBillingPage() {
           description="Manage your agency subscription and payment methods."
           hideBreadcrumbs={true}
           actions={
-            <Button variant="outline">
-              <History className="h-4 w-4 mr-2" />
-              View Billing History
-            </Button>
+            <div />
           }
         />
       }
