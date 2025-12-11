@@ -208,6 +208,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return <AgencySettingsSidebarContent />;
       case "agency-workspaces":
         return <AgencyWorkspacesSidebarContent />;
+      case "agency-templates":
+        return <AgencyTemplatesSidebarContent />;
       default:
         return <DefaultSidebarContent />;
     }
@@ -239,6 +241,8 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return "Agency Settings";
       case "agency-workspaces":
         return "Workspaces";
+      case "agency-templates":
+        return "Templates";
       default:
         return "Menu";
     }
@@ -500,6 +504,31 @@ function SidebarItem({ icon: Icon, label, badge, active, actions }: { icon: any,
             )}
         </div>
     )
+}
+
+function AgencyTemplatesSidebarContent() {
+  return (
+    <div className="space-y-1">
+      <SidebarSection title="Views">
+        <SidebarItem icon={LayoutTemplate} label="All Templates" active />
+        <SidebarItem icon={Star} label="Favorites" />
+        <SidebarItem icon={Clock} label="Recently Used" />
+      </SidebarSection>
+      
+      <SidebarSection title="Categories">
+        <SidebarItem icon={Folder} label="Snapshots" badge="12" />
+        <SidebarItem icon={Folder} label="Campaigns" badge="8" />
+        <SidebarItem icon={Folder} label="Funnels" badge="5" />
+      </SidebarSection>
+
+      <SidebarSection title="Industries">
+        <SidebarItem icon={Hash} label="Real Estate" />
+        <SidebarItem icon={Hash} label="Medical" />
+        <SidebarItem icon={Hash} label="Fitness" />
+        <SidebarItem icon={Hash} label="Automotive" />
+      </SidebarSection>
+    </div>
+  );
 }
 
 function AgencySettingsSidebarContent() {

@@ -141,6 +141,12 @@ const AGENCY_TOOLS: ToolItem[] = [
     label: "Workspaces",
     visible: true,
   },
+  {
+    id: "agency-templates",
+    icon: LayoutTemplate,
+    label: "Templates",
+    visible: true,
+  },
 ];
 
 export function ToolIconsSidebar({
