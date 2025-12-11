@@ -23,7 +23,9 @@ import {
   CheckCheck,
   Trash,
   Archive,
-  Ban
+  Ban,
+  X,
+  FolderPlus
 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +36,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Mock data for workspaces
 const WORKSPACES = [
@@ -108,6 +118,8 @@ export default function AgencyWorkspacesPage() {
   });
 
   const [selectedWorkspaces, setSelectedWorkspaces] = useState<number[]>([]);
+  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
 
   const toggleMetric = (key: keyof typeof visibleMetrics) => {
     setVisibleMetrics(prev => ({
@@ -128,6 +140,13 @@ export default function AgencyWorkspacesPage() {
     } else {
       setSelectedWorkspaces(WORKSPACES.map(w => w.id));
     }
+  };
+
+  const handleCreateGroup = () => {
+    // In a real app, this would create the group
+    console.log("Creating group:", newGroupName);
+    setIsAddGroupOpen(false);
+    setNewGroupName("");
   };
 
   return (
@@ -276,43 +295,81 @@ export default function AgencyWorkspacesPage() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xl z-50 px-4"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-fit px-4"
           >
-            <div className="bg-slate-900 text-slate-50 rounded-xl shadow-2xl border border-slate-800 p-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 px-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-500 text-white font-medium text-sm">
-                  {selectedWorkspaces.length}
-                </div>
-                <span className="font-medium text-sm">Selected</span>
-              </div>
-              
-              <div className="h-8 w-px bg-slate-800 mx-2" />
-              
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-800">
-                  <Archive className="h-4 w-4 mr-2" />
-                  Deactivate
-                </Button>
-                <Button variant="ghost" size="sm" className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/30">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete
+            <div className="bg-[#1a1a1a] text-white rounded-lg shadow-2xl border border-gray-800 p-1.5 flex items-center gap-1">
+              {/* Selection Count & Clear */}
+              <div className="flex items-center gap-2 px-2 pl-3">
+                <span className="font-medium text-sm whitespace-nowrap">{selectedWorkspaces.length} Selected</span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-5 w-5 text-gray-400 hover:text-white hover:bg-white/20 rounded-full" 
+                  onClick={() => setSelectedWorkspaces([])}
+                >
+                  <X className="h-3 w-3" />
                 </Button>
               </div>
 
-              <div className="h-8 w-px bg-slate-800 mx-2" />
+              <div className="h-5 w-px bg-gray-700 mx-1" />
+
+              {/* Actions */}
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-white/10 h-8 px-3 rounded-md font-medium">
+                 <Archive className="h-4 w-4 mr-2" />
+                 Deactivate
+              </Button>
               
               <Button 
                 variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full"
-                onClick={() => setSelectedWorkspaces([])}
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 h-8 px-3 rounded-md font-medium" 
+                onClick={() => setIsAddGroupOpen(true)}
               >
-                <Check className="h-4 w-4" />
+                 <FolderPlus className="h-4 w-4 mr-2" />
+                 Add Group
+              </Button>
+
+              <div className="h-5 w-px bg-gray-700 mx-1" />
+
+              {/* Delete */}
+              <Button variant="ghost" size="icon" className="text-rose-400 hover:text-rose-300 hover:bg-rose-900/30 h-8 w-8 rounded-md">
+                <Trash className="h-4 w-4" />
+              </Button>
+              
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-white/10 h-8 px-3 rounded-md font-medium">
+                 <MoreHorizontal className="h-4 w-4 mr-2" />
+                 More
               </Button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog open={isAddGroupOpen} onOpenChange={setIsAddGroupOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create Group</DialogTitle>
+            <DialogDescription>
+              Create a new group to organize your workspaces.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Group Name</Label>
+              <Input 
+                id="name" 
+                value={newGroupName} 
+                onChange={(e) => setNewGroupName(e.target.value)} 
+                placeholder="e.g. Enterprise Clients"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddGroupOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateGroup} disabled={!newGroupName}>Create Group</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
