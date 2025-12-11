@@ -1,5 +1,5 @@
 
-import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon, Palette, HelpCircle, Phone } from "lucide-react";
+import { Bell, Search, Settings, User, ArrowLeft, Plus, Check, ChevronDown, Zap, MessageSquare, LayoutGrid, CheckCircle2, Calculator, Calendar, CreditCard, Smile, Sparkles, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Globe, Command as CommandIcon, Image as ImageIcon, Palette, HelpCircle, Phone, Hexagon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -611,6 +611,14 @@ export function DashboardMainHeader() {
 
       {/* Left section - Team Switcher */}
       <div className="flex items-center gap-4">
+        {/* Logo */}
+        <div className="flex items-center gap-2 mr-2">
+          <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm shadow-indigo-200">
+            <Hexagon className="h-5 w-5 text-white fill-indigo-600" strokeWidth={2.5} />
+          </div>
+          <span className="font-bold text-xl tracking-tight text-slate-900 hidden lg:block">AgencyOS</span>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-800 rounded-md transition-all shadow-sm hover:shadow-md h-10 overflow-hidden pr-2">
