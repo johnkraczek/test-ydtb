@@ -371,43 +371,74 @@ export default function AgencyWorkspaceDetailPage() {
           </TabsContent>
 
           <TabsContent value="users" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                   <div>
-                     <CardTitle>Workspace Users</CardTitle>
-                     <CardDescription>Manage user access for this workspace.</CardDescription>
-                   </div>
-                   <Button size="sm" className="gap-2">
-                     <Users className="h-4 w-4" />
-                     Add User
-                   </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[1, 2, 3].map((user) => (
-                    <div key={user} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarFallback>U{user}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">User Name {user}</p>
-                          <p className="text-xs text-muted-foreground">user{user}@example.com</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                     <div>
+                       <CardTitle>Workspace Users</CardTitle>
+                       <CardDescription>Manage user access for this workspace.</CardDescription>
+                     </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((user) => (
+                      <div key={user} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarFallback>U{user}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">User Name {user}</p>
+                            <p className="text-xs text-muted-foreground">user{user}@example.com</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Badge variant="outline">Admin</Badge>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <Badge variant="outline">Admin</Badge>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Add User</CardTitle>
+                  <CardDescription>Search for an existing user to add to this workspace.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   <div className="space-y-2">
+                     <Label>Search User</Label>
+                     <div className="relative">
+                       <Users className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                       <Input placeholder="Search by name or email..." className="pl-9" />
+                     </div>
+                   </div>
+                   <div className="space-y-2">
+                     <Label>Role</Label>
+                     <Select defaultValue="member">
+                       <SelectTrigger>
+                         <SelectValue placeholder="Select role" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="admin">Admin</SelectItem>
+                         <SelectItem value="member">Member</SelectItem>
+                         <SelectItem value="viewer">Viewer</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   <Button className="w-full gap-2">
+                     <Users className="h-4 w-4" />
+                     Add to Workspace
+                   </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
