@@ -576,10 +576,6 @@ function WorkspaceCard({ workspace, visibleMetrics, isSelected, onToggleSelectio
         </div>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
-            <BarChart2 className="h-3.5 w-3.5" />
-            Reports
-          </Button>
           <Button size="sm" className="gap-2 w-full sm:w-auto">
             <ExternalLink className="h-3.5 w-3.5" />
             Switch to Workspace
