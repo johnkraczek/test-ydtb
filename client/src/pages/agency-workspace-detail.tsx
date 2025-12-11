@@ -34,11 +34,27 @@ import {
   MessageSquare,
   Image,
   FileText,
-  Zap
+  Zap,
+  Check,
+  ChevronsUpDown
 } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 // Mock data for the workspace detail
 const WORKSPACE_DATA = {
@@ -69,6 +85,14 @@ const WORKSPACE_DATA = {
     { name: 'Jul', value: 3490 },
   ]
 };
+
+const AVAILABLE_USERS = [
+  { value: "sarah", label: "Sarah Wilson", email: "sarah@example.com" },
+  { value: "michael", label: "Michael Chen", email: "michael@example.com" },
+  { value: "emma", label: "Emma Rodriguez", email: "emma@example.com" },
+  { value: "james", label: "James Kim", email: "james@example.com" },
+  { value: "alex", label: "Alex Turner", email: "alex@example.com" },
+];
 
 const PERMISSIONS_SCHEMA = [
   {
@@ -180,6 +204,9 @@ export default function AgencyWorkspaceDetailPage() {
     upload_media: true,
     view_pages: true
   });
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
 
   const togglePermission = (id: string) => {
     setPermissions(prev => ({
@@ -581,10 +608,52 @@ export default function AgencyWorkspaceDetailPage() {
                 <CardContent className="space-y-4">
                    <div className="space-y-2">
                      <Label>Search User</Label>
-                     <div className="relative">
-                       <Users className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                       <Input placeholder="Search by name or email..." className="pl-9" />
-                     </div>
+                     <Popover open={open} onOpenChange={setOpen}>
+                       <PopoverTrigger asChild>
+                         <Button
+                           variant="outline"
+                           role="combobox"
+                           aria-expanded={open}
+                           className="w-full justify-between"
+                         >
+                           {value
+                             ? AVAILABLE_USERS.find((user) => user.value === value)?.label
+                             : "Select user..."}
+                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                         </Button>
+                       </PopoverTrigger>
+                       <PopoverContent className="w-[300px] p-0" align="start">
+                         <Command>
+                           <CommandInput placeholder="Search user..." />
+                           <CommandList>
+                             <CommandEmpty>No user found.</CommandEmpty>
+                             <CommandGroup>
+                               {AVAILABLE_USERS.map((user) => (
+                                 <CommandItem
+                                   key={user.value}
+                                   value={user.value}
+                                   onSelect={(currentValue) => {
+                                     setValue(currentValue === value ? "" : currentValue);
+                                     setOpen(false);
+                                   }}
+                                 >
+                                   <Check
+                                     className={cn(
+                                       "mr-2 h-4 w-4",
+                                       value === user.value ? "opacity-100" : "opacity-0"
+                                     )}
+                                   />
+                                   <div className="flex flex-col">
+                                     <span>{user.label}</span>
+                                     <span className="text-xs text-muted-foreground">{user.email}</span>
+                                   </div>
+                                 </CommandItem>
+                               ))}
+                             </CommandGroup>
+                           </CommandList>
+                         </Command>
+                       </PopoverContent>
+                     </Popover>
                    </div>
                    <div className="space-y-2">
                      <Label>Role</Label>
