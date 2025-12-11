@@ -465,10 +465,13 @@ function MediaSidebarContent() {
   );
 }
 
-function SidebarSection({ title, children }: { title: string; children: React.ReactNode }) {
+function SidebarSection({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
     return (
         <div className="mb-6">
-            <h4 className="mb-2 px-2 font-semibold text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">{title}</h4>
+            <div className="flex items-center justify-between mb-2 px-2">
+                <h4 className="font-semibold text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">{title}</h4>
+                {action}
+            </div>
             <div className="space-y-0.5">
                 {children}
             </div>
@@ -551,14 +554,17 @@ function AgencyWorkspacesSidebarContent() {
         <SidebarItem icon={Clock} label="Recently Active" />
       </SidebarSection>
       
-      <SidebarSection title="Groups">
+      <SidebarSection 
+        title="Groups"
+        action={
+          <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-primary p-0">
+             <Plus className="h-3 w-3" />
+          </Button>
+        }
+      >
         <SidebarItem icon={Folder} label="Enterprise Clients" badge="5" />
         <SidebarItem icon={Folder} label="Local Business" badge="12" />
         <SidebarItem icon={Folder} label="Churn Risk" badge="2" />
-        <Button className="w-full justify-start gap-2 h-8 px-2.5 text-slate-400 hover:text-primary mt-1" variant="ghost">
-            <Plus className="h-3 w-3" />
-            <span className="text-xs font-medium">Create Group</span>
-        </Button>
       </SidebarSection>
     </div>
   );
