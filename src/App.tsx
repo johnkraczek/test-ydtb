@@ -18,7 +18,6 @@ function Router() {
 import { ThemeProvider } from "~/components/theme-provider";
 import { ThemeColorProvider } from "~/hooks/use-theme-color";
 import { ThemePatternProvider } from "~/hooks/use-theme-pattern";
-import { MediaProvider } from "~/context/media-context";
 
 function App() {
   return (
@@ -26,12 +25,10 @@ function App() {
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class" enableSystem>
         <ThemeColorProvider defaultThemeColor="zinc" storageKey="vite-ui-theme-color">
           <ThemePatternProvider defaultThemePattern="dots" storageKey="vite-ui-theme-pattern">
-            <MediaProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Router />
-              </TooltipProvider>
-            </MediaProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
           </ThemePatternProvider>
         </ThemeColorProvider>
       </ThemeProvider>

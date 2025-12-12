@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useState } from "react"
 
 export type ThemePattern = "none" | "dots" | "grid" | "graph" | "noise"
 

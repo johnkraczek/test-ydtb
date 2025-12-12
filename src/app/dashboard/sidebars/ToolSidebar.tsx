@@ -13,7 +13,6 @@ import {
   CreditCard,
   FileText,
   File,
-  Home,
   MessageSquare,
   Instagram,
   Facebook,
@@ -46,9 +45,7 @@ import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Badge } from "~/components/ui/badge";
-import { useMedia, FileSystemItem } from "~/context/media-context";
 import { Card } from "~/components/ui/card";
-import { FileSelectionDialog } from "~/components/media/FileSelectionDialog";
 import { Progress } from "~/components/ui/progress";
 import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -80,7 +77,6 @@ import { Label } from "~/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "~/components/ui/context-menu";
 
 interface ToolSidebarProps {
   isOpen: boolean;
@@ -192,8 +188,6 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
         return <TeamSidebarContent />;
       case "messages":
         return <MessagesSidebarContent />;
-      case "media":
-        return <MediaSidebarContent />;
       case "pages":
         return <PagesSidebarContent />;
       case "automation":
@@ -278,188 +272,64 @@ export function ToolSidebar({ isOpen, onToggle, toolId, onCreateClick }: ToolSid
           </ScrollArea>
         </div>
 
-        {/* Bottom Action */}
-        <div className="p-3 border-t border-slate-100 dark:border-slate-800">
-          {toolId === "media" && (
-            <div className="mb-2">
-              <FileSelectionDialog
-                trigger={
-                  <Button className="w-full justify-start gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm mb-2" variant="outline">
-                    <File className="h-4 w-4" />
-                    <span className="font-medium">Select File...</span>
-                  </Button>
-                }
-                onSelect={(file) => console.log('Selected file:', file)}
-              />
-            </div>
-          )}
-
-          {toolId === "launchpad" ? (
-            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/10 dark:border-primary/20">
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-medium text-slate-900 dark:text-slate-100">
-                    <span>Setup Progress</span>
-                    <span>50%</span>
-                  </div>
-                  <Progress value={50} className="h-2 bg-primary/20 dark:bg-primary/30 [&>div]:bg-primary" />
+        {toolId === "launchpad" ? (
+          <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/10 dark:border-primary/20">
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs font-medium text-slate-900 dark:text-slate-100">
+                  <span>Setup Progress</span>
+                  <span>50%</span>
                 </div>
-
-                <div className="py-1">
-                  <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Next: Connect Payments</p>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
-                    Set up your payment processor to start accepting orders.
-                  </p>
-                </div>
-
-                <Button className="w-full justify-between bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-9">
-                  <span className="font-medium text-xs">Next Step</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
+                <Progress value={50} className="h-2 bg-primary/20 dark:bg-primary/30 [&>div]:bg-primary" />
               </div>
+
+              <div className="py-1">
+                <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Next: Connect Payments</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                  Set up your payment processor to start accepting orders.
+                </p>
+              </div>
+
+              <Button className="w-full justify-between bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-9">
+                <span className="font-medium text-xs">Next Step</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
             </div>
-          ) : toolId === "team" ? (
-            <NewConversationDialog>
-              <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
-                <Plus className="h-4 w-4" />
-                <span className="font-medium">New Conversation</span>
-              </Button>
-            </NewConversationDialog>
-          ) : toolId !== "settings" && (
-            <Button
-              className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none"
-              onClick={onCreateClick}
-            >
-              <Plus className="h-4 w-4" />
-              <span className="font-medium">
-                {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
-              </span>
-            </Button>
-          )}
-
-          {toolId === "media" && (
-            <Card className="p-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-none shadow-lg mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium opacity-80">Storage</span>
-                <span className="text-xs font-bold">75%</span>
-              </div>
-              <div className="h-1.5 bg-primary-foreground/20 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-primary-foreground w-[75%]" />
-              </div>
-              <p className="text-xs opacity-80 mb-4">7.5 GB of 10 GB used</p>
-              <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-primary-foreground/20 hover:bg-primary-foreground/30 border-none text-primary-foreground">
-                Upgrade Plan
-              </Button>
-            </Card>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MediaSidebarContent() {
-  const { items, currentPath, navigateToFolder, setCurrentPath, setSelectedItems, favoriteItems, toggleFavorite } = useMedia();
-  const currentFolderId = currentPath.length > 0 ? currentPath[currentPath.length - 1].id : null;
-
-  const FileTreeItem = ({ item, level = 0 }: { item: FileSystemItem, level?: number }) => {
-    const hasChildren = items.some(i => i.parentId === item.id);
-    const isExpanded = currentPath.some(p => p.id === item.id) || (currentPath.length > 0 && currentPath[0].id === item.id && level === 0);
-
-    return (
-      <div className="select-none">
-        <div
-          className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${currentFolderId === item.id
-            ? 'bg-primary/10 text-primary font-medium'
-            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-            }`}
-          style={{ paddingLeft: `${level * 12 + 8}px` }}
-          onClick={() => navigateToFolder(item)}
-        >
-          {item.type === 'folder' ? (
-            <Folder className={`h-4 w-4 ${currentFolderId === item.id ? 'fill-primary/20' : 'text-slate-400'}`} />
-          ) : (
-            <File className="h-4 w-4 text-slate-400" />
-          )}
-          <span className="text-sm truncate">{item.name}</span>
-        </div>
-
-        {hasChildren && isExpanded && (
-          <div>
-            {items
-              .filter(i => i.parentId === item.id && i.type === 'folder')
-              .map(child => (
-                <FileTreeItem key={child.id} item={child} level={level + 1} />
-              ))}
           </div>
+        ) : toolId === "team" ? (
+          <NewConversationDialog>
+            <Button className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none">
+              <Plus className="h-4 w-4" />
+              <span className="font-medium">New Conversation</span>
+            </Button>
+          </NewConversationDialog>
+        ) : toolId !== "settings" && (
+          <Button
+            className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-0 shadow-none"
+            onClick={onCreateClick}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="font-medium">
+              {toolId === "users" ? "Create New Contact" : toolId === "media" ? "Upload File" : "Create New"}
+            </span>
+          </Button>
         )}
-      </div>
-    );
-  };
 
-  return (
-    <div className="space-y-4">
-      {favoriteItems.length > 0 && (
-        <div className="space-y-1">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2">Favorites</div>
-          {items
-            .filter(item => favoriteItems.includes(item.id))
-            .map(item => (
-              <ContextMenu key={item.id}>
-                <ContextMenuTrigger>
-                  <div
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${currentFolderId === item.id
-                      ? 'bg-primary/10 text-primary font-medium'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                      }`}
-                    onClick={() => {
-                      if (item.type === 'folder') {
-                        navigateToFolder(item);
-                      } else {
-                        // Navigate to parent and select item
-                        if (item.parentId) {
-                          const parent = items.find(i => i.id === item.parentId);
-                          if (parent) navigateToFolder(parent);
-                          setSelectedItems([item.id]);
-                        }
-                      }
-                    }}
-                  >
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    <span className="text-sm truncate">{item.name}</span>
-                  </div>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem onClick={() => toggleFavorite(item.id)}>
-                    <Star className="mr-2 h-4 w-4" /> Unpin from Favorites
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            ))}
-        </div>
-      )}
-
-      <div className="space-y-1">
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2">Folders</div>
-        {/* Root - All Files */}
-        <div
-          className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${currentPath.length === 0
-            ? 'bg-primary/10 text-primary font-medium'
-            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-            }`}
-          onClick={() => {
-            setCurrentPath([]);
-            setSelectedItems([]);
-          }}
-        >
-          <Home className="h-4 w-4" />
-          <span className="text-sm">All Files</span>
-        </div>
-
-        {/* Tree Structure */}
-        {items.filter(i => i.parentId === null).map(item => (
-          <FileTreeItem key={item.id} item={item} />
-        ))}
+        {toolId === "media" && (
+          <Card className="p-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-none shadow-lg mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium opacity-80">Storage</span>
+              <span className="text-xs font-bold">75%</span>
+            </div>
+            <div className="h-1.5 bg-primary-foreground/20 rounded-full overflow-hidden mb-3">
+              <div className="h-full bg-primary-foreground w-[75%]" />
+            </div>
+            <p className="text-xs opacity-80 mb-4">7.5 GB of 10 GB used</p>
+            <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-primary-foreground/20 hover:bg-primary-foreground/30 border-none text-primary-foreground">
+              Upgrade Plan
+            </Button>
+          </Card>
+        )}
       </div>
     </div>
   );
