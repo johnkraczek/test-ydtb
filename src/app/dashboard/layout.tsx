@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DashboardFooter } from "./DashboardFooter";
 import { DashboardMainHeader } from "./headers/DashboardMainHeader";
 import { DashboardPageHeader } from "./headers/DashboardPageHeader";
-import { ToolIconsSidebar } from "./sidebars/ToolIconsSidebar";
+import { IconRail } from "./sidebars/IconRail";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 import { useThemePattern } from "~/hooks/use-theme-pattern";
 
@@ -104,8 +104,8 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
           <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-rose-50/30 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 opacity-70" />
         </div>
 
-        {/* Tool Icons Sidebar - Fixed left */}
-        <ToolIconsSidebar
+        {/* Icon Rail - Fixed left */}
+        <IconRail
           activeTool={activeTool}
           onToolSelect={handleToolSelect}
           isToolSidebarOpen={isToolSidebarOpen}

@@ -39,7 +39,7 @@ const BOTTOM_TOOLS = [
 ];
 
 
-interface ToolIconsSidebarProps {
+interface IconRailProps {
   activeTool?: string;
   onToolSelect?: (toolId: string) => void;
   isToolSidebarOpen?: boolean;
@@ -47,12 +47,12 @@ interface ToolIconsSidebarProps {
 }
 
 
-export function ToolIconsSidebar({
+export function IconRail({
   activeTool = "home",
   onToolSelect,
   isToolSidebarOpen = true,
   onToggleSidebar,
-}: ToolIconsSidebarProps) {
+}: IconRailProps) {
   const [tools, setTools] = useState<ToolItem[]>(SIDEBAR_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
