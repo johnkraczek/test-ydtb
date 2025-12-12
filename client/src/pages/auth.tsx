@@ -69,21 +69,25 @@ export default function AuthPage() {
             </CardHeader>
             <CardContent className="pb-4">
               <div className="grid gap-4">
-                <Button variant="outline" className="w-full h-11 relative overflow-hidden group border-slate-200 hover:border-slate-300 hover:bg-slate-50">
-                  <Fingerprint className="mr-2 h-4 w-4 text-indigo-600" />
-                  {mode === "signin" ? "Login with Passkey" : "Sign up with Passkey"}
-                </Button>
+                {mode === "signin" && (
+                  <>
+                    <Button variant="outline" className="w-full h-11 relative overflow-hidden group border-slate-200 hover:border-slate-300 hover:bg-slate-50">
+                      <Fingerprint className="mr-2 h-4 w-4 text-indigo-600" />
+                      Login with Passkey
+                    </Button>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-slate-200" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white/50 backdrop-blur-sm px-2 text-slate-500 font-medium">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-slate-200" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white/50 backdrop-blur-sm px-2 text-slate-500 font-medium">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <form onSubmit={handleSubmit} className="grid gap-4">
                   <div className="grid gap-2">
