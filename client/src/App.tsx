@@ -37,10 +37,12 @@ import AgencyProfilePage from "@/pages/agency-settings/profile";
 import AgencyTeamPage from "@/pages/agency-settings/team";
 import AgencyBillingPage from "@/pages/agency-settings/billing";
 import AgencyWhiteLabelPage from "@/pages/agency-settings/white-label";
+import AuthPage from "@/pages/auth";
 
 function Router() {
   return (
     <Switch>
+      <Route path="/auth" component={AuthPage} />
       <Route path="/" component={DashboardPage} />
       <Route path="/agency" component={AgencyDashboardPage} />
       <Route path="/agency/workspaces" component={AgencyWorkspacesPage} />
