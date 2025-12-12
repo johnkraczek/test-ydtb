@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useRoute } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Textarea } from "~/components/ui/textarea";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Checkbox } from "~/components/ui/checkbox";
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "~/components/ui/select";
 import { 
   Sheet,
   SheetContent,
@@ -25,12 +25,12 @@ import {
   SheetTrigger,
   SheetFooter,
   SheetClose
-} from "@/components/ui/sheet";
+} from "~/components/ui/sheet";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "~/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -38,9 +38,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { useToast } from "@/hooks/use-toast";
-import CustomerFormContent from "@/components/customers/CustomerFormContent";
+} from "~/components/ui/command";
+import { useToast } from "~/hooks/use-toast";
+import CustomerFormContent from "~/components/customers/CustomerFormContent";
 import { 
   ArrowLeft, 
   Phone, 
@@ -66,9 +66,9 @@ import {
   StickyNote
 } from "lucide-react";
 import { Link } from "wouter";
-import { cn } from "@/lib/utils";
+import { cn } from "~/lib/utils";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import DashboardLayout from "~/components/layout/DashboardLayout";
 
 export default function CustomerDetail() {
   const [match, params] = useRoute("/dashboard/customers/:id");
