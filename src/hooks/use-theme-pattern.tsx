@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react"
+"use client"
+
+import { createContext, useContext, useState, useEffect } from "react"
 
 export type ThemePattern = "none" | "dots" | "grid" | "graph" | "noise"
 
@@ -23,16 +25,25 @@ const ThemePatternProviderContext = createContext<ThemePatternState>(initialStat
 export function ThemePatternProvider({
   children,
   defaultThemePattern = "dots",
-  storageKey = "vite-ui-theme-pattern",
+  storageKey = "ui-theme-pattern",
 }: ThemePatternProviderProps) {
-  const [themePattern, setThemePattern] = useState<ThemePattern>(
-    () => (localStorage.getItem(storageKey) as ThemePattern) || defaultThemePattern
-  )
+  const [themePattern, setThemePattern] = useState<ThemePattern>(defaultThemePattern)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const savedPattern = localStorage.getItem(storageKey) as ThemePattern
+    if (savedPattern) {
+      setThemePattern(savedPattern)
+    }
+  }, [storageKey])
 
   const value = {
     themePattern,
     setThemePattern: (pattern: ThemePattern) => {
-      localStorage.setItem(storageKey, pattern)
+      if (mounted) {
+        localStorage.setItem(storageKey, pattern)
+      }
       setThemePattern(pattern)
     },
   }

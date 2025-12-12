@@ -1,20 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ChevronsRight,
   Home,
   Settings,
-  Users,
-  Zap,
-  Layers,
-  MessageSquare,
-  Image,
   Grid3X3,
-  LayoutTemplate,
-  File,
-  Rocket,
-  Briefcase,
-  LayoutGrid
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
@@ -30,76 +20,17 @@ import {
 } from "~/components/ui/popover";
 import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
 
-const INITIAL_TOOLS: ToolItem[] = [
-  {
-    id: "launchpad",
-    icon: Rocket,
-    label: "Launchpad",
-    visible: true,
-  },
+const SIDEBAR_TOOLS: ToolItem[] = [
   {
     id: "home",
     icon: Home,
-    label: "Dashboard",
+    label: "Basic",
     visible: true,
-  },
-  {
-    id: "users",
-    icon: Users,
-    label: "Contacts",
-    visible: true,
-  },
-  {
-    id: "team",
-    icon: Briefcase,
-    label: "Team",
-    visible: true,
-  },
-  {
-    id: "media",
-    icon: Image,
-    label: "Media Storage",
-    visible: true,
-  },
-  {
-    id: "automation",
-    icon: Zap,
-    label: "Automation",
-    visible: true,
-  },
-  {
-    id: "pages",
-    icon: File,
-    label: "Pages",
-    visible: true,
-  },
-  {
-    id: "messages",
-    icon: MessageSquare,
-    label: "Messages",
-    visible: true,
-  },
-  {
-    id: "sop",
-    icon: FileText,
-    label: "SOP Library",
-    visible: true,
-  },
-  {
-    id: "spaces",
-    icon: Layers, // Placeholder icon
-    label: "Spaces",
-    visible: false,
   },
 ];
 
 // Always fixed at the bottom
-const CLIENT_BOTTOM_TOOLS = [
-  {
-    id: "integrations",
-    icon: Layers,
-    label: "Integrations",
-  },
+const BOTTOM_TOOLS = [
   {
     id: "settings",
     icon: Settings,
@@ -107,73 +38,24 @@ const CLIENT_BOTTOM_TOOLS = [
   },
 ];
 
-const AGENCY_BOTTOM_TOOLS = [
-  {
-    id: "agency-settings",
-    icon: Settings,
-    label: "Agency Settings",
-  },
-];
-
-import { FileText } from "lucide-react"; // Import missing icon
 
 interface ToolIconsSidebarProps {
   activeTool?: string;
   onToolSelect?: (toolId: string) => void;
   isToolSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
-  mode?: "client" | "agency";
 }
 
-const AGENCY_TOOLS: ToolItem[] = [
-  {
-    id: "agency-home",
-    icon: Home,
-    label: "Agency Dashboard",
-    visible: true,
-  },
-  {
-    id: "agency-workspaces",
-    icon: LayoutGrid,
-    label: "Workspaces",
-    visible: true,
-  },
-  {
-    id: "agency-templates",
-    icon: LayoutTemplate,
-    label: "Templates",
-    visible: true,
-  },
-];
 
 export function ToolIconsSidebar({
   activeTool = "home",
   onToolSelect,
   isToolSidebarOpen = true,
   onToggleSidebar,
-  mode = "client",
 }: ToolIconsSidebarProps) {
-  const [tools, setTools] = useState<ToolItem[]>(mode === "agency" ? AGENCY_TOOLS : INITIAL_TOOLS);
-  const bottomTools = mode === "agency" ? AGENCY_BOTTOM_TOOLS : CLIENT_BOTTOM_TOOLS;
+  const [tools, setTools] = useState<ToolItem[]>(SIDEBAR_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-
-  // Update tools when mode changes
-  useEffect(() => {
-    setTools(mode === "agency" ? AGENCY_TOOLS : INITIAL_TOOLS);
-  }, [mode]);
-
-  // If the active tool is hidden by the user, redirect to home (Dashboard)
-  // This handles the case where a user hides "Launchpad" while currently on the Launchpad page
-  useEffect(() => {
-    const activeToolItem = tools.find(t => t.id === activeTool);
-    if (activeToolItem && !activeToolItem.visible) {
-      // Only redirect if we are not already on home
-      if (activeTool !== "home") {
-        onToolSelect?.("home");
-      }
-    }
-  }, [tools, activeTool, onToolSelect]);
 
   // Filter visible and hidden tools
   // If a tool is active, it should be visible even if it's hidden in settings
@@ -298,7 +180,7 @@ export function ToolIconsSidebar({
           <div className="w-6 h-px bg-slate-200 mx-auto mb-2" />
 
           {/* Bottom Tools (Fixed) */}
-          {bottomTools.map((tool) => {
+          {BOTTOM_TOOLS.map((tool) => {
             const Icon = tool.icon;
             const isActive = tool.id === activeTool;
 

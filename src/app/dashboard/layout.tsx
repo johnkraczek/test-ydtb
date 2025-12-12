@@ -8,8 +8,6 @@ import { DashboardPageHeader } from "./headers/DashboardPageHeader";
 import { ToolIconsSidebar } from "./sidebars/ToolIconsSidebar";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 import { useThemePattern } from "~/hooks/use-theme-pattern";
-import { ContactEditDrawer } from "./ContactEditDrawer";
-import { useToast } from "~/hooks/use-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -19,12 +17,10 @@ interface DashboardLayoutProps {
   onToolSelect?: (toolId: string) => void;
 }
 
-export default function DashboardLayout({ children, activeTool: initialActiveTool = "home", header, mode = "client", onToolSelect }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, activeTool: initialActiveTool = "home", header, onToolSelect }: DashboardLayoutProps) {
   const [activeTool, setActiveTool] = useState(initialActiveTool);
   const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const { themePattern } = useThemePattern();
-  const [isCreateContactOpen, setIsCreateContactOpen] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
 
   // Sync internal state with prop if it changes
@@ -114,7 +110,6 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
           onToolSelect={handleToolSelect}
           isToolSidebarOpen={isToolSidebarOpen}
           onToggleSidebar={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
-          mode={mode}
         />
 
         {/* Collapsible Tool Sidebar + Main Content */}
@@ -124,11 +119,6 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
             isOpen={isToolSidebarOpen}
             onToggle={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
             toolId={activeTool}
-            onCreateClick={() => {
-              if (activeTool === "users") {
-                setIsCreateContactOpen(true);
-              }
-            }}
           />
 
           {/* Main Content Area */}
@@ -160,19 +150,6 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
           </div>
         </div>
       </div>
-
-      <ContactEditDrawer
-        open={isCreateContactOpen}
-        onOpenChange={setIsCreateContactOpen}
-        contact={{}}
-        onSave={(data) => {
-          toast({
-            title: "Contact Created",
-            description: `${data.firstName || 'New contact'} has been added successfully.`
-          });
-          setIsCreateContactOpen(false);
-        }}
-      />
     </div>
   );
 }

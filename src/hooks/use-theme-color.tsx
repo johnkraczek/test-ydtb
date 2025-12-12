@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useContext, useEffect, useState } from "react"
 
 type ThemeColor = "zinc" | "slate" | "stone" | "gray" | "neutral" | "red" | "rose" | "orange" | "green" | "blue" | "yellow" | "violet"
@@ -23,13 +25,22 @@ const ThemeColorProviderContext = createContext<ThemeColorState>(initialState)
 export function ThemeColorProvider({
   children,
   defaultThemeColor = "zinc",
-  storageKey = "vite-ui-theme-color",
+  storageKey = "ui-theme-color",
 }: ThemeColorProviderProps) {
-  const [themeColor, setThemeColor] = useState<ThemeColor>(
-    () => (localStorage.getItem(storageKey) as ThemeColor) || defaultThemeColor
-  )
+  const [themeColor, setThemeColor] = useState<ThemeColor>(defaultThemeColor)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    const savedTheme = localStorage.getItem(storageKey) as ThemeColor
+    if (savedTheme) {
+      setThemeColor(savedTheme)
+    }
+  }, [storageKey])
+
+  useEffect(() => {
+    if (!mounted) return
+
     const root = window.document.body
     root.classList.remove(
       "theme-zinc",
@@ -46,12 +57,14 @@ export function ThemeColorProvider({
       "theme-violet"
     )
     root.classList.add(`theme-${themeColor}`)
-  }, [themeColor])
+  }, [themeColor, mounted])
 
   const value = {
     themeColor,
     setThemeColor: (theme: ThemeColor) => {
-      localStorage.setItem(storageKey, theme)
+      if (mounted) {
+        localStorage.setItem(storageKey, theme)
+      }
       setThemeColor(theme)
     },
   }
