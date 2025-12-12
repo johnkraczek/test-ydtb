@@ -13,11 +13,13 @@ type ThemePatternProviderProps = {
 type ThemePatternState = {
   themePattern: ThemePattern
   setThemePattern: (pattern: ThemePattern) => void
+  getPatternClass: (activeTool?: string) => string
 }
 
 const initialState: ThemePatternState = {
   themePattern: "dots",
   setThemePattern: () => null,
+  getPatternClass: () => "",
 }
 
 const ThemePatternProviderContext = createContext<ThemePatternState>(initialState)
@@ -38,6 +40,17 @@ export function ThemePatternProvider({
     }
   }, [storageKey])
 
+  const getPatternClass = (activeTool?: string) => {
+    if (activeTool === "messages") return "";
+    switch (themePattern) {
+      case "dots": return "bg-dot-pattern";
+      case "grid": return "bg-grid-pattern";
+      case "graph": return "bg-graph-paper";
+      case "noise": return "bg-noise";
+      default: return "";
+    }
+  };
+
   const value = {
     themePattern,
     setThemePattern: (pattern: ThemePattern) => {
@@ -46,6 +59,7 @@ export function ThemePatternProvider({
       }
       setThemePattern(pattern)
     },
+    getPatternClass,
   }
 
   return (
