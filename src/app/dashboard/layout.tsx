@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardFooter } from "./DashboardFooter";
 import { DashboardMainHeader } from "./headers/DashboardMainHeader";
-import { DashboardPageHeader } from "./headers/DashboardPageHeader";
+import { ToolHeader } from "./headers/ToolHeader";
 import { IconRail } from "./sidebars/IconRail";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 import { useThemePattern } from "~/hooks/use-theme-pattern";
@@ -125,7 +125,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
           <div className={`flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300 ${activeTool === "messages" ? "bg-white/0 border-none shadow-none backdrop-blur-none" : ""}`}>
             {/* Page Header */}
             {header ? header : (
-              <DashboardPageHeader
+              <ToolHeader
                 description={
                   activeTool === "users" ? "Manage your team and contacts." :
                     activeTool === "media" ? "Manage and organize your media assets." :
@@ -136,7 +136,6 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
                     activeTool === "media" ? "Media Storage" :
                       "Dashboard"
                 }
-                isBorderVisible={true}
               />
             )}
 
