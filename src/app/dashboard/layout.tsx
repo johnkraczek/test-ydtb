@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardFooter } from "./DashboardFooter";
-import { DashboardMainHeader } from "./headers/DashboardMainHeader";
+import { MainHeader } from "./headers/MainHeader";
 import { ToolHeader } from "./headers/ToolHeader";
 import { IconRail } from "./sidebars/IconRail";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
@@ -95,7 +95,7 @@ export default function DashboardLayout({ children, activeTool: initialActiveToo
   return (
     <div className="flex h-screen flex-col bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
       {/* Main Header - Fixed at top */}
-      <DashboardMainHeader />
+      <MainHeader />
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Background decoration */}
