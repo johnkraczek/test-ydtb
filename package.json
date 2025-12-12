@@ -4,13 +4,13 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev:client": "vite dev --port 5001",
-    "dev": "NODE_ENV=development tsx server/index.ts",
+    "dev:client": "vite dev --port 5002",
+    "dev": "NODE_ENV=development PORT=5002 tsx server/index.ts",
     "build": "tsx script/build.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "stop": "lsof -ti:5000 | xargs kill -9",
+    "stop": "lsof -ti:5002 | xargs kill -9",
     "restart": "bun run stop && bun run dev"
   },
   "dependencies": {
