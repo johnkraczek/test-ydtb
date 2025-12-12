@@ -16,14 +16,11 @@ import {
   Zap,
   Building,
   Calendar,
-  History,
   Plus,
   ArrowRight,
   Shield,
-  Star,
   Lock
 } from "lucide-react";
-import { Separator } from "~/components/ui/separator";
 import {
   Dialog,
   DialogContent,

@@ -1,33 +1,31 @@
-import { useState } from "react";
+
 import DashboardLayout from "~/components/dashboard/Layout";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { Separator } from "~/components/ui/separator";
+
 import { Switch } from "~/components/ui/switch";
-import { ScrollArea } from "~/components/ui/scroll-area";
+
 import {
   ArrowLeft,
   LayoutTemplate,
   Mail,
-  Settings,
-  Check,
+
   Copy,
   MoreHorizontal,
   Calendar,
   User,
   Download,
   FileText,
-  MessageSquare,
+
   Zap,
   Globe,
   Share2,
   PenLine
 } from "lucide-react";
-import { useLocation, useRoute } from "wouter";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,9 +67,6 @@ const TEMPLATE_DATA = {
 };
 
 export default function AgencyTemplateDetailPage() {
-  const [, setLocation] = useLocation();
-  const [match, params] = useRoute("/agency/templates/:id");
-  const id = params?.id;
 
   // In a real app, fetch data based on ID
   const template = TEMPLATE_DATA;
@@ -86,7 +81,6 @@ export default function AgencyTemplateDetailPage() {
             variant="ghost"
             size="sm"
             className="w-fit -ml-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-            onClick={() => setLocation("/agency/templates")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Templates

@@ -6,7 +6,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Switch } from "~/components/ui/switch";
-import { Building, CreditCard, Users, Globe, Mail, Lock } from "lucide-react";
+import { Building, CreditCard, Users, Globe, Mail } from "lucide-react";
 
 export default function AgencySettingsPage() {
   return (
