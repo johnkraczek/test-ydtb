@@ -8,3 +8,4 @@ vite.config.ts.*
 .next
 next-env.d.ts
 .turbo
+.changeset
