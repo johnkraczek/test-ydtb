@@ -41,22 +41,8 @@ export function ThemeColorProvider({
   useEffect(() => {
     if (!mounted) return
 
-    const root = window.document.body
-    root.classList.remove(
-      "theme-zinc",
-      "theme-slate",
-      "theme-stone",
-      "theme-gray",
-      "theme-neutral",
-      "theme-red",
-      "theme-rose",
-      "theme-orange",
-      "theme-green",
-      "theme-blue",
-      "theme-yellow",
-      "theme-violet"
-    )
-    root.classList.add(`theme-${themeColor}`)
+    const root = window.document.documentElement
+    root.setAttribute('data-theme-color', themeColor)
   }, [themeColor, mounted])
 
   const value = {

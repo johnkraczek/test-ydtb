@@ -40,6 +40,13 @@ export function ThemePatternProvider({
     }
   }, [storageKey])
 
+  useEffect(() => {
+    if (!mounted) return
+
+    const root = window.document.documentElement
+    root.setAttribute('data-theme-pattern', themePattern)
+  }, [themePattern, mounted])
+
   const getPatternClass = (activeTool?: string) => {
     if (activeTool === "messages") return "";
     switch (themePattern) {
