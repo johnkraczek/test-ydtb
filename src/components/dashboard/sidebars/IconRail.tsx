@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   ChevronsRight,
   Home,
@@ -19,7 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { useSidebar } from "~/context/sidebar/use-sidebar";
 import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
 
 const SIDEBAR_TOOLS: ToolItem[] = [
@@ -40,43 +38,24 @@ const BOTTOM_TOOLS = [
   },
 ];
 
-// Navigation mapping for tool IDs to routes
-const TOOL_ROUTES: Record<string, string> = {
-  home: "/dashboard",
-  agency: "/agency",
-  launchpad: "/launchpad",
-  users: "/dashboard/contacts",
-  media: "/dashboard/media",
-  messages: "/dashboard/messages",
-  automation: "/dashboard/automation",
-  pages: "/dashboard/pages",
-  sop: "/dashboard/sop",
-  settings: "/dashboard/settings",
-  "agency-settings": "/agency/settings/profile",
-  "agency-workspaces": "/agency/workspaces",
-  "agency-templates": "/agency/templates",
-};
-
 
 interface IconRailProps {
   activeTool?: string;
+  onToolSelect?: (toolId: string) => void;
+  isToolSidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
+
 
 export function IconRail({
   activeTool = "home",
+  onToolSelect,
+  isToolSidebarOpen = true,
+  onToggleSidebar,
 }: IconRailProps) {
-  const router = useRouter();
-  const { isOpen, toggle } = useSidebar();
   const [tools, setTools] = useState<ToolItem[]>(SIDEBAR_TOOLS);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-
-  const handleToolSelect = (toolId: string) => {
-    const route = TOOL_ROUTES[toolId];
-    if (route) {
-      router.push(route);
-    }
-  };
 
   // Filter visible and hidden tools
   // If a tool is active, it should be visible even if it's hidden in settings
@@ -88,13 +67,13 @@ export function IconRail({
       <div className="flex h-full py-2 pl-2">
         <div className="flex w-12 flex-col items-center gap-2 border border-slate-200/60 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-md shadow-sm py-1.5 z-20">
           {/* Expand/Collapse Button */}
-          {!isOpen && (
+          {!isToolSidebarOpen && onToggleSidebar && (
             <div className="mb-2">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     className="h-8 w-8 p-0 rounded-sm hover:bg-primary/10 text-slate-500 hover:text-primary transition-all"
-                    onClick={toggle}
+                    onClick={onToggleSidebar}
                     variant="ghost"
                   >
                     <ChevronsRight className="h-4 w-4" />
@@ -121,7 +100,7 @@ export function IconRail({
                       ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
                       : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                       }`}
-                    onClick={() => handleToolSelect(tool.id)}
+                    onClick={() => onToolSelect?.(tool.id)}
                     variant="ghost"
                   >
                     <Icon className="h-4 w-4" strokeWidth={isActive ? 2.5 : 2} />
@@ -164,7 +143,7 @@ export function IconRail({
                       key={tool.id}
                       className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       onClick={() => {
-                        handleToolSelect(tool.id);
+                        onToolSelect?.(tool.id);
                         setIsMoreOpen(false);
                       }}
                     >
@@ -213,7 +192,7 @@ export function IconRail({
                       ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                       : "bg-transparent text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                       }`}
-                    onClick={() => handleToolSelect(tool.id)}
+                    onClick={() => onToolSelect?.(tool.id)}
                     variant="ghost"
                   >
                     <Icon className="h-4 w-4" strokeWidth={isActive ? 2.5 : 2} />
