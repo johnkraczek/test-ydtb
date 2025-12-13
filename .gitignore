@@ -7,3 +7,4 @@ vite.config.ts.*
 .local/state/replit/agent/*
 .next
 next-env.d.ts
+.turbo
