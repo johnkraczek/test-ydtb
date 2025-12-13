@@ -7,16 +7,15 @@ import {
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useSidebar } from "~/context/sidebar/use-sidebar";
-import { useActiveTool } from "~/hooks/use-active-tool";
 
 export function ToolSidebar() {
-  const toolId = useActiveTool();
+
   const { isOpen, toggle } = useSidebar();
 
   const renderToolContent = () => {
     return (
       <div className="py-4 text-center text-sm text-slate-500">
-        Select a tool to view options for {toolId}
+        Select a tool to view options for
       </div>
     );
   };
