@@ -1,5 +1,5 @@
-import { Providers } from "../providers";
-import { DashboardClient } from "./components/DashboardClient";
+import { Providers } from "../../context/providers";
+import { DashboardClient } from "../../components/dashboard/DashboardClient";
 
 export default function DashboardLayout({
   children,

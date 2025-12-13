@@ -1,8 +1,8 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import { ThemeColorProvider } from "~/hooks/use-theme-color";
-import { ThemePatternProvider } from "~/hooks/use-theme-pattern";
+import { ThemeColorProvider } from "~/context/theme/use-theme-color";
+import { ThemePatternProvider } from "~/context/theme/use-theme-pattern";
 
 interface ProvidersProps {
   children: React.ReactNode;

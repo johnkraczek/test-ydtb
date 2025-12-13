@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { DashboardFooter } from "../DashboardFooter";
-import { MainHeader } from "../headers/MainHeader";
-import { ToolHeader } from "../headers/ToolHeader";
-import { IconRail } from "../sidebars/IconRail";
-import { ToolSidebar } from "../sidebars/ToolSidebar";
-import { useThemePattern } from "~/hooks/use-theme-pattern";
+import { DashboardFooter } from "./DashboardFooter";
+import { MainHeader } from "./headers/MainHeader";
+import { ToolHeader } from "./headers/ToolHeader";
+import { IconRail } from "./sidebars/IconRail";
+import { ToolSidebar } from "./sidebars/ToolSidebar";
+import { useThemePattern } from "~/context/theme/use-theme-pattern";
 
 interface DashboardClientProps {
   children: React.ReactNode;

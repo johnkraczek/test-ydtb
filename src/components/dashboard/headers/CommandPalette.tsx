@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Search, Sparkles, Settings, ArrowLeft, Plus, CheckCircle2, Calendar, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Command as CommandIcon, Image as ImageIcon, MessageSquare, LayoutGrid, User, Palette } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
-import { useThemeColor } from "~/hooks/use-theme-color";
-import { useThemePattern } from "~/hooks/use-theme-pattern";
+import { useThemeColor } from "~/context/theme/use-theme-color";
+import { useThemePattern } from "~/context/theme/use-theme-pattern";
 import { useTheme } from "next-themes";
 import { cn } from "~/lib/utils";
 import {
