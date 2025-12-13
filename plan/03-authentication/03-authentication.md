@@ -3,7 +3,7 @@
 ## Folder: `03-authentication`
 
 ## Purpose
-Implement a comprehensive authentication system using NextAuth.js with email/password authentication, workspace management, and session handling.
+Implement a comprehensive authentication system using better-auth with email/password authentication, workspace management, and session handling.
 
 ## Context
 - No current authentication implementation in the application
@@ -12,9 +12,10 @@ Implement a comprehensive authentication system using NextAuth.js with email/pas
 - Users should be able to belong to multiple workspaces
 - Sessions need to track both user and current workspace context
 - Authentication should integrate with the database schema from Unit 1.2
+- better-auth will manage users and sessions with its own schema
 
 ## Definition of Done
-- [ ] NextAuth.js configured with custom adapter for our database
+- [ ] better-auth configured with custom adapter for our database
 - [ ] Email/password authentication working with secure password hashing
 - [ ] Workspace membership validation during login
 - [ ] Session management with workspace context
@@ -23,21 +24,22 @@ Implement a comprehensive authentication system using NextAuth.js with email/pas
 - [ ] Workspace dropdown updated to use real data
 - [ ] Automatic redirection for unauthenticated users
 - [ ] Session refresh on workspace switching
+- [ ] better-auth schemas created (users, sessions, accounts)
 
 ## Steps
 
-### 1. Install and Configure NextAuth.js
-Install dependencies using Bun and set up NextAuth.js with custom configuration for our needs.
+### 1. Install and Configure better-auth
+Install dependencies using Bun and set up better-auth with custom configuration for our needs.
 ```bash
-bun add next-auth @auth/drizzle-adapter bcryptjs
-bun add -d @types/bcryptjs
+bun add better-auth drizzle-adapter
+bun add -d @types/better-auth
 ```
 
-### 2. Create Custom Auth Adapter
-Implement an adapter that works with our database schema for users, sessions, and workspace membership.
+### 2. Configure better-auth with Drizzle Adapter
+Set up better-auth with the Drizzle adapter and configure authentication providers.
 
-### 3. Implement Password Hashing
-Set up secure password hashing and verification using bcrypt.
+### 3. Create Authentication Schemas
+Let better-auth create its own user and session schemas in our database.
 
 ### 4. Create Authentication Pages
 Build login and register pages with proper validation and error handling.

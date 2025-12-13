@@ -1,18 +1,4 @@
 {
-  "include": [
-    "./src",
-    "./shared/**/*",
-    "./server/**/*",
-    "./dist/types/**/*.ts",
-    "./next-env.d.ts",
-    "dist/types/**/*.ts",
-    "dist/dev/types/**/*.ts",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
-  "exclude": [
-    "./node_modules"
-  ],
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
@@ -36,26 +22,6 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "@/*": [
-        "./src/*"
-      ],
-      "@assets/*": [
-        "./public/*"
-      ],
-      "@shared/*": [
-        "./shared/*"
-      ]
-    },
     "skipLibCheck": true
   }
 }

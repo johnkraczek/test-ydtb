@@ -24,7 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { CustomizeNavigationDialog, ToolItem } from "../customization/CustomizeNavigationDialog";
+import { CustomizeNavigationDialog, ToolItem } from "~/components/dashboard/customization/CustomizeNavigationDialog";
 import { useSidebar } from "~/context/sidebar/use-sidebar";
 
 const SIDEBAR_TOOLS: ToolItem[] = [
@@ -32,21 +32,21 @@ const SIDEBAR_TOOLS: ToolItem[] = [
     id: "home",
     icon: Home,
     label: "Dashboard",
-    route: "/dashboard",
+    route: "/",
     visible: true,
   },
   {
     id: "users",
     icon: Users,
     label: "Contacts",
-    route: "/dashboard/contacts",
+    route: "/contacts",
     visible: true,
   },
   {
     id: "analytics",
     icon: BarChart3,
     label: "Analytics",
-    route: "/dashboard/analytics",
+    route: "/analytics",
     visible: true,
   },
 ];
@@ -57,7 +57,7 @@ const BOTTOM_TOOLS: ToolItem[] = [
     id: "settings",
     icon: Settings,
     label: "Settings",
-    route: "/dashboard/settings",
+    route: "/settings",
     visible: true,
   },
 ];

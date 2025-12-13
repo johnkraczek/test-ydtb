@@ -1,4 +1,4 @@
-# Unit 5.3: Basic Package Database
+# Unit 6.3: Basic Package Database
 
 ## Folder: `12-basic-database`
 
@@ -6,11 +6,12 @@
 Implement database features for the Basic package, including schema definition, service layer, and CRUD operations. This demonstrates workspace isolation and proper data management patterns for CRM Toolkit packages.
 
 ## Context
-- Basic package components are implemented (Unit 5.2)
+- Basic package components are implemented (Unit 6.2)
+- Package Database Registry is available (Unit 3.4)
 - Need to persist note data in the database
 - Must follow workspace isolation pattern (all data scoped to workspaceId)
 - Should implement service layer pattern for data access
-- Need to integrate with the core database schema
+- Need to register schema with Package Database Registry
 - Should include proper validation and error handling
 - Must support the features used in the UI components
 
@@ -20,8 +21,8 @@ Implement database features for the Basic package, including schema definition, 
 - [ ] Workspace filtering applied to all queries
 - [ ] Input validation using Zod schemas
 - [ ] Error handling and proper response formats
-- [ ] Integration with existing core database
-- [ ] Migration file generated
+- [ ] Schema registered with Package Database Registry
+- [ ] Migration file generated and registered
 - [ ] Indexes created for performance
 - [ ] TypeScript types generated from schema
 

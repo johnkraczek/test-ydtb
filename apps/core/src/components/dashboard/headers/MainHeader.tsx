@@ -3,11 +3,11 @@
 
 import { Search, Hexagon } from "lucide-react";
 import { useState } from "react";
-import { WorkspaceDropdown } from "./WorkspaceDropdown";
-import { CommandPalette } from "./CommandPalette";
-import { NotificationDropdown } from "./NotificationDropdown";
-import { HelpDropdown } from "./HelpDropdown";
-import { ProfileAvatar } from "./ProfileAvatar";
+import { WorkspaceDropdown } from "~/components/dashboard/headers/WorkspaceDropdown";
+import { CommandPalette } from "~/components/dashboard/headers/CommandPalette";
+import { NotificationDropdown } from "~/components/dashboard/headers/NotificationDropdown";
+import { HelpDropdown } from "~/components/dashboard/headers/HelpDropdown";
+import { ProfileAvatar } from "~/components/dashboard/headers/ProfileAvatar";
 
 export function MainHeader() {
   const [open, setOpen] = useState(false);

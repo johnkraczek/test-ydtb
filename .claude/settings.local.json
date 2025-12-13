@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(bun install)"
+    ],
     "deny": [
       "Bash(npm:*)"
     ]

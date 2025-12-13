@@ -1,4 +1,4 @@
-# Unit 4.1: Dynamic Tool Routes
+# Unit 5.1: Dynamic Tool Routes
 
 ## Folder: `08-dynamic-routing`
 
@@ -6,7 +6,7 @@
 Implement dynamic routing system that renders registered tools and their components based on URL patterns, allowing packages to register tools that are accessible via routes without hard-coding them in the Next.js file system.
 
 ## Context
-- Registry system is implemented with tool registrations (Units 3.1-3.3)
+- Registry system is implemented with tool registrations (Units 3.1-3.4)
 - Tools need to be accessible via URLs like `/[workspaceId]/tools/[toolId]/...`
 - Must pass route context (toolId, currentRoute, routeParams) to tool components
 - Should handle workspace context and permissions

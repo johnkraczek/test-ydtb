@@ -7,76 +7,124 @@ Establish the core database schema with multi-tenancy support using Drizzle ORM.
 
 ## Context
 - Drizzle ORM is already configured but `schema.ts` is missing
-- Need core tables: users, workspaces, sessions, workspace_members
+- Need core tables: workspaces, workspace_members (users and sessions will be handled by better-auth in Unit 2.1)
 - All package tables will reference `workspaces.id` for data isolation
 - Workspace IDs will be 10-20 alphanumeric characters for URL-friendly identifiers
 - Database connection should use singleton pattern for efficiency
+- Better-auth will handle user and session management with its own schema
 
 ## Definition of Done
-- [ ] Core database schema created (users, workspaces, sessions, workspace_members)
+- [ ] Core database schema created (workspaces, workspace_members)
 - [ ] Database connection singleton established
 - [ ] Drizzle configuration updated for monorepo structure
 - [ ] Initial migration generated and can run successfully
 - [ ] Workspace ID validation implemented (10-20 alphanumeric)
 - [ ] Database utilities created for workspace filtering
 - [ ] Type safety ensured with TypeScript types generated
+- [ ] Better-auth compatibility considered (no conflicts with auth schemas)
 
 ## Steps
 
 ### 1. Create Core Database Schema
-Create the fundamental tables required for multi-tenancy:
-
-**users table**:
-- id: uuid (primary key)
-- email: string (unique)
-- password_hash: string
-- name: string
-- created_at: timestamp
-- updated_at: timestamp
+Create the fundamental tables required for multi-tenancy (auth tables handled by better-auth):
 
 **workspaces table**:
 - id: string (10-20 alphanumeric, primary key)
 - name: string
 - description: string (optional)
-- created_by: uuid (foreign key to users.id)
 - created_at: timestamp
 - updated_at: timestamp
 
 **workspace_members table**:
 - id: uuid (primary key)
 - workspace_id: string (foreign key to workspaces.id)
-- user_id: uuid (foreign key to users.id)
+- user_id: string (foreign key to better-auth users table)
 - role: enum ('owner', 'admin', 'member')
 - joined_at: timestamp
 
-**sessions table**:
-- id: string (primary key)
-- user_id: uuid (foreign key to users.id)
-- workspace_id: string (foreign key to workspaces.id)
-- expires_at: timestamp
-- created_at: timestamp
+Note: Users and sessions will be managed by better-auth with its own schema structure. The workspace_members.user_id will reference the user ID from better-auth's user table.
 
-### 2. Implement Database Connection Singleton
-Create a singleton pattern for database connections to ensure efficient connection management.
+### 2. Create Environment Configuration
+Create environment validation following the ydtb pattern with @t3-oss/env-nextjs for type-safe environment variables.
 
-### 3. Update Drizzle Configuration
-Ensure Drizzle works correctly with the new monorepo structure.
+### 3. Implement Database Connection Singleton
+Create a cached database connection following the ydtb pattern:
+- Use postgres-js for the connection
+- Cache the connection in development using globalThis
+- Use Drizzle ORM with the connection
 
-### 4. Generate Initial Migration
+### 4. Update Drizzle Configuration
+Configure Drizzle Kit following ydtb pattern:
+- Set schema path to point to core schema
+- Use tablesFilter with prefix (e.g., "crm_*")
+- Configure for PostgreSQL with database URL from env
+
+### 5. Create Database Setup Script
+Create a `start-database.sh` script following the ydtb pattern:
+- Supports both Docker and Podman
+- Reads DATABASE_URL from .env.local
+- Automatically starts database daemon if not running
+- Generates random password if using default
+
+### 6. Generate Initial Migration
 Create and run the first migration to set up core tables.
 
-### 5. Create Workspace Utilities
+### 7. Create Workspace Utilities
 Implement helper functions for:
 - Validating workspace ID format
 - Filtering queries by workspace
 - Checking user workspace membership
 
-### 6. Set Up Type Generation
+### 8. Set Up Type Generation
 Configure Drizzle to generate TypeScript types from the schema.
 
 ## Files to Create
 
-### 1. `/apps/core/src/lib/db/schema/core.ts`
+### 1. `/apps/core/src/lib/env.ts`
+```typescript
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+export const env = createEnv({
+  /**
+   * Specify your server-side environment variables schema here.
+   */
+  server: {
+    DATABASE_URL: z.string().url(),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
+  },
+
+  /**
+   * Specify your client-side environment variables schema here.
+   */
+  client: {
+    NEXT_PUBLIC_APP_URL: z.string().url(),
+  },
+
+  /**
+   * You can't destruct `process.env` as a regular object in the Next.js edge runtimes
+   */
+  runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  },
+
+  /**
+   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
+   */
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+
+  /**
+   * Makes it so that empty strings are treated as undefined.
+   */
+  emptyStringAsUndefined: true,
+});
+```
+
+### 2. `/apps/core/src/lib/db/schema/core.ts`
 ```typescript
 import {
   pgTable,
@@ -89,91 +137,115 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-// Users table
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+// Note: Users and Sessions tables will be created by better-auth
+// These schemas are defined here only for reference - actual creation happens in Unit 2.1
 
 // Workspaces table
-export const workspaces = pgTable("workspaces", {
+export const workspaces = pgTable("ydtb_workspaces", {
   id: varchar("id", { length: 20 }).primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  createdBy: uuid("created_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 // Workspace members table
-export const workspaceMembers = pgTable("workspace_members", {
+export const workspaceMembers = pgTable("ydtb_workspace_members", {
   id: uuid("id").primaryKey().defaultRandom(),
-  workspaceId: varchar("workspace_id", { length: 20 }).notNull().references(() => workspaces.id),
-  userId: uuid("user_id").notNull().references(() => users.id),
+  workspaceId: varchar("workspace_id", { length: 20 }).notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  userId: varchar("user_id", { length: 255 }).notNull(), // References better-auth user ID
   role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member'] }).notNull().default('member'),
   joinedAt: timestamp("joined_at").notNull().defaultNow(),
 });
 
-// Sessions table
-export const sessions = pgTable("sessions", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id),
-  workspaceId: varchar("workspace_id", { length: 20 }).notNull().references(() => workspaces.id),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
 // Type schemas
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
 export const insertWorkspaceSchema = createInsertSchema(workspaces);
 export const selectWorkspaceSchema = createSelectSchema(workspaces);
 export const insertWorkspaceMemberSchema = createInsertSchema(workspaceMembers);
 export const selectWorkspaceMemberSchema = createSelectSchema(workspaceMembers);
-export const insertSessionSchema = createInsertSchema(sessions);
-export const selectSessionSchema = createSelectSchema(sessions);
 ```
 
-### 2. `/apps/core/src/lib/db/index.ts`
+### 3. `/apps/core/src/lib/db/index.ts`
 ```typescript
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { env } from "~/env";
 import * as schema from "./schema/core";
 
-// Singleton pattern for database connection
-class Database {
-  private static instance: Database;
-  private client: postgres.Sql;
-  public db: ReturnType<typeof drizzle>;
+/**
+ * Cache the database connection in development.
+ * Following the ydtb pattern to avoid creating a new connection on every HMR update.
+ */
+const globalForDb = globalThis as unknown as {
+  conn: postgres.Sql | undefined;
+};
 
-  private constructor() {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error("DATABASE_URL is not set");
-    }
+const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
+if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
-    this.client = postgres(connectionString, { max: 1 });
-    this.db = drizzle(this.client, { schema });
-  }
+export const db = drizzle(conn, { schema });
+export { schema };
+```
 
-  public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database();
-    }
-    return Database.instance;
-  }
+### 4. `/apps/core/drizzle.config.ts`
+```typescript
+import { config } from "dotenv";
+import type { Config } from "drizzle-kit";
 
-  public async close() {
-    await this.client.end();
-  }
+// Load environment variables from .env.local
+config({ path: ".env.local" });
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is not set in .env.local");
 }
 
-export const db = Database.getInstance().db;
-export { schema };
+export default {
+  schema: "./src/lib/db/schema/core.ts",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: databaseUrl,
+  },
+  tablesFilter: ["ydtb_*"],
+} satisfies Config;
+```
+
+### 5. `/scripts/start-database.sh`
+Create a shell script following the ydtb pattern for local development database setup. (See ydtb project for reference implementation)
+```bash
+#!/usr/bin/env bash
+# Use this script to start a docker container for a local development database
+# Following the pattern from ydtb project
+
+# TO RUN ON WINDOWS:
+# 1. Install WSL (Windows Subsystem for Linux)
+# 2. Install Docker Desktop or Podman Desktop
+# 3. Open WSL - `wsl`
+# 4. Run this script - `./start-database.sh`
+
+# On Linux and macOS you can run this script directly - `./start-database.sh`
+
+# import env variables from .env.local
+set -a
+source .env.local
+
+# Parse database URL and generate container configuration
+# [Implementation details matching ydtb pattern]
+
+# Check for Docker/Podman availability and start daemon if needed
+# [Implementation details matching ydtb pattern]
+
+# Check port availability
+# [Implementation details matching ydtb pattern]
+
+# Handle existing containers
+# [Implementation details matching ydtb pattern]
+
+# Generate random password for default
+# [Implementation details matching ydtb pattern]
+
+# Run PostgreSQL container
+# [Implementation details matching ydtb pattern]
 ```
 
 ### 3. `/apps/core/src/lib/utils/workspace.ts`
@@ -211,34 +283,40 @@ export function withWorkspace(workspaceId: string) {
 
 ## Files to Update
 
-### 1. `/apps/core/drizzle.config.ts`
-```typescript
-import type { Config } from "drizzle-kit";
-import { config } from "dotenv";
-
-config({ path: ".env.local" });
-
-export default {
-  schema: "./src/lib/db/schema/core.ts",
-  out: "./drizzle",
-  driver: "pg",
-  dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
-  },
-  verbose: true,
-  strict: true,
-} satisfies Config;
-```
-
-### 2. `/apps/core/package.json`
-Add database-related scripts:
+### 1. `/apps/core/package.json`
+Add dependencies following ydtb pattern:
 ```json
 {
+  "dependencies": {
+    "@t3-oss/env-nextjs": "^0.7.1",
+    "drizzle-orm": "^0.29.3",
+    "postgres": "^3.4.3",
+    "drizzle-zod": "^0.5.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/postgres": "^3.4.6",
+    "drizzle-kit": "^0.20.14"
+  },
   "scripts": {
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
+  }
+}
+```
+
+### 2. Update `/apps/core/tsconfig.json`
+Add path for environment file:
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@ydtb/*": ["../../packages/*"],
+      "~/*": ["./src/*"]
+    }
   }
 }
 ```
