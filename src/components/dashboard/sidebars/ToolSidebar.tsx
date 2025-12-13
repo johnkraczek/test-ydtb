@@ -4,17 +4,17 @@ import {
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { useSidebar } from "~/context/sidebar/use-sidebar";
 
 
 
 interface ToolSidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
   toolId: string;
   onCreateClick?: () => void;
 }
 
-export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
+export function ToolSidebar({ toolId }: ToolSidebarProps) {
+  const { isOpen, toggle } = useSidebar();
   const renderToolContent = () => {
     return (
       <div className="py-4 text-center text-sm text-slate-500">
@@ -34,7 +34,7 @@ export function ToolSidebar({ isOpen, onToggle, toolId }: ToolSidebarProps) {
           {isOpen && <h3 className="font-display font-semibold text-slate-900 dark:text-slate-100 tracking-tight pl-1">Tool Title HERE</h3>}
           <Button
             className="h-7 w-7 p-0 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
-            onClick={onToggle}
+            onClick={toggle}
             size="sm"
             variant="ghost"
           >

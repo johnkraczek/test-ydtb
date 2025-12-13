@@ -36,6 +36,7 @@ export interface ToolItem {
   id: string;
   icon: any;
   label: string;
+  route: string;
   visible: boolean;
 }
 

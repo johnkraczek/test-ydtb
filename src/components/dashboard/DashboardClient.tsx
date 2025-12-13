@@ -1,90 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { DashboardFooter } from "./DashboardFooter";
 import { MainHeader } from "./headers/MainHeader";
 import { ToolHeader } from "./headers/ToolHeader";
 import { IconRail } from "./sidebars/IconRail";
 import { ToolSidebar } from "./sidebars/ToolSidebar";
 import { useThemePattern } from "~/context/theme/use-theme-pattern";
+import { useSidebar } from "~/context/sidebar/use-sidebar";
 
 interface DashboardClientProps {
   children: React.ReactNode;
   activeTool?: string;
   header?: React.ReactNode;
   mode?: "client" | "agency";
-  onToolSelect?: (toolId: string) => void;
 }
 
 export function DashboardClient({
   children,
   activeTool: initialActiveTool = "home",
   header,
-  onToolSelect
 }: DashboardClientProps) {
   const [activeTool, setActiveTool] = useState(initialActiveTool);
-  const [isToolSidebarOpen, setIsToolSidebarOpen] = useState(true);
   const { getPatternClass } = useThemePattern();
-  const router = useRouter();
+  const { isOpen: isToolSidebarOpen } = useSidebar();
 
   // Sync internal state with prop if it changes
   useEffect(() => {
     setActiveTool(initialActiveTool);
   }, [initialActiveTool]);
-
-  const handleToolSelect = (toolId: string) => {
-    setActiveTool(toolId);
-
-    // Navigation using Next.js router
-    switch (toolId) {
-      case "home":
-        router.push("/");
-        break;
-      case "agency-home":
-        router.push("/agency");
-        break;
-      case "launchpad":
-        router.push("/launchpad");
-        break;
-      case "users":
-        router.push("/contacts");
-        break;
-      case "media":
-        router.push("/media");
-        break;
-      case "messages":
-        router.push("/messages");
-        break;
-      case "automation":
-        router.push("/automation");
-        break;
-      case "pages":
-        router.push("/pages");
-        break;
-      case "sop":
-        router.push("/sop");
-        break;
-      case "settings":
-        router.push("/settings/account");
-        break;
-      case "agency-settings":
-        router.push("/agency/settings/profile");
-        break;
-      case "agency-workspaces":
-        router.push("/agency/workspaces");
-        break;
-      case "agency-templates":
-        router.push("/agency/templates");
-        break;
-      default:
-        // Notify parent of tool selection for custom navigation
-        if (onToolSelect) {
-          onToolSelect(toolId);
-        }
-        break;
-    }
-  };
 
   return (
     <div className="flex h-screen flex-col bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
@@ -99,19 +43,12 @@ export function DashboardClient({
         </div>
 
         {/* Icon Rail - Fixed left */}
-        <IconRail
-          activeTool={activeTool}
-          onToolSelect={handleToolSelect}
-          isToolSidebarOpen={isToolSidebarOpen}
-          onToggleSidebar={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
-        />
+        <IconRail />
 
         {/* Collapsible Tool Sidebar + Main Content */}
         <div className={`flex flex-1 overflow-hidden p-2 ${isToolSidebarOpen ? "gap-2" : ""}`}>
 
           <ToolSidebar
-            isOpen={isToolSidebarOpen}
-            onToggle={() => setIsToolSidebarOpen(!isToolSidebarOpen)}
             toolId={activeTool}
           />
 

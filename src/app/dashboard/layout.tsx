@@ -1,4 +1,5 @@
 import { Providers } from "../../context/providers";
+import { SidebarProvider } from "../../context/sidebar/use-sidebar";
 import { DashboardClient } from "../../components/dashboard/DashboardClient";
 
 export default function DashboardLayout({
@@ -8,9 +9,11 @@ export default function DashboardLayout({
 }) {
   return (
     <Providers>
-      <DashboardClient>
-        {children}
-      </DashboardClient>
+      <SidebarProvider>
+        <DashboardClient>
+          {children}
+        </DashboardClient>
+      </SidebarProvider>
     </Providers>
   );
 }
