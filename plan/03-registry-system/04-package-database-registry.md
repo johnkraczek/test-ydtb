@@ -52,9 +52,10 @@ registry.registerDatabase({
 5. **Runtime Registration**: Supports hot-reloading in development
 
 **Integration Points**:
-- Called during package initialization (Unit 6.2)
-- Used by Basic Package Database (Unit 5.3)
+- Called during package initialization (Unit 7.2)
+- Used by Basic Package Database (Unit 6.3)
 - Required for database initialization (updated in Unit 2.1)
+- Environment variables registered via env registry (Unit 1.2)
 
 **Validation Rules**:
 - All package tables must be prefixed with `ydtb_`

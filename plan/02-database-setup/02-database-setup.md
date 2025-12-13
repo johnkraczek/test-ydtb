@@ -45,7 +45,7 @@ Create the fundamental tables required for multi-tenancy (auth tables handled by
 Note: Users and sessions will be managed by better-auth with its own schema structure. The workspace_members.user_id will reference the user ID from better-auth's user table.
 
 ### 2. Create Environment Configuration
-Create environment validation following the ydtb pattern with @t3-oss/env-nextjs for type-safe environment variables.
+Environment validation is handled in `apps/core/src/env.ts` using the build-time environment collection system (Unit 1.2). The database connection will use the validated `DATABASE_URL` from the core environment.
 
 ### 3. Implement Database Connection Singleton
 Create a cached database connection following the ydtb pattern:
@@ -78,50 +78,13 @@ Implement helper functions for:
 ### 8. Set Up Type Generation
 Configure Drizzle to generate TypeScript types from the schema.
 
-## Files to Create
+## Files to Update
 
-### 1. `/apps/core/src/lib/env.ts`
+### 1. `/apps/core/src/lib/db/index.ts`
+Import the environment from core:
 ```typescript
-import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
-
-export const env = createEnv({
-  /**
-   * Specify your server-side environment variables schema here.
-   */
-  server: {
-    DATABASE_URL: z.string().url(),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
-  },
-
-  /**
-   * Specify your client-side environment variables schema here.
-   */
-  client: {
-    NEXT_PUBLIC_APP_URL: z.string().url(),
-  },
-
-  /**
-   * You can't destruct `process.env` as a regular object in the Next.js edge runtimes
-   */
-  runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    NODE_ENV: process.env.NODE_ENV,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-  },
-
-  /**
-   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
-   */
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-
-  /**
-   * Makes it so that empty strings are treated as undefined.
-   */
-  emptyStringAsUndefined: true,
-});
+import { env } from "@/env";
+import { envRegistry } from "@/registry/env";
 ```
 
 ### 2. `/apps/core/src/lib/db/schema/core.ts`

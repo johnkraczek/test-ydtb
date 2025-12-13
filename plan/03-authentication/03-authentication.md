@@ -681,10 +681,11 @@ Add dependencies:
 6. Test workspace switching functionality
 
 ## Common Issues and Solutions
-1. **Session Not Persisting**: Check NEXTAUTH_SECRET environment variable
-2. **Database Adapter Errors**: Ensure schema matches NextAuth expectations
+1. **Session Not Persisting**: Check BETTER_AUTH_SECRET environment variable from core env
+2. **Database Adapter Errors**: Ensure schema matches better-auth expectations
 3. **Redirect Loops**: Verify middleware configuration
 4. **Password Hash Failures**: Check bcrypt implementation
+5. **Environment Variable Access**: Import env from `@/env` in auth configuration
 
 ## Next Steps
 After authentication is working:

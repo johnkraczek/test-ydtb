@@ -1,376 +1,497 @@
 # Unit 1.2: Environment Variables for Monorepo
 **Folder**: `02-environment-variables`
 
-**Purpose**: Design and implement environment variable management for the monorepo architecture, considering the needs of both core application and packages
+**Purpose**: Implement type-safe environment variable management using a Hybrid Approach where core defines required variables and packages can register optional ones
 
 **Context**:
 - Moving from monolithic to monorepo architecture
 - Core app needs environment variables (database URL, auth secrets, etc.)
-- Packages may need their own environment variables
-- Need to decide on strategy for package-specific environment variables
-- ydtb project uses @t3-oss/env-nextjs for type-safe environment variables
+- Packages need to register their own environment variables (API keys, feature flags)
+- Using @t3-oss/env-nextjs for type-safe environment variables
 - Must support development, testing, and production environments
 
 **Definition of Done**:
-- ✅ Environment variable strategy decided (core-only vs package-specific)
-- ✅ Core environment validation implemented with @t3-oss/env-nextjs
-- ✅ Shared environment package created if needed
-- ✅ Documentation for adding new environment variables
-- ✅ .env templates for each environment
-- ✅ Runtime environment validation working
-- ✅ Type safety for all environment variables
+- ✅ Environment registry system implemented in core
+- ✅ Build-time environment variable collection
+- ✅ Core environment validation with @t3-oss/env-nextjs
+- ✅ Package environment schema registration without circular dependencies
+- ✅ Type-safe environment variable access for all packages
+- ✅ Environment template generation from registry
+- ✅ Documentation for package developers
 
 ---
 
-## Environment Variable Strategy Discussion
+## Implementation: Hybrid Approach with Build-time Environment Collection
 
-### Option A: Core-Only Environment Variables
-All environment variables are defined and consumed by the core application only.
-- Pros: Simpler, centralized configuration, easier deployment
-- Cons: Packages need to pass all configuration through props or context
+The Hybrid Approach uses a build-time environment collection strategy where:
+- Core defines required environment variables (database, auth, app URL)
+- Packages declare their environment variables in separate files
+- All schemas are collected at build time without direct imports
+- Full type safety maintained throughout
 
-### Option B: Hybrid Approach (Recommended)
-Core defines required environment variables, packages can define optional ones.
-- Core variables: Database URL, auth secrets, app URL (required for all)
-- Package variables: API keys, feature flags, package-specific settings
-- Each package exports its environment schema that gets merged at build time
+### 1. Environment Registry System
 
-### Option C: Full Package Environment Variables
-Each package can define its own environment variables independently.
-- Pros: Maximum flexibility, packages can be self-contained
-- Cons: More complex, potential for conflicts, harder deployment
+#### `apps/core/src/registry/env.ts`
+```typescript
+import { z } from "zod";
 
----
+export interface PackageEnvSchema {
+  server?: Record<string, z.ZodType>;
+  client?: Record<string, z.ZodType>;
+}
 
-## Recommended Implementation: Hybrid Approach
+class EnvRegistry {
+  private schemas = new Map<string, PackageEnvSchema>();
+  private isFinalized = false;
 
-### 1. Core Environment Variables
-Create `apps/core/src/env.ts`:
+  register(packageName: string, schema: PackageEnvSchema) {
+    if (this.isFinalized) {
+      throw new Error(`Environment registry is finalized. Cannot register ${packageName}`);
+    }
+
+    // Check for conflicts
+    for (const [key] of Object.keys(schema.server || {})) {
+      if (this.hasKeyConflict(key, packageName)) {
+        throw new Error(
+          `Environment variable conflict: ${key} already registered by ${this.getPackageForKey(key)}`
+        );
+      }
+    }
+
+    for (const [key] of Object.keys(schema.client || {})) {
+      if (this.hasKeyConflict(key, packageName)) {
+        throw new Error(
+          `Environment variable conflict: ${key} already registered by ${this.getPackageForKey(key)}`
+        );
+      }
+    }
+
+    this.schemas.set(packageName, schema);
+  }
+
+  private hasKeyConflict(key: string, excludePackage: string): boolean {
+    for (const [pkgName, schema] of this.schemas) {
+      if (pkgName === excludePackage) continue;
+      if (schema.server?.[key] || schema.client?.[key]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private getPackageForKey(key: string): string {
+    for (const [pkgName, schema] of this.schemas) {
+      if (schema.server?.[key] || schema.client?.[key]) {
+        return pkgName;
+      }
+    }
+    return "unknown";
+  }
+
+  finalize() {
+    this.isFinalized = true;
+  }
+
+  getAll() {
+    return Array.from(this.schemas.entries());
+  }
+
+  getMergedSchema() {
+    const server: Record<string, z.ZodType> = {};
+    const client: Record<string, z.ZodType> = {};
+
+    for (const [_, schema] of this.schemas) {
+      if (schema.server) {
+        Object.assign(server, schema.server);
+      }
+      if (schema.client) {
+        Object.assign(client, schema.client);
+      }
+    }
+
+    return { server, client };
+  }
+}
+
+export const envRegistry = new EnvRegistry();
+```
+
+### 2. Package Discovery and Build-time Collection
+
+#### `apps/core/src/registry/discover-packages.ts`
+```typescript
+// This file handles package discovery without importing them directly
+import fs from "fs";
+import path from "path";
+
+interface PackageInfo {
+  name: string;
+  path: string;
+  envSchemaPath?: string;
+}
+
+export function discoverPackages(): PackageInfo[] {
+  const packagesDir = path.resolve(__dirname, "../../../packages");
+  const packages: PackageInfo[] = [];
+
+  if (!fs.existsSync(packagesDir)) {
+    return packages;
+  }
+
+  const packageFolders = fs.readdirSync(packagesDir, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
+
+  for (const folder of packageFolders) {
+    const packageJsonPath = path.join(packagesDir, folder, "package.json");
+
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+        const envSchemaPath = path.join(packagesDir, folder, "src", "env-schema.ts");
+
+        packages.push({
+          name: packageJson.name || folder,
+          path: path.join(packagesDir, folder),
+          envSchemaPath: fs.existsSync(envSchemaPath) ? envSchemaPath : undefined,
+        });
+      } catch (error) {
+        console.warn(`Failed to read package.json for ${folder}:`, error);
+      }
+    }
+  }
+
+  return packages;
+}
+
+// Build-time function to collect all environment schemas
+export function collectEnvironmentSchemas() {
+  const packages = discoverPackages();
+  const schemas: Array<{ packageName: string; schema: any }> = [];
+
+  for (const pkg of packages) {
+    if (pkg.envSchemaPath) {
+      try {
+        // Dynamic import to avoid circular dependencies
+        const envModule = require(pkg.envSchemaPath);
+        if (envModule.envSchema) {
+          schemas.push({
+            packageName: pkg.name,
+            schema: envModule.envSchema,
+          });
+        }
+      } catch (error) {
+        console.warn(`Failed to load env schema for ${pkg.name}:`, error);
+      }
+    }
+  }
+
+  return schemas;
+}
+```
+
+### 3. Build-time Environment Schema Builder
+
+#### `scripts/build-env-schemas.js`
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+// This script runs at build time to create the consolidated environment schemas
+function buildEnvSchemas() {
+  const packagesDir = path.resolve(__dirname, '../packages');
+  const coreDir = path.resolve(__dirname, '../apps/core/src');
+
+  const schemas = [];
+
+  // Discover packages
+  if (fs.existsSync(packagesDir)) {
+    const packageFolders = fs.readdirSync(packagesDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+    for (const folder of packageFolders) {
+      const envSchemaPath = path.join(packagesDir, folder, 'src', 'env-schema.ts');
+
+      if (fs.existsSync(envSchemaPath)) {
+        try {
+          // Read the env schema file content
+          const content = fs.readFileSync(envSchemaPath, 'utf-8');
+          const packageName = require(path.join(packagesDir, folder, 'package.json')).name;
+
+          // Extract the schema export
+          const schemaMatch = content.match(/export const envSchema\s*=\s*({[\s\S]*?})\s*;?\s*$/m);
+          if (schemaMatch) {
+            schemas.push({
+              packageName,
+              schema: schemaMatch[1]
+            });
+          }
+        } catch (error) {
+          console.warn(`Failed to process env schema for ${folder}:`, error);
+        }
+      }
+    }
+  }
+
+  // Generate the consolidated schemas file
+  const template = `// Auto-generated at build time - do not edit manually
+import { envRegistry } from './registry/env';
+import { z } from 'zod';
+
+// Register all package environment schemas
+${schemas.map(({ packageName, schema }) => {
+  return `// ${packageName}\nenvRegistry.register('${packageName.replace(/[^a-zA-Z0-9]/g, '')}', ${schema});`;
+}).join('\n\n')}
+
+// Finalize registry to prevent further registrations
+envRegistry.finalize();
+`;
+
+  fs.writeFileSync(path.join(coreDir, 'registry', 'package-env-schemas.ts'), template);
+  console.log(`✅ Generated environment schemas for ${schemas.length} packages`);
+}
+
+buildEnvSchemas();
+```
+
+### 4. Core Environment Variables with Registry Integration
+
+#### `apps/core/src/env.ts`
 ```typescript
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { envRegistry } from "./registry/env";
+// Import the generated package schemas (build-time)
+import "./registry/package-env-schemas";
+
+// Get merged schema from registry
+const { server: packageServer, client: packageClient } = envRegistry.getMergedSchema();
+
+// Core required environment variables
+const coreServerSchema = {
+  DATABASE_URL: z.string().url(),
+  BETTER_AUTH_SECRET: z.string(),
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
+};
+
+const coreClientSchema = {
+  NEXT_PUBLIC_APP_URL: z.string().url(),
+};
+
+// Merge core and package schemas
+const server = { ...coreServerSchema, ...packageServer };
+const client = { ...coreClientSchema, ...packageClient };
+
+// Build runtime env object
+const runtimeEnv: Record<string, string | undefined> = {
+  // Core variables
+  DATABASE_URL: process.env.DATABASE_URL,
+  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+  NODE_ENV: process.env.NODE_ENV,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+};
+
+// Add all registered package variables
+for (const [_, schema] of envRegistry.getAll()) {
+  for (const key of Object.keys(schema.server || {})) {
+    runtimeEnv[key] = process.env[key];
+  }
+  for (const key of Object.keys(schema.client || {})) {
+    runtimeEnv[key] = process.env[key];
+  }
+}
 
 export const env = createEnv({
-  /**
-   * Server-side environment variables
-   * These are available on the server but not exposed to the client
-   */
-  server: {
-    // Database
-    DATABASE_URL: z.string().url(),
-
-    // Authentication (better-auth)
-    BETTER_AUTH_SECRET: process.env.NODE_ENV === "production"
-      ? z.string()
-      : z.string().optional(),
-
-    // Core application settings
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
-
-    // Security
-    CORS_ORIGINS: z.string().optional()
-      .transform(val => val?.split(",")),
-    API_RATE_LIMIT: z.coerce.number().default(100),
-
-    // Feature flags
-    ENABLE_ANALYTICS: z.coerce.boolean().default(false),
-    ENABLE_CRASH_REPORTING: z.coerce.boolean().default(false),
-  },
-
-  /**
-   * Client-side environment variables
-   * These are prefixed with NEXT_PUBLIC_ and exposed to the browser
-   */
-  client: {
-    NEXT_PUBLIC_APP_URL: z.string().url(),
-    NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-    NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
-  },
-
-  /**
-   * Runtime environment variables
-   * This maps the actual process.env to our validated schema
-   */
-  runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    NODE_ENV: process.env.NODE_ENV,
-    CORS_ORIGINS: process.env.CORS_ORIGINS,
-    API_RATE_LIMIT: process.env.API_RATE_LIMIT,
-    ENABLE_ANALYTICS: process.env.ENABLE_ANALYTICS,
-    ENABLE_CRASH_REPORTING: process.env.ENABLE_CRASH_REPORTING,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  },
-
-  // Skip validation in certain cases
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-
-  // Treat empty strings as undefined
+  server,
+  client,
+  runtimeEnv,
   emptyStringAsUndefined: true,
 });
 ```
 
-### 2. Shared Environment Package
-Create `packages/env/src/index.ts`:
+### 5. Package Environment Declaration Pattern
+
+#### `packages/analytics/src/env-schema.ts`
 ```typescript
 import { z } from "zod";
 
-/**
- * Base environment schema that all packages should extend
- */
-export const basePackageEnvSchema = {
-  // Common package configuration
-  DEBUG: z.coerce.boolean().default(false),
-  LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
+export const envSchema = {
+  server: {
+    ANALYTICS_POSTHOG_API_KEY: z.string().optional()
+      .describe("PostHog API key for analytics tracking"),
+    ANALYTICS_GA_MEASUREMENT_ID: z.string().optional()
+      .describe("Google Analytics measurement ID"),
+  },
+  client: {
+    NEXT_PUBLIC_ANALYTICS_ENABLED: z.coerce.boolean().default(true)
+      .describe("Enable/disable analytics tracking"),
+    NEXT_PUBLIC_ANALYTICS_DEBUG: z.coerce.boolean().default(false)
+      .describe("Enable debug mode for analytics"),
+  },
 };
 
-/**
- * Environment variable helpers for packages
- */
-export function createPackageEnv<T extends Record<string, any>>(
-  packageName: string,
-  schema: T
-) {
-  return {
-    // Prefix all env vars with package name
-    schema: Object.entries(schema).reduce((acc, [key, value]) => {
-      const prefixedKey = `${packageName.toUpperCase()}_${key}`;
-      acc[prefixedKey] = value;
-      return acc;
-    }, {} as Record<string, any>),
+// Note: No registration happens here - it's done at build time
+```
 
-    // Helper to get prefixed env var
-    getEnvVar: (key: string) => {
-      return process.env[`${packageName.toUpperCase()}_${key}`];
-    },
-  };
-}
+#### `packages/analytics/src/index.ts`
+```typescript
+// Package index - no environment registration needed
+// Environment variables are available through the core env import
 
-/**
- * Common environment variables for packages
- */
-export const commonPackageSchemas = {
-  // API keys (common pattern)
-  apiKey: z.string().optional(),
-
-  // External service URLs
-  apiUrl: z.string().url().optional(),
-
-  // Feature flags
-  enabled: z.coerce.boolean().default(true),
-
-  // Timeouts
-  timeout: z.coerce.number().default(30000),
-
-  // Retries
-  retries: z.coerce.number().default(3),
+export const analyticsService = {
+  init() {
+    // Will import env from core when needed
+  },
 };
 ```
 
-### 3. Package Environment Implementation Example
-Example for a hypothetical `analytics` package:
+### 6. Usage in Packages
+
+#### `packages/analytics/src/service.ts`
 ```typescript
-// packages/analytics/src/env.ts
-import { createPackageEnv, commonPackageSchemas } from "@ydtb/env";
-import { z } from "zod";
+// Import environment from core
+import { env } from "@/env";
 
-const { schema, getEnvVar } = createPackageEnv("ANALYTICS", {
-  // Google Analytics
-  GA_MEASUREMENT_ID: z.string().optional(),
-
-  // PostHog
-  POSTHOG_API_KEY: commonPackageSchemas.apiKey,
-  POSTHOG_API_HOST: z.string().url().optional(),
-
-  // Configuration
-  TRACK_PAGE_VIEWS: commonPackageSchemas.enabled,
-  BATCH_SIZE: z.coerce.number().default(10),
-  FLUSH_INTERVAL: z.coerce.number().default(5000),
-});
-
-// Validate at runtime
-export const analyticsEnv = {
-  gaMeasurementId: getEnvVar("GA_MEASUREMENT_ID"),
-  posthogApiKey: getEnvVar("POSTHOG_API_KEY"),
-  posthogApiHost: getEnvVar("POSTHOG_API_HOST") || "https://app.posthog.com",
-  trackPageViews: getEnvVar("TRACK_PAGE_VIEWS") === "true",
-  batchSize: parseInt(getEnvVar("BATCH_SIZE") || "10"),
-  flushInterval: parseInt(getEnvVar("FLUSH_INTERVAL") || "5000"),
-};
-```
-
-### 4. Environment File Templates
-
-#### `.env.example` (Root level)
-```bash
-# Core Application
-DATABASE_URL=postgresql://postgres:password@localhost:5432/crm_toolkit
-BETTER_AUTH_SECRET=your-secret-key-here
-NODE_ENV=development
-
-# URLs
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# CORS (comma-separated origins)
-CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
-
-# Rate Limiting
-API_RATE_LIMIT=100
-
-# Feature Flags
-ENABLE_ANALYTICS=false
-ENABLE_CRASH_REPORTING=false
-
-# Monitoring (optional)
-NEXT_PUBLIC_POSTHOG_KEY=your-posthog-key
-NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
-```
-
-#### `.env.local.example` (For developers)
-```bash
-# Override values from .env.example
-# Copy to .env.local and customize
-
-# Development database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/crm_toolkit_dev
-
-# Development secrets
-BETTER_AUTH_SECRET=dev-secret-not-for-production
-
-# Package-specific environment variables
-ANALYTICS_POSTHOG_API_KEY=your-dev-posthog-key
-ANALYTICS_DEBUG=true
-
-NOTIFICATION_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxx
-NOTIFICATION_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
-
-MEDIA_S3_BUCKET=your-dev-bucket
-MEDIA_S3_REGION=us-east-1
-```
-
-### 5. Environment Loading Strategy
-
-#### Core Application
-```typescript
-// apps/core/src/config/env.ts
-import { env } from "./env";
-
-// Core env is loaded at startup
-export { env };
-
-// Helper for packages to access their env vars
-export function getPackageEnv(packageName: string, key: string) {
-  const prefixedKey = `${packageName.toUpperCase()}_${key}`;
-  return process.env[prefixedKey];
+export class AnalyticsService {
+  constructor() {
+    // Type-safe access to environment variables
+    this.posthogApiKey = env.ANALYTICS_POSTHOG_API_KEY;
+    this.enabled = env.NEXT_PUBLIC_ANALYTICS_ENABLED;
+  }
 }
 ```
 
-#### Package Initialization
-```typescript
-// In each package's initialization
-import { getPackageEnv } from "@/config/env";
+### 7. Build Pipeline Integration
 
-export function initializePackage(packageName: string) {
-  // Package can read its env vars through core helper
-  const apiKey = getPackageEnv(packageName, "API_KEY");
-  const enabled = getPackageEnv(packageName, "ENABLED") === "true";
-
-  // Initialize package with configuration
-  return {
-    apiKey,
-    enabled,
-    // ... other config
-  };
-}
-```
-
-### 6. Validation at Build Time
-
+#### Add to `turbo.json`:
 ```json
-// turbo.json
 {
   "pipeline": {
-    "build": {
-      "dependsOn": ["^build", "env:validate"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    "env:build": {
+      "dependsOn": [],
+      "outputs": ["apps/core/src/registry/package-env-schemas.ts"]
     },
-    "env:validate": {
-      "cache": false,
-      "outputs": []
+    "build": {
+      "dependsOn": ["^build", "env:build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     }
   }
 }
 ```
 
-```bash
-# Add to package.json scripts
-"env:validate": "bun -e \"import('./src/env').then(m => m.env)\""
+#### Add to root `package.json`:
+```json
+{
+  "scripts": {
+    "env:build": "node scripts/build-env-schemas.js",
+    "env:generate": "node scripts/generate-env-example.js",
+    "env:validate": "bun -e \"import('./apps/core/src/env').then(m => m.env)\""
+  }
+}
 ```
 
-### 7. Documentation Standards
+### 8. Environment Template Generation
 
-Each package must document:
-1. Required environment variables (if any)
-2. Optional environment variables with defaults
-3. Example configuration in README.md
-4. Environment variable prefix used
+#### `scripts/generate-env-example.js`
+```javascript
+const fs = require('fs');
+const path = require('path');
 
-Template for package README:
-```markdown
-## Environment Variables
+// Read the generated schemas file to extract environment variables
+function generateEnvExample() {
+  const schemasFile = path.resolve(__dirname, '../apps/core/src/registry/package-env-schemas.ts');
+  const coreEnvFile = path.resolve(__dirname, '../apps/core/src/env.ts');
 
-This package uses the `PREFIX_` prefix for all environment variables.
+  if (!fs.existsSync(schemasFile)) {
+    console.error('Package environment schemas not found. Run env:build first.');
+    process.exit(1);
+  }
 
-### Required
+  let example = `# Core Environment Variables
+DATABASE_URL=postgresql://postgres:password@localhost:5432/crm_toolkit
+BETTER_AUTH_SECRET=your-secret-here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=development
 
-- `PREFIX_API_KEY` - API key for external service
+# Package Environment Variables
+`;
 
-### Optional
+  // Extract environment variables from schemas
+  const content = fs.readFileSync(schemasFile, 'utf-8');
+  const registerCalls = content.match(/envRegistry\.register\([^,]+,\s*({[\s\S]*?})\);/g) || [];
 
-- `PREFIX_ENABLED` - Enable/disable the package (default: true)
-- `PREFIX_TIMEOUT` - Request timeout in ms (default: 30000)
-- `PREFIX_DEBUG` - Enable debug logging (default: false)
+  for (const call of registerCalls) {
+    const schemaMatch = call.match(/{([\s\S]*?)}/);
+    if (schemaMatch) {
+      try {
+        // Simple parsing to extract variable names and descriptions
+        const lines = schemaMatch[1].split('\n');
+        let packageName = '';
+
+        for (const line of lines) {
+          const match = line.match(/\/\/\s*(.+)$/);
+          if (match && !packageName) {
+            packageName = match[1].trim() + '\n';
+          }
+
+          const varMatch = line.match(/(\w+):\s*z\.\w+/);
+          if (varMatch) {
+            example += `\n${packageName}${varMatch[1]}=`;
+            packageName = ''; // Only show package name once
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to parse schema:', error);
+      }
+    }
+  }
+
+  fs.writeFileSync('.env.example', example);
+  console.log('✅ .env.example generated');
+}
+
+generateEnvExample();
 ```
-
----
-
-## Decision Points
-
-### 1. Should packages have direct access to process.env?
-**Recommendation**: No, packages should access through core helper to maintain consistency.
-
-### 2. Should package environment variables be validated at runtime?
-**Recommendation**: Yes, but optionally. Core env is validated, packages can opt-in.
-
-### 3. Should we support different env files per package?
-**Recommendation**: No, keep it simple. All env vars in root .env files with prefixes.
-
-### 4. Should package env vars be shared across workspaces?
-**Recommendation**: No, env vars are workspace-scoped for security and isolation.
 
 ---
 
 ## Files to Create
 
-1. `apps/core/src/env.ts` - Core environment validation
-2. `packages/env/src/index.ts` - Shared environment utilities
-3. `packages/env/package.json` - Environment package configuration
-4. `.env.example` - Root environment template
-5. `.env.local.example` - Development environment template
-6. `.env.test.example` - Testing environment template
+1. `apps/core/src/registry/env.ts` - Environment registry system
+2. `apps/core/src/registry/discover-packages.ts` - Package discovery utilities
+3. `scripts/build-env-schemas.js` - Build-time schema collector
+4. `scripts/generate-env-example.js` - Environment template generator
+5. `.env.example` - Generated environment template
 
 ---
 
 ## Files to Update
 
-1. `apps/core/package.json` - Add @t3-oss/env-nextjs dependency
-2. `apps/core/src/config/index.ts` - Export env configuration
-3. `turbo.json` - Add env validation pipeline
-4. Each package's README.md - Document environment variables
-5. Each package's initialization code - Use env helpers
+1. `apps/core/src/env.ts` - Core environment with registry integration
+2. All packages' `src/env-schema.ts` - Declare environment schemas
+3. `apps/core/turbo.json` - Add env:build pipeline
+4. Root `package.json` - Add env scripts
+5. All packages' README.md - Document environment variables
 
-This approach provides flexibility for packages while maintaining a clear, type-safe, and documented environment variable system.
+---
+
+## Key Advantages of This Approach
+
+1. **No Circular Dependencies**: Packages don't import core, core doesn't import packages
+2. **Build-time Resolution**: All environment variables resolved before Next.js starts
+3. **Conflict Detection**: Prevents duplicate environment variable names
+4. **Type Safety**: Full TypeScript support with @t3-oss/env-nextjs
+5. **Automatic Discovery**: New packages automatically included
+6. **Clear Separation**: Packages declare, core manages
+
+---
+
+## Integration with Registry System
+
+The environment registry works seamlessly with the package registry system:
+
+1. **No Import Conflicts**: Environment schemas collected without direct imports
+2. **Build-time Only**: Environment variables resolved before app startup
+3. **Consistent Pattern**: Follows same registry pattern as other systems
+4. **Clean Architecture**: Clear separation between declaration and registration

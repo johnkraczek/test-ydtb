@@ -485,13 +485,15 @@ function verifyWebhookSignature(
 /**
  * Handle incoming webhook from external service
  */
+import { env } from "@/env";
+
 export async function handleWebhook(request: NextRequest) {
   try {
     const signature = request.headers.get("x-basic-signature");
     const body = await request.text();
 
     // Get webhook secret from environment
-    const secret = process.env.BASIC_WEBHOOK_SECRET;
+    const secret = env.BASIC_WEBHOOK_SECRET;
     if (!secret) {
       console.error("Webhook secret not configured");
       return NextResponse.json(
@@ -851,11 +853,23 @@ export const GET = basicNotesRequest;
 export const POST = basicNotesRequest;
 ```
 
-### 2. Add environment variables to `.env.example`
+### 2. Create environment schema in `packages/basic/src/env-schema.ts`
+```typescript
+import { z } from "zod";
+
+export const envSchema = {
+  server: {
+    BASIC_WEBHOOK_SECRET: z.string().optional()
+      .describe("Secret for verifying webhook signatures"),
+  },
+  client: {
+    NEXT_PUBLIC_BASIC_DEBUG: z.coerce.boolean().default(false)
+      .describe("Enable debug mode for basic package"),
+  },
+};
 ```
-# Basic package
-BASIC_WEBHOOK_SECRET=your-webhook-secret-here
-```
+
+The environment variables will be automatically included in `.env.example` when running `npm run env:generate`.
 
 ## Validation Checklist
 
