@@ -1,4 +1,4 @@
-# Unit 6.2: Package Initialization
+# Unit 7.2: Package Initialization
 
 ## Folder: `15-package-init`
 
@@ -6,7 +6,8 @@
 Initialize packages in the dashboard layout and set up the package loading system that discovers and loads all available packages when the application starts.
 
 ## Context
-- Core components are updated to use registry (Unit 6.1)
+- Core components are updated to use registry (Unit 7.1)
+- Package Database Registry is implemented (Unit 3.4)
 - Need to load packages dynamically when the app starts
 - Should handle package dependencies and load order
 - Must validate packages before loading
@@ -18,6 +19,7 @@ Initialize packages in the dashboard layout and set up the package loading syste
 - [ ] Packages imported and initialized in layout
 - [ ] Registration validation prevents invalid packages
 - [ ] Dependencies resolved before loading
+- [ ] Package database schemas registered with Database Registry
 - [ ] Error handling for package failures
 - [ ] Package loading state tracked
 - [ ] Support for package-specific configuration
