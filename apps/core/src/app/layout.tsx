@@ -7,6 +7,7 @@ import { IconRail } from "~/components/dashboard/sidebars/IconRail";
 import { ToolSidebar } from "~/components/dashboard/sidebars/ToolSidebar";
 import { ToolHeader } from "~/components/dashboard/headers/ToolHeader";
 import { DashboardFooter } from "~/components/dashboard/DashboardFooter";
+import { ThemedContentArea } from "~/components/ThemedContentArea";
 import '~/index.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -45,8 +46,10 @@ export default function RootLayout({
                     {/* Main Content Area */}
                     <div className="flex flex-1 flex-col overflow-hidden bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm transition-all duration-300">
                       <ToolHeader />
-                      <div className="flex-1 overflow-auto p-8 bg-slate-50/50 dark:bg-slate-900/50">
-                        {children}
+                      <div className="flex-1 overflow-auto">
+                        <ThemedContentArea>
+                          {children}
+                        </ThemedContentArea>
                       </div>
                       <DashboardFooter />
                     </div>
