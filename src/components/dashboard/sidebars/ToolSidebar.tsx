@@ -7,15 +7,12 @@ import {
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useSidebar } from "~/context/sidebar/use-sidebar";
+import { useActiveTool } from "~/hooks/use-active-tool";
 
 
 
-interface ToolSidebarProps {
-  toolId: string;
-  onCreateClick?: () => void;
-}
-
-export function ToolSidebar({ toolId }: ToolSidebarProps) {
+export function ToolSidebar() {
+  const toolId = useActiveTool();
   const { isOpen, toggle } = useSidebar();
   const renderToolContent = () => {
     return (
