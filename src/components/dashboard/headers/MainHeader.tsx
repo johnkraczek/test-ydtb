@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Search, Hexagon } from "lucide-react";
 import { useState } from "react";
 import { WorkspaceDropdown } from "./WorkspaceDropdown";

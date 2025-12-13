@@ -1,4 +1,6 @@
 
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useActiveTool } from "~/hooks/use-active-tool";
