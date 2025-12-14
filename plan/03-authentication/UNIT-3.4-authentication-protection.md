@@ -1,4 +1,4 @@
-# Unit 3.5: Authentication Protection
+# Unit 3.4: Authentication Protection
 
 ## Purpose
 Implement route-level and component-level authentication protection using Next.js layouts, server components, and client-side guards to ensure only authenticated users can access protected resources.
