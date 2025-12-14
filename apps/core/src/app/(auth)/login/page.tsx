@@ -33,8 +33,12 @@ export default function LoginPage() {
 
       if (result.error) {
         setError(result.error.message || "Invalid credentials");
+      } else if (result.data?.twoFactorRedirect) {
+        // User has 2FA enabled, redirect to OTP verification
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
       } else {
-        router.push("/");
+        // No 2FA required, redirect to dashboard
+        router.push("/dashboard");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

@@ -15,6 +15,9 @@ export const {
   useSession,
 } = authClient;
 
+// Check if twoFactor methods are available
+export const twoFactor = authClient.twoFactor;
+
 // forgotPassword - manual implementation since better-auth doesn't export it directly
 export const forgotPassword = async ({ email, redirectTo }: { email: string; redirectTo: string }) => {
   const response = await fetch('/api/auth/forgot-password', {
