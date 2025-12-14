@@ -1,4 +1,4 @@
-# Unit 2.2: Core Authentication Setup
+# Unit 3.1: Core Authentication Setup
 
 ## Purpose
 Configure the foundational authentication infrastructure using better-auth with PostgreSQL adapter, email/password authentication, and API route handling.

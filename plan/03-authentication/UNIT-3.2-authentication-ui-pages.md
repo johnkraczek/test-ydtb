@@ -1,4 +1,4 @@
-# Unit 2.3: Authentication UI Pages
+# Unit 3.2: Authentication UI Pages
 
 ## Purpose
 Create user authentication pages (login, signup, forgot password, reset password) with smooth animations and integration with better-auth methods.

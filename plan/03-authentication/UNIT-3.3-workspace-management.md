@@ -1,13 +1,18 @@
-# Unit 2.4: Workspace Management
+# Unit 3.3: Workspace Management
 
 ## Purpose
 Implement workspace management functionality using better-auth's organization plugin, including workspace context provider, workspace switching, and integration with existing workspace UI components.
 
 ## Context
-- Must have Unit 2.2 (Core Authentication Setup) completed for organization plugin
-- Must have Unit 2.3 (Authentication UI Pages) completed for user authentication
+- Must have Unit 3.1 (Core Authentication Setup) completed for organization plugin
+- Must have Unit 3.2 (Authentication UI Pages) completed for user authentication
 - Requires database schema updates to support organization plugin fields
 - Updates existing WorkspaceDropdown component to use real data
+
+## Documentation Reference
+For detailed information about better-auth's organization plugin, see:
+- [better-auth Organization Plugin Documentation](https://www.better-auth.com/docs/plugins/organization)
+- Includes API reference, configuration options, and examples
 
 ## Definition of Done
 - [ ] Organization plugin configured with workspace schema mapping
@@ -517,164 +522,19 @@ export async function inviteUserToWorkspace(data: {
 }
 ```
 
-### 7. Create Workspace Creation Page (Optional)
-Create `/apps/core/src/app/workspaces/new/page.tsx`:
-```typescript
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { useWorkspace } from "~/context/workspace/workspace-context";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Textarea } from "~/components/ui/textarea";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Loader2, Building } from "lucide-react";
-
-export default function NewWorkspacePage() {
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const { createWorkspace } = useWorkspace();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      await createWorkspace({
-        name,
-        slug: slug || undefined,
-        description: description || undefined,
-      });
-
-      // Workspace provider handles redirection
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create workspace");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto"
-        >
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Building className="h-8 w-8" />
-              Create New Workspace
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Set up a new workspace to organize your projects and team
-            </p>
-          </div>
-
-          <div className="bg-card p-8 rounded-lg shadow-lg">
-            {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="name">Workspace Name *</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    // Auto-generate slug if empty
-                    if (!slug) {
-                      setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
-                    }
-                  }}
-                  placeholder="My Workspace"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="slug">URL Slug</Label>
-                <Input
-                  id="slug"
-                  type="text"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="my-workspace"
-                  disabled={isLoading}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  This will be part of your workspace URL: app.ydtb.com/{slug}
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Optional description of your workspace"
-                  rows={3}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="flex gap-4">
-                <Button
-                  type="submit"
-                  className="flex-1"
-                  disabled={isLoading}
-                >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Workspace
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.back()}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-```
 
 ## Files to Create
 
 1. `/apps/core/src/context/workspace/workspace-context.tsx` - Workspace context definition
 2. `/apps/core/src/context/workspace/workspace-provider.tsx` - Workspace provider implementation
 3. `/apps/core/src/server/actions/workspace.ts` - Server actions for workspace operations
-4. `/apps/core/src/app/workspaces/new/page.tsx` - Workspace creation page (optional)
 
 ## Files to Update
 
 1. `/apps/core/src/context/providers.tsx` - Add WorkspaceProvider
 2. `/apps/core/src/components/dashboard/headers/WorkspaceDropdown.tsx` - Integrate with better-auth
 3. Database schema - Add slug, logo, metadata, status fields
-4. `/apps/core/src/server/auth.ts` - Ensure organization plugin is properly configured (done in Unit 2.2)
+4. `/apps/core/src/server/auth.ts` - Ensure organization plugin is properly configured (done in Unit 3.1)
 
 ## Validation Checklist
 
