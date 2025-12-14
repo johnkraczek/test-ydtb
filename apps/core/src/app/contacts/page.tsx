@@ -1,5 +1,7 @@
+import { env } from '@/env'
+
 export default function Home() {
   return (
-    <p></p>
+    <p>env: {env.NEXT_PUBLIC_APP_URL}</p>
   );
 }

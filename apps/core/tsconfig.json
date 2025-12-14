@@ -3,17 +3,32 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@ydtb/*": ["../../packages/*"],
-      "~/*": ["./src/*"],
-      "@assets/*": ["./public/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ],
+      "@ydtb/*": [
+        "../../packages/*"
+      ],
+      "~/*": [
+        "./src/*"
+      ],
+      "@assets/*": [
+        "./public/*"
+      ]
+    },
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "./src",
     "./next-env.d.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "./dist/types/**/*.ts"
   ],
   "exclude": [
     "./node_modules"

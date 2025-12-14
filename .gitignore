@@ -9,3 +9,16 @@ vite.config.ts.*
 next-env.d.ts
 .turbo
 .changeset
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# App specific environment files
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.development
+apps/*/.env.production

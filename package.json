@@ -24,6 +24,8 @@
     "install:all": "bun install",
     "type-check": "turbo run type-check",
     "dev:core": "turbo run dev --filter=core",
+    "env:validate": "turbo run env:validate",
+    "env:generate": "turbo run env:generate",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build && changeset publish"

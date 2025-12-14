@@ -1,51 +1,54 @@
 {
-	"permissions": {
-		"allow": [
-			"Bash(bun add:*)",
-			"Bash(bun info:*)",
-			"Bash(bun run:*)",
-			"Bash(bun search:*)",
-			"Bash(bun test:*)",
-			"Bash(bun list:*)",
-			"Bash(bun run check)",
-			"Bash(bun dev:*)",
-			"Bash(bun storybook:*)",
-			"Bash(bunx next build)",
-			"Bash(bunx storybook@latest init:*)",
-			"Bash(bunx db:generate)",
-			"Bash(bunx tsx:*)",
-			"Bash(git add:*)",
-			"Bash(tree:*)",
-			"Bash(curl:*)",
-			"Bash(pkill:*)",
-			"Bash(gh pr list:*)",
-			"Bash(gh pr create:*)",
-			"Bash(gh pr view:*)",
-			"Bash(git branch:*)",
-			"Bash(git commit:*)",
-			"mcp__playwright__browser_navigate",
-			"mcp__playwright__browser_wait_for",
-			"mcp__playwright__browser_take_screenshot",
-			"mcp__playwright__browser_click",
-			"mcp__playwright__browser_snapshot",
-			"mcp__playwright__browser_type",
-			"mcp__playwright__browser_console_messages",
-			"mcp__playwright__browser_press_key",
-			"mcp__playwright__browser_evaluate",
-			"mcp__playwright__browser_fill_form",
-			"mcp__playwright__browser_run_code",
-			"mcp__playwright__browser_network_requests",
-			"mcp__playwright__browser_network_resize",
-			"mcp__playwright__browser_resize",
-			"Bash(bun run typecheck:*)"
-		],
-		"deny": [
-			"Bash(npm:*)"
-		],
-		"ask": []
-	},
-	"enableAllProjectMcpServers": true,
-	"enabledMcpjsonServers": [
-		"shadcn"
-	]
+  "permissions": {
+    "allow": [
+      "Bash(bun add:*)",
+      "Bash(bun info:*)",
+      "Bash(bun run:*)",
+      "Bash(bun search:*)",
+      "Bash(bun test:*)",
+      "Bash(bun list:*)",
+      "Bash(bun run check)",
+      "Bash(bun dev:*)",
+      "Bash(bun storybook:*)",
+      "Bash(bunx next build)",
+      "Bash(bunx storybook@latest init:*)",
+      "Bash(bunx db:generate)",
+      "Bash(bunx tsx:*)",
+      "Bash(git add:*)",
+      "Bash(tree:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git branch:*)",
+      "Bash(git commit:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_network_resize",
+      "mcp__playwright__browser_resize",
+      "Bash(bun run typecheck:*)",
+      "Bash(mkdir:*)",
+      "Bash(bun scripts/generate-env-example.js:*)",
+      "Bash(bun:*)"
+    ],
+    "deny": [
+      "Bash(npm:*)"
+    ],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
 }

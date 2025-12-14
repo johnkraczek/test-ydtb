@@ -44,6 +44,12 @@
     "db:studio": {
       "cache": false,
       "persistent": true
+    },
+    "env:validate": {
+      "cache": false
+    },
+    "env:generate": {
+      "cache": false
     }
   }
 }
