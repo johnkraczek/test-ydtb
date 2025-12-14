@@ -20,8 +20,7 @@ export function WorkspaceDropdown() {
     activeWorkspace,
     workspaces,
     isLoading,
-    switchWorkspace,
-    createWorkspace
+    switchWorkspace
   } = useWorkspace();
 
   if (isLoading) {

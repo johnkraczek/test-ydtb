@@ -7,14 +7,48 @@ import type { Organization } from "@/lib/auth-client";
 
 export async function getActiveOrganization(): Promise<Organization | null> {
   try {
-    const data = await auth.api.getFullOrganization({
+    const response = await auth.api.getFullOrganization({
       headers: await headers(),
     });
-    // Handle the case where there's no active organization
-    if (!data || !data.data) {
+
+    // The response might be the organization directly or have a data property
+    if (!response) {
       return null;
     }
-    return data.data as Organization;
+
+    // Handle different response structures
+    const org = 'data' in response ? response.data : response;
+
+    // If org is null or undefined, return null
+    if (!org || typeof org !== 'object') {
+      return null;
+    }
+
+    // Check if org has the required properties
+    if (!('id' in org && 'name' in org)) {
+      return null;
+    }
+
+    // Type assertion to access properties
+    const orgData = org as {
+      id: string;
+      name: string;
+      slug?: string;
+      logo?: string | null;
+      metadata?: Record<string, any> | null;
+      createdAt?: Date;
+      updatedAt?: Date;
+    };
+
+    return {
+      id: orgData.id,
+      name: orgData.name,
+      slug: orgData.slug || '',
+      logo: orgData.logo || null,
+      metadata: orgData.metadata || null,
+      createdAt: orgData.createdAt || new Date(),
+      updatedAt: orgData.updatedAt || new Date(),
+    } as Organization;
   } catch (error) {
     console.error("Failed to fetch active organization:", error);
     return null;
@@ -54,11 +88,11 @@ export async function createOrganization(data: {
 }) {
   try {
     const result = await auth.api.createOrganization({
-      body: data,
+      body: data as any,
       headers: await headers(),
     });
     revalidatePath("/dashboard");
-    return result;
+    return result || null;
   } catch (error) {
     console.error("Failed to create organization:", error);
     throw error;
@@ -71,7 +105,7 @@ export async function getOrganizationMembers(organizationId: string) {
       headers: await headers(),
       query: { organizationId },
     });
-    return data.data || [];
+    return data?.members || [];
   } catch (error) {
     console.error("Failed to fetch organization members:", error);
     return [];
@@ -80,7 +114,7 @@ export async function getOrganizationMembers(organizationId: string) {
 
 export async function inviteUser(data: {
   email: string;
-  role: string;
+  role: "owner" | "admin" | "member";
   organizationId: string;
 }) {
   try {

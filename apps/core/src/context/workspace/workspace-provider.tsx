@@ -56,9 +56,9 @@ export function WorkspaceProvider({ children }: Props) {
 
       // Refresh the workspaces list is handled automatically by the mutation
 
-      // Switch to the new workspace if it was created successfully
-      if (result.data?.id) {
-        await switchWorkspace(result.data.id);
+      // The result should contain the created organization
+      if (result && result.id) {
+        await switchWorkspace(result.id);
       }
 
       router.push("/dashboard");

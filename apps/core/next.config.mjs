@@ -1,15 +1,10 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   distDir: './dist', // Changes the build output directory to `./dist/`
-  experimental: {
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
+  turbopack: {
+    root: path.resolve('../../'), // Specify the absolute root directory
   },
   images: {
     unoptimized: true,

@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Organization } from "./auth-client";
 import {
   getActiveOrganization,
   listOrganizations,
