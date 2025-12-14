@@ -7,10 +7,14 @@ import type { Organization } from "@/lib/auth-client";
 
 export async function getActiveOrganization(): Promise<Organization | null> {
   try {
-    const data = await auth.api.getActiveOrganization({
+    const data = await auth.api.getFullOrganization({
       headers: await headers(),
     });
-    return data as Organization | null;
+    // Handle the case where there's no active organization
+    if (!data || !data.data) {
+      return null;
+    }
+    return data.data as Organization;
   } catch (error) {
     console.error("Failed to fetch active organization:", error);
     return null;
@@ -63,11 +67,11 @@ export async function createOrganization(data: {
 
 export async function getOrganizationMembers(organizationId: string) {
   try {
-    const data = await auth.api.getOrganizationMembers({
+    const data = await auth.api.listMembers({
       headers: await headers(),
       query: { organizationId },
     });
-    return data || [];
+    return data.data || [];
   } catch (error) {
     console.error("Failed to fetch organization members:", error);
     return [];
@@ -80,7 +84,7 @@ export async function inviteUser(data: {
   organizationId: string;
 }) {
   try {
-    const result = await auth.api.inviteUser({
+    const result = await auth.api.createInvitation({
       body: data,
       headers: await headers(),
     });

@@ -5,7 +5,7 @@ import { twoFactor } from "better-auth/plugins";
 import { organization } from "better-auth/plugins";
 import { env } from "@/env";
 import { db } from "@/server/db";
-import { user, session, account, verification, passkey, workspaces, workspaceMembers } from "@/server/db/schema";
+import { user, session, account, verification, passkey as passkeyTable, workspaces, workspaceMembers } from "@/server/db/schema";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
@@ -17,7 +17,7 @@ export const auth = betterAuth({
       session,
       account,
       verification,
-      passkey,
+      passkey: passkeyTable,
       organization: workspaces,
       member: workspaceMembers,
     },
@@ -50,27 +50,6 @@ export const auth = betterAuth({
       // TOTP will be optional - users need to enable it
     }),
     organization({
-      // Map our workspace schema to organization plugin
-      schema: {
-        organization: {
-          tableName: "ydtb_workspaces",
-          fields: {
-            name: "name",
-            slug: "slug",
-            logo: "logo",
-            metadata: "metadata",
-          },
-        },
-        member: {
-          tableName: "ydtb_workspace_members",
-          fields: {
-            organizationId: "workspaceId",
-            userId: "userId",
-            role: "role",
-            status: "status",
-          },
-        },
-      },
       allowUserToCreateOrganization: true,
     }),
   ],
