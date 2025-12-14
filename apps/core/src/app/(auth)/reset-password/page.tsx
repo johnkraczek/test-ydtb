@@ -63,18 +63,14 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const result = await resetPassword({
+      await resetPassword({
         newPassword: password,
         token,
       });
 
-      if (result.error) {
-        setError(result.error.message || "Failed to reset password");
-      } else {
-        setSuccess(true);
-      }
+      setSuccess(true);
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }

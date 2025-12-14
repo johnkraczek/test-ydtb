@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { forgotPassword } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -24,18 +23,14 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const result = await forgotPassword({
+      await forgotPassword({
         email,
         redirectTo: "/reset-password",
       });
 
-      if (result.error) {
-        setError(result.error.message || "Failed to send reset email");
-      } else {
-        setSuccess(true);
-      }
+      setSuccess(true);
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }

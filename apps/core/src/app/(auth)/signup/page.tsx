@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const router = useRouter();
 
   const validatePassword = (password: string) => {
     const minLength = password.length >= 8;

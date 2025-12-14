@@ -41,7 +41,9 @@
       "Bash(mkdir:*)",
       "Bash(bun scripts/generate-env-example.js:*)",
       "Bash(bun:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(npx shadcn-ui@latest add:*)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [
       "Bash(npm:*)"
