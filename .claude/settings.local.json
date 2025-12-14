@@ -43,7 +43,8 @@
       "Bash(bun:*)",
       "Bash(cd:*)",
       "Bash(npx shadcn-ui@latest add:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "WebFetch(domain:*)"
     ],
     "deny": [
       "Bash(npm:*)"

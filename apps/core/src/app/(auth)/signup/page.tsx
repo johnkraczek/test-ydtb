@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -8,18 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Lock, User, ArrowRight, CheckCircle } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-
+  
   const validatePassword = (password: string) => {
     const minLength = password.length >= 8;
     const hasUpper = /[A-Z]/.test(password);
@@ -51,13 +52,14 @@ export default function SignupPage() {
         email,
         password,
         name,
-        callbackURL: "/",
+        callbackURL: "/verify-otp",
       });
 
       if (result.error) {
         setError(result.error.message || "Failed to create account");
       } else {
-        setShowSuccess(true);
+        // Redirect to OTP verification page after successful signup
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}&fromSignup=true`);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -66,7 +68,9 @@ export default function SignupPage() {
     }
   };
 
-  if (showSuccess) {
+  // Note: The success state is now handled by redirecting to verify-otp page
+  // This conditional is no longer needed
+  if (false) {
     return (
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -77,7 +81,7 @@ export default function SignupPage() {
           <CardHeader className="space-y-1 pb-4 text-center">
             <div className="flex justify-center mb-4">
               <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-7 w-7 text-green-600" strokeWidth={2.5} />
+                <div className="h-7 w-7 bg-green-600 rounded-sm" />
               </div>
             </div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">

@@ -24,6 +24,11 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  // Check if email is verified
+  if (!session.user.emailVerified) {
+    redirect(`/verify-otp?email=${encodeURIComponent(session.user.email)}&fromDashboard=true`);
+  }
+
   return (
     <SidebarProvider>
       <div className="flex h-screen flex-col bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">

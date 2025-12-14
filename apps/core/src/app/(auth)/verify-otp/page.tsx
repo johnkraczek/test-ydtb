@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+// import { authClient } from "@/lib/auth-client"; // Not used directly
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -22,12 +23,20 @@ export default function VerifyOTPPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [email, setEmail] = useState("");
+    const [fromLogin, setFromLogin] = useState(false);
+    const [fromSignup, setFromSignup] = useState(false);
 
     useEffect(() => {
         const emailParam = searchParams.get("email");
+        const fromLoginParam = searchParams.get("fromLogin");
+        const fromSignupParam = searchParams.get("fromSignup");
+        
         if (emailParam) {
             setEmail(emailParam);
         }
+
+        setFromLogin(fromLoginParam === "true");
+        setFromSignup(fromSignupParam === "true");
     }, [searchParams]);
 
     useEffect(() => {
@@ -40,8 +49,32 @@ export default function VerifyOTPPage() {
     const handleResend = async () => {
         setError("");
         setTimeLeft(30);
-        // TODO: Implement resend OTP logic
-        console.log("Resending OTP to:", email);
+
+        if (!email) {
+            setError("Email address is required");
+            return;
+        }
+
+        try {
+            // Call the API endpoint to resend OTP
+            const response = await fetch('/api/auth/send-verification-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                setError(data.error || "Failed to resend verification code");
+            } else {
+                // Success, show message
+                console.log("Verification code sent to:", email);
+            }
+        } catch (err) {
+            setError("An error occurred. Please try again.");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,20 +86,34 @@ export default function VerifyOTPPage() {
             return;
         }
 
+        if (!email) {
+            setError("Email address is required");
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            // TODO: Implement OTP verification
-            // This would typically call an API endpoint to verify the TOTP code
-            console.log("Verifying OTP:", code);
+            // First verify the OTP
+            const verifyResponse = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, otp: code }),
+            });
 
-            // For now, we'll simulate verification
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const verifyData = await verifyResponse.json();
 
-            // On success, redirect to root
-            router.push("/");
+            if (!verifyResponse.ok) {
+                setError(verifyData.error || "Invalid verification code");
+            } else {
+                // Email verification successful! User now needs to sign in with their password
+                // Redirect to login page with a success message
+                router.push(`/login?verified=true&email=${encodeURIComponent(email)}`);
+            }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Invalid code. Please try again.");
+            setError("An error occurred. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -98,7 +145,11 @@ export default function VerifyOTPPage() {
                                 Enter verification code
                             </h2>
                             <p className="text-sm text-slate-500 mt-1">
-                                We sent a 6-digit code to your authenticator app
+                                {fromLogin
+                                    ? "Please verify your email to sign in"
+                                    : fromSignup
+                                    ? "We sent a 6-digit code to your email to complete signup"
+                                    : "We sent a 6-digit code to your email"}
                             </p>
                             {email && (
                                 <p className="text-xs text-slate-400 mt-2">

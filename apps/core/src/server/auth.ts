@@ -3,9 +3,12 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { passkey } from "@better-auth/passkey";
 import { twoFactor } from "better-auth/plugins";
 import { organization } from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins";
 import { env } from "@/env";
 import { db } from "@/server/db";
 import { user, session, account, verification, passkey as passkeyTable, workspaces, workspaceMembers } from "@/server/db/schema";
+import { sendVerificationOTP } from "./auth/email-sender";
+import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
@@ -24,7 +27,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       console.log("Password reset requested for:", user.email);
       console.log("Reset URL:", url);
@@ -51,6 +54,23 @@ export const auth = betterAuth({
     }),
     organization({
       allowUserToCreateOrganization: true,
+    }),
+    emailOTP({
+      sendVerificationOTP: async ({ email, otp }) => {
+        // Get user info from database for name
+        const userRecord = await db.select().from(user).where(eq(user.email, email)).limit(1);
+
+        await sendVerificationOTP({
+          email,
+          otp,
+          userName: userRecord[0]?.name || undefined,
+        });
+      },
+      sendVerificationOnSignUp: true,
+      otpLength: 6,
+      expiresIn: 300, // 5 minutes
+      allowedAttempts: 3,
+      storeOTP: "hashed",
     }),
   ],
 });

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -9,19 +9,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Lock, ArrowRight, Fingerprint } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, Fingerprint, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const verified = searchParams.get("verified");
+    const emailParam = searchParams.get("email");
+
+    if (verified === "true" && emailParam) {
+      setEmail(emailParam);
+      setSuccess("Email verified successfully! Please sign in with your password.");
+    }
+  }, [searchParams]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -32,12 +45,30 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || "Invalid credentials");
-      } else if ((result as any).twoFactorRedirect) {
-        // User has 2FA enabled, redirect to OTP verification
-        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+        // Check if error is about unverified email
+        if (result.error.status === 403 && result.error.message?.toLowerCase().includes("email not verified")) {
+          setError("Please verify your email address. Check your inbox for a verification code.");
+          // Trigger OTP send before redirecting
+          try {
+            await fetch('/api/auth/send-verification-otp', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email }),
+            });
+          } catch (err) {
+            console.error("Failed to send OTP:", err);
+          }
+          // Redirect to OTP verification after a delay
+          setTimeout(() => {
+            router.push(`/verify-otp?email=${encodeURIComponent(email)}&fromLogin=true`);
+          }, 2000);
+        } else {
+          setError(result.error.message || "Invalid credentials");
+        }
       } else {
-        // No 2FA required, redirect to root
+        // Successful login, redirect to dashboard
         router.push("/");
       }
     } catch (err) {
@@ -91,6 +122,13 @@ export default function LoginPage() {
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert className="mb-4 border-green-200 bg-green-50">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">{success}</AlertDescription>
             </Alert>
           )}
 

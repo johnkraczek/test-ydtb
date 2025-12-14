@@ -6,7 +6,7 @@ const nextConfig = {
   turbopack: {
     root: path.resolve('../../'), // Specify the absolute root directory
   },
-  images: {
+    images: {
     unoptimized: true,
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 2592000, // 30 days
