@@ -179,3 +179,18 @@ Only for integration with external systems:
   - Public APIs for third-party integration (with API keys)
   - Mobile app backends (with OAuth/JWT)
   - Internal package webhooks (with authenticated calls)
+
+## Git Commit Convention
+
+This project follows conventional commits with specific type specifiers:
+
+- **plan:** - For commits that update or modify plan files (e.g., when you ask to "commit the plan" or "commit changes to the plan")
+- **feat:** - For new features and functionality implementation
+- **fix:** - For bug fixes and error corrections
+- **docs:** - For documentation updates and changes
+- **refactor:** - For code refactoring without functional changes
+- **test:** - For adding or updating tests
+- **chore:** - For maintenance tasks, dependency updates, etc.
+
+### Important: Plan Commits
+When working on planning activities and you request to commit plan changes, always use the `plan:` prefix. This clearly distinguishes planning work from actual feature implementation.
