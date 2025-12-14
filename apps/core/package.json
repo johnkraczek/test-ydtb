@@ -10,6 +10,8 @@
     "start": "next start",
     "check": "tsc",
     "db:push": "drizzle-kit push",
+    "db:reset": "bun run scripts/reset-db.ts",
+    "db:reset:force": "bun run scripts/reset-db.ts --force",
     "lint": "next lint",
     "env:validate": "bun -e \"import('./src/env').then(m => m.env)\"",
     "env:generate": "bun scripts/generate-env-example.js"
@@ -24,7 +26,7 @@
   "devDependencies": {
     "@types/node": "^20.19.27",
     "drizzle-kit": "^0.31.8",
-    "next": "14.0.4",
+    "next": "^16.0.10",
     "typescript": "^5.9.3"
   }
 }

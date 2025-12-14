@@ -3,6 +3,7 @@ import {
     boolean,
     index,
     integer,
+    jsonb,
     pgTableCreator,
     text,
     timestamp,
@@ -34,6 +35,8 @@ export const session = createTable("sessions", {
     expiresAt: timestamp("expires_at").notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
+    activeOrganizationId: varchar("active_organization_id", { length: 20 })
+        .references(() => workspaces.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -91,7 +94,10 @@ export const passkey = createTable("passkeys", {
 export const workspaces = createTable("workspaces", {
     id: varchar("id", { length: 20 }).primaryKey(), // 10-20 alphanumeric for URL-friendly IDs
     name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
     description: text("description"),
+    logo: text("logo"),
+    metadata: jsonb("metadata").$default(() => ({})),
     createdAt: timestamp("created_at")
         .$defaultFn(() => new Date())
         .notNull(),
@@ -112,6 +118,7 @@ export const workspaceMembers = createTable("workspace_members", {
     role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
         .notNull()
         .default('member'),
+    status: varchar("status", { length: 50 }).default('active'),
     joinedAt: timestamp("joined_at")
         .$defaultFn(() => new Date())
         .notNull(),
@@ -131,6 +138,11 @@ export const sessionRelations = relations(session, ({ one }) => ({
     user: one(user, {
         fields: [session.userId],
         references: [user.id],
+    }),
+    activeOrganization: one(workspaces, {
+        fields: [session.activeOrganizationId],
+        references: [workspaces.id],
+        relationName: "activeOrganization",
     }),
 }));
 

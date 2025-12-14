@@ -2,15 +2,25 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { passkey } from "@better-auth/passkey";
 import { twoFactor } from "better-auth/plugins";
-// import { organization } from "better-auth/plugins";
+import { organization } from "better-auth/plugins";
 import { env } from "@/env";
 import { db } from "@/server/db";
+import { user, session, account, verification, passkey, workspaces, workspaceMembers } from "@/server/db/schema";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: {
+      user,
+      session,
+      account,
+      verification,
+      passkey,
+      organization: workspaces,
+      member: workspaceMembers,
+    },
   }),
   emailAndPassword: {
     enabled: true,
@@ -39,30 +49,29 @@ export const auth = betterAuth({
     twoFactor({
       // TOTP will be optional - users need to enable it
     }),
-    // Temporarily comment out organization plugin to avoid build issues
-    // organization({
-    //   // Map our workspace schema to organization plugin
-    //   schema: {
-    //     organization: {
-    //       tableName: "workspaces",
-    //       fields: {
-    //         name: "name",
-    //         slug: "slug",
-    //         logo: "logo",
-    //         metadata: "metadata",
-    //       },
-    //     },
-    //     member: {
-    //       tableName: "workspace_members",
-    //       fields: {
-    //         organizationId: "workspaceId",
-    //         userId: "userId",
-    //         role: "role",
-    //         status: "status",
-    //       },
-    //     },
-    //   },
-    //   allowUserToCreateOrganization: true,
-    // }),
+    organization({
+      // Map our workspace schema to organization plugin
+      schema: {
+        organization: {
+          tableName: "ydtb_workspaces",
+          fields: {
+            name: "name",
+            slug: "slug",
+            logo: "logo",
+            metadata: "metadata",
+          },
+        },
+        member: {
+          tableName: "ydtb_workspace_members",
+          fields: {
+            organizationId: "workspaceId",
+            userId: "userId",
+            role: "role",
+            status: "status",
+          },
+        },
+      },
+      allowUserToCreateOrganization: true,
+    }),
   ],
 });

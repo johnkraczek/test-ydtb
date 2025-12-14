@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765686641817,
-      "tag": "0000_common_magus",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1765686903492,
-      "tag": "0001_solid_talon",
+      "when": 1765689375014,
+      "tag": "0000_dazzling_scorpion",
       "breakpoints": true
     }
   ]

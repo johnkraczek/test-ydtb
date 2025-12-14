@@ -36,6 +36,7 @@ CREATE TABLE "ydtb_sessions" (
 	"expires_at" timestamp NOT NULL,
 	"ip_address" text,
 	"user_agent" text,
+	"active_organization_id" varchar(20),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "ydtb_sessions_token_unique" UNIQUE("token")
@@ -47,6 +48,7 @@ CREATE TABLE "ydtb_users" (
 	"email" text NOT NULL,
 	"email_verified" boolean DEFAULT false,
 	"image" text,
+	"two_factor_enabled" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "ydtb_users_email_unique" UNIQUE("email")
@@ -66,20 +68,26 @@ CREATE TABLE "ydtb_workspace_members" (
 	"workspace_id" varchar(20) NOT NULL,
 	"user_id" text NOT NULL,
 	"role" varchar(50) DEFAULT 'member' NOT NULL,
+	"status" varchar(50) DEFAULT 'active',
 	"joined_at" timestamp NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "ydtb_workspaces" (
 	"id" varchar(20) PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
+	"slug" varchar(255) NOT NULL,
 	"description" text,
+	"logo" text,
+	"metadata" jsonb,
 	"created_at" timestamp NOT NULL,
-	"updated_at" timestamp NOT NULL
+	"updated_at" timestamp NOT NULL,
+	CONSTRAINT "ydtb_workspaces_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 ALTER TABLE "ydtb_accounts" ADD CONSTRAINT "ydtb_accounts_user_id_ydtb_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."ydtb_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ydtb_passkeys" ADD CONSTRAINT "ydtb_passkeys_user_id_ydtb_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."ydtb_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ydtb_sessions" ADD CONSTRAINT "ydtb_sessions_user_id_ydtb_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."ydtb_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ydtb_sessions" ADD CONSTRAINT "ydtb_sessions_active_organization_id_ydtb_workspaces_id_fk" FOREIGN KEY ("active_organization_id") REFERENCES "public"."ydtb_workspaces"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ydtb_workspace_members" ADD CONSTRAINT "ydtb_workspace_members_workspace_id_ydtb_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."ydtb_workspaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ydtb_workspace_members" ADD CONSTRAINT "ydtb_workspace_members_user_id_ydtb_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."ydtb_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "accounts_provider_account_idx" ON "ydtb_accounts" USING btree ("provider_id","account_id");--> statement-breakpoint

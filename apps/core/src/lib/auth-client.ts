@@ -1,12 +1,10 @@
 import { createAuthClient } from "better-auth/react";
 import { passkeyClient } from "@better-auth/passkey/client";
 // import { twoFactorClient } from "better-auth/plugins";
-// Temporarily comment out organizationClient to see if it's causing the build issue
-// import { organizationClient } from "better-auth/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL,
-  plugins: [passkeyClient()], // organizationClient()],
+  plugins: [passkeyClient()],
 });
 
 export const {
@@ -61,14 +59,16 @@ export const resetPassword = async ({ newPassword, token }: { newPassword: strin
   return data;
 };
 
-// Organization-specific exports (commented out temporarily)
-// export const {
-//   setActiveOrganization,
-//   setActiveTeam,
-//   useActiveOrganization,
-//   useActiveTeam,
-//   useListOrganizations,
-//   useOrganizationMembers,
-// } = authClient.organization;
+// Organization type definition
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string | null;
+  metadata?: Record<string, any> | null;
+  createdAt: Date;
+  updatedAt: Date;
+  role?: string;
+}
 
 export type Session = typeof authClient.$Infer.Session;
