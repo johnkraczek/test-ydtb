@@ -10,9 +10,11 @@ if (!databaseUrl) {
 }
 
 export default {
-  schema: "./src/server/db/schema.ts",
+  schema: "./apps/core/src/server/db/schema.ts",
   out: "./drizzle",
   dialect: "postgresql",
-  dbCredentials: databaseUrl,
+  dbCredentials: {
+    url: databaseUrl,
+  },
   tablesFilter: ["ydtb_*"],
 } satisfies Config;

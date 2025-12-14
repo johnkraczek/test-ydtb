@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Use this script to start a docker container for a local development database
-# Following the pattern from ydtb project
 
 # TO RUN ON WINDOWS:
 # 1. Install WSL (Windows Subsystem for Linux) - https://learn.microsoft.com/en-us/windows/wsl/install
@@ -12,9 +11,9 @@
 
 # On Linux and macOS you can run this script directly - `./start-database.sh`
 
-# import env variables from .env.local
+# import env variables from .env
 set -a
-source .env.local
+source ../.env.local
 
 DB_PASSWORD=$(echo "$DATABASE_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 DB_PORT=$(echo "$DATABASE_URL" | awk -F':' '{print $4}' | awk -F'\/' '{print $1}')
@@ -99,16 +98,16 @@ if [ "$DB_PASSWORD" = "password" ]; then
   echo "You are using the default database password"
   read -p "Should we generate a random password for you? [y/N]: " -r REPLY
   if ! [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "Please change the default password in the .env.local file and try again"
+    echo "Please change the default password in the .env file and try again"
     exit 1
   fi
   # Generate a random URL-safe password
   DB_PASSWORD=$(openssl rand -base64 12 | tr '+/' '-_')
   if [[ "$(uname)" == "Darwin" ]]; then
     # macOS requires an empty string to be passed with the `i` flag
-    sed -i '' "s#:password@#:$DB_PASSWORD@#" .env.local
+    sed -i '' "s#:password@#:$DB_PASSWORD@#" ../.env.local
   else
-    sed -i "s#:password@#:$DB_PASSWORD@#" .env.local
+    sed -i "s#:password@#:$DB_PASSWORD@#" ../.env.local
   fi
 fi
 

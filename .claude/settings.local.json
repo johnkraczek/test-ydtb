@@ -40,7 +40,8 @@
       "Bash(bun run typecheck:*)",
       "Bash(mkdir:*)",
       "Bash(bun scripts/generate-env-example.js:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(cd:*)"
     ],
     "deny": [
       "Bash(npm:*)"
