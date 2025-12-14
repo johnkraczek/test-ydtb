@@ -22,7 +22,7 @@ Implement route-level and component-level authentication protection using Next.j
 
 ## Steps
 
-### 1. Create AuthGuard Component
+### 1. Create AuthGuard Component with Error Handling
 Create `/apps/core/src/components/auth/auth-guard.tsx`:
 ```typescript
 import { auth } from "@/server/auth";
@@ -37,19 +37,27 @@ export async function AuthGuard({
   children,
   redirectTo = "/login"
 }: AuthGuardProps) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  if (!session?.user) {
+    if (!session?.user) {
+      redirect(redirectTo);
+    }
+
+    return <>{children}</>;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
+    console.error("AuthGuard failed:", error);
     redirect(redirectTo);
   }
-
-  return <>{children}</>;
 }
 ```
 
-### 2. Create Enhanced Server Session Helper
+### 2. Create Enhanced Server Session Helper with Error Handling
 Create `/apps/core/src/lib/session.ts`:
 ```typescript
 import { auth } from "@/server/auth";
@@ -57,34 +65,60 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 
 export const getSession = cache(async () => {
-  return await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    return await auth.api.getSession({
+      headers: await headers(),
+    });
+  } catch (error) {
+    console.error("Failed to get session:", error);
+    return null;
+  }
 });
 
 export const getCurrentUser = cache(async () => {
-  const session = await getSession();
-  return session?.user;
+  try {
+    const session = await getSession();
+    return session?.user || null;
+  } catch (error) {
+    console.error("Failed to get current user:", error);
+    return null;
+  }
 });
 
 export const requireAuth = cache(async (redirectTo?: string) => {
-  const session = await getSession();
+  try {
+    const session = await getSession();
 
-  if (!session?.user) {
+    if (!session?.user) {
+      redirect(redirectTo || "/login");
+    }
+
+    return session;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
+    console.error("Auth check failed:", error);
     redirect(redirectTo || "/login");
   }
-
-  return session;
 });
 
 export const requireWorkspace = cache(async () => {
-  const session = await requireAuth();
+  try {
+    const session = await requireAuth();
 
-  if (!session.activeOrganizationId) {
+    if (!session.activeOrganizationId) {
+      redirect("/workspaces");
+    }
+
+    return session;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
+    console.error("Workspace check failed:", error);
     redirect("/workspaces");
   }
-
-  return session;
 });
 ```
 
@@ -131,9 +165,14 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   // Redirect authenticated users away from auth pages
-  const user = await getCurrentUser();
-  if (user) {
-    redirect("/dashboard");
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      redirect("/dashboard");
+    }
+  } catch (error) {
+    // If we can't verify user state, allow access to auth pages
+    console.error("Failed to check auth state in layout:", error);
   }
 
   return (
@@ -401,7 +440,7 @@ export default function ProjectsPage() {
 }
 ```
 
-### 11. Create Higher-Order Protection Hook
+### 11. Create Higher-Order Protection Hook with Error Handling
 Create `/apps/core/src/hooks/use-require-auth.ts`:
 ```typescript
 import { useSession } from "@/lib/auth-client";
@@ -409,16 +448,16 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function useRequireAuth(redirectTo = "/login") {
-  const { data: session, isLoading } = useSession();
+  const { data: session, isLoading, error } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !session) {
+    if (!isLoading && (!session || error)) {
       router.push(redirectTo);
     }
-  }, [session, isLoading, router, redirectTo]);
+  }, [session, isLoading, error, router, redirectTo]);
 
-  return { session, isLoading };
+  return { session, isLoading, error };
 }
 ```
 
@@ -439,16 +478,18 @@ export function useRequireAuth(redirectTo = "/login") {
 
 ## Validation Checklist
 
-- [ ] AuthGuard component prevents unauthenticated access
-- [ ] Dashboard layout properly protected
-- [ ] Auth pages redirect authenticated users
-- [ ] Server-side session helpers working
-- [ ] Client-side protected component functions correctly
+- [ ] AuthGuard component prevents unauthenticated access with error handling
+- [ ] Dashboard layout properly protected using AuthGuard
+- [ ] Auth pages redirect authenticated users away from auth routes
+- [ ] Server-side session helpers handle errors gracefully
+- [ ] Client-side protected component functions correctly with error states
 - [ ] Workspace-aware protection validates workspace selection
 - [ ] Loading states display during auth checks
 - [ ] Redirect URLs include proper query parameters
-- [ ] Error handling for auth failures
-- [ ] Middleware (if used) doesn't interfere with API routes
+- [ ] Error handling for auth failures doesn't break redirects
+- [ ] No middleware conflicts (using layout-level protection only)
+- [ ] Separate auth pages (login, signup, forgot, reset) work independently
+- [ ] SessionProvider properly wraps the application in providers.tsx
 
 ## Testing
 
@@ -485,28 +526,44 @@ bun run dev
 
 1. **Infinite Redirects**:
    - Check that auth pages aren't wrapped in AuthGuard
-   - Verify middleware doesn't conflict with layout guards
    - Ensure redirect URLs don't create loops
+   - Verify error handling doesn't interfere with redirects
 
 2. **Session Not Available**:
-   - Verify SessionProvider wraps the app
+   - Verify SessionProvider wraps the app in providers.tsx
    - Check that auth API routes are working
    - Ensure cookies are being set properly
+   - Check console for session errors
 
-3. **Hydration Mismatches**:
+3. **Error Handling Issues**:
+   - Ensure try/catch blocks properly handle redirect errors
+   - Check for NEXT_REDIRECT errors in error handling
+   - Verify null returns from session helpers
+
+4. **Hydration Mismatches**:
    - Use appropriate protection patterns for SSR/client
    - Server components should use server-side helpers
-   - Client components should use useSession hook
+   - Client components should use useSession hook with error state
 
-4. **Performance Issues**:
-   - Cache session data appropriately
+5. **Performance Issues**:
+   - Cache session data with React.cache
    - Avoid multiple auth checks in same render
-   - Use React.memo for protected components when needed
+   - Use error states to prevent repeated failed requests
+
+## Key Implementation Notes
+
+1. **No Unified Auth Component**: This implementation uses separate auth pages (login, signup, forgot, reset) as defined in Unit 3.2. There is no unified auth component.
+
+2. **Error-First Approach**: All session helpers include comprehensive error handling with try/catch blocks that return null or redirect as appropriate.
+
+3. **Layout-Level Protection**: Authentication is handled at the Next.js layout level, not through middleware.
+
+4. **Separate UI Pages**: Auth pages remain as separate routes under `/app/(auth)/` with their own layouts and components.
 
 ## Integration Points
 
-- **Unit 2.2**: Uses session helpers and auth configuration
-- **Unit 2.3**: Protects routes that require authentication
-- **Unit 2.4**: Workspace-aware protection for workspace-specific features
+- **Unit 3.1**: Uses session helpers and auth configuration
+- **Unit 3.2**: Protects routes that require authentication
+- **Unit 3.3**: Workspace-aware protection for workspace-specific features
 - **All Protected Routes**: Apply protection pattern to dashboard, settings, projects, etc.
 - **API Routes**: Can use same session helpers for server-side auth checks
