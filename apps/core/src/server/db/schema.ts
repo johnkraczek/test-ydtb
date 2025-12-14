@@ -20,6 +20,7 @@ export const user = createTable("users", {
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false),
     image: text("image"),
+    twoFactorEnabled: boolean("two_factor_enabled").default(false),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
 });

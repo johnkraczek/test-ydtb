@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+
 import type { Config } from "drizzle-kit";
 
 // Load environment variables from .env.local
@@ -11,8 +12,9 @@ if (!databaseUrl) {
 
 export default {
   schema: "./src/server/db/schema.ts",
-  out: "./drizzle",
   dialect: "postgresql",
-  dbCredentials: databaseUrl,
+  dbCredentials: {
+    url: databaseUrl,
+  },
   tablesFilter: ["ydtb_*"],
 } satisfies Config;

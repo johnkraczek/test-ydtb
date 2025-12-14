@@ -1,5 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 import { passkeyClient } from "@better-auth/passkey/client";
+// import { twoFactorClient } from "better-auth/plugins";
 // Temporarily comment out organizationClient to see if it's causing the build issue
 // import { organizationClient } from "better-auth/plugins";
 
@@ -16,7 +17,7 @@ export const {
 } = authClient;
 
 // Check if twoFactor methods are available
-export const twoFactor = authClient.twoFactor;
+// export const twoFactor = authClient.twoFactor;
 
 // forgotPassword - manual implementation since better-auth doesn't export it directly
 export const forgotPassword = async ({ email, redirectTo }: { email: string; redirectTo: string }) => {

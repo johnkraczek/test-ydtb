@@ -11,7 +11,6 @@ export default function TOTPSettingsPage() {
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [secret, setSecret] = useState("");
-  const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [showSetup, setShowSetup] = useState(false);
@@ -30,13 +29,11 @@ export default function TOTPSettingsPage() {
 
       // Mock data for now
       const mockSecret = "JBSWY3DPEHPK3PXP";
-      const mockQrCode = `otpauth://totp/YDTB:user@example.com?secret=${mockSecret}&issuer=YDTB`;
       const mockBackupCodes = [
         "123456", "789012", "345678", "901234", "567890", "234567",
       ];
 
       setSecret(mockSecret);
-      setQrCodeUrl(mockQrCode);
       setBackupCodes(mockBackupCodes);
       setShowSetup(true);
     } catch (err) {
@@ -59,7 +56,6 @@ export default function TOTPSettingsPage() {
         setIsTwoFactorEnabled(true);
         setShowSetup(false);
         setSecret("");
-        setQrCodeUrl("");
         setBackupCodes([]);
       } else {
         setError("Invalid TOTP code");
@@ -119,7 +115,6 @@ export default function TOTPSettingsPage() {
                   {isTwoFactorEnabled
                     ? "Your account is protected with 2FA"
                     : "2FA is not enabled for your account"}
-                  }
                 </p>
               </div>
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${

@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { passkey } from "@better-auth/passkey";
 import { twoFactor } from "better-auth/plugins";
-import { organization } from "better-auth/plugins";
+// import { organization } from "better-auth/plugins";
 import { env } from "@/env";
 import { db } from "@/server/db";
 
@@ -37,7 +37,6 @@ export const auth = betterAuth({
       // Use default settings for WebAuthn
     }),
     twoFactor({
-      appName: "YDTB",
       // TOTP will be optional - users need to enable it
     }),
     // Temporarily comment out organization plugin to avoid build issues
