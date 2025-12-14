@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { auth } from "@/server/auth";
 import { SidebarProvider } from "~/context/sidebar/use-sidebar";
 import { MainHeader } from "~/components/dashboard/headers/MainHeader";
 import { IconRail } from "~/components/dashboard/sidebars/IconRail";
@@ -6,11 +9,21 @@ import { ToolHeader } from "~/components/dashboard/headers/ToolHeader";
 import { DashboardFooter } from "~/components/dashboard/DashboardFooter";
 import { ThemedContentArea } from "~/components/ThemedContentArea";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Check if user is authenticated
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // If not authenticated, redirect to login
+  if (!session) {
+    redirect("/login");
+  }
+
   return (
     <SidebarProvider>
       <div className="flex h-screen flex-col bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">

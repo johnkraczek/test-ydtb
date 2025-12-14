@@ -63,8 +63,8 @@ export default function VerifyOTPPage() {
             // For now, we'll simulate verification
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // On success, redirect to dashboard
-            router.push("/dashboard");
+            // On success, redirect to root
+            router.push("/");
         } catch (err) {
             setError(err instanceof Error ? err.message : "Invalid code. Please try again.");
         } finally {

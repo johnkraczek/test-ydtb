@@ -1,15 +1,28 @@
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { auth } from "@/server/auth";
 
 export const metadata: Metadata = {
   title: "Authentication | YDTB",
   description: "Sign in or create an account to get started",
 };
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Check if user is already authenticated
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // If already authenticated, redirect to root
+  if (session) {
+    redirect("/");
+  }
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 relative overflow-hidden">
       {/* Background Patterns */}

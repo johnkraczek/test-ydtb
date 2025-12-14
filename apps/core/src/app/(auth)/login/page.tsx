@@ -37,8 +37,8 @@ export default function LoginPage() {
         // User has 2FA enabled, redirect to OTP verification
         router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
       } else {
-        // No 2FA required, redirect to dashboard
-        router.push("/dashboard");
+        // No 2FA required, redirect to root
+        router.push("/");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
