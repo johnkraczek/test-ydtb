@@ -11,6 +11,7 @@
     "check": "tsc",
     "db:reset": "bun run scripts/reset-db.ts",
     "db:reset:force": "bun run scripts/reset-db.ts --force",
+    "db:backup": "bun run scripts/simple-backup.ts",
     "lint": "next lint",
     "env:validate": "bun -e \"import('./src/env').then(m => m.env)\"",
     "env:generate": "bun scripts/generate-env-example.js",
