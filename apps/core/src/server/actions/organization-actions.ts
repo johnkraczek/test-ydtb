@@ -87,9 +87,13 @@ export async function createOrganization(data: {
   metadata?: Record<string, any>;
 }) {
   try {
+    const orgBody = {
+      name: data.name,
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+      metadata: data.metadata,
+    };
     const result = await auth.api.createOrganization({
-      body: data as any,
-      headers: await headers(),
+      body: orgBody,
     });
     revalidatePath("/");
     return result || null;

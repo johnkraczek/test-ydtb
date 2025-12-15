@@ -6,6 +6,10 @@ import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { eq, and, gt } from "drizzle-orm";
 import { workspaces, workspaceInvitations, workspaceMembers } from "@/server/db/schema";
+import { requireAuth } from "@/server/auth-session";
+import type {
+  CreateOrganizationBody
+} from "@/types/better-auth";
 
 export async function createWorkspace(data: {
   name: string;
@@ -19,29 +23,25 @@ export async function createWorkspace(data: {
     message?: string;
   }>;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  const session = await requireAuth();
 
   try {
     // Use better-auth's createOrganization method
+    const orgBody: CreateOrganizationBody = {
+      name: data.name,
+      slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+      logo: data.logo,
+      metadata: {
+        description: data.description,
+        ...data.metadata,
+      },
+    };
+
     const workspace = await auth.api.createOrganization({
-      body: {
-        name: data.name,
-        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
-        logo: data.logo,
-        metadata: {
-          description: data.description,
-          ...data.metadata,
-        },
-      } as any,
+      body: orgBody,
     });
 
-    if (!workspace) {
+    if (!workspace || !workspace.id) {
       throw new Error("Failed to create workspace");
     }
 
@@ -223,13 +223,8 @@ export async function inviteUserToWorkspace(data: {
 }
 
 export async function validateSlug(slug: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  // Authentication is required to validate slugs
+  await requireAuth();
 
   // Check if slug is already taken
   const existingWorkspace = await db.query.workspaces.findFirst({
