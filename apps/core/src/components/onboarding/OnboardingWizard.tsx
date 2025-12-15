@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useSession } from "@/lib/auth-client";
+import { useSession, authClient } from "@/lib/auth-client";
 
 // Import server actions
-import { validateSlug, inviteUserToWorkspace } from "@/server/actions/workspace";
+import { inviteUserToWorkspace } from "@/server/actions/workspace";
 
 // Import client-side workspace context
 import { useWorkspace } from "@/context/workspace/workspace-context";
@@ -156,7 +156,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
-  // Real-time slug validation
+  // Real-time slug validation using Better Auth client
   const validateSlugAsync = async (slug: string) => {
     if (!slug || slug.length < 3) {
       setSlugError("");
@@ -165,8 +165,12 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
 
     setIsValidatingSlug(true);
     try {
-      const isValid = await validateSlug(slug);
-      setSlugError(isValid ? "" : "URL slug is already taken");
+      const { data } = await authClient.organization.checkSlug({
+        slug: slug,
+      });
+
+      // data is available boolean
+      setSlugError(data ? "" : "URL slug is already taken");
     } catch (error) {
       setSlugError("Failed to validate slug");
     } finally {

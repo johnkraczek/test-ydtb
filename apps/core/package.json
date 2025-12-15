@@ -14,7 +14,9 @@
     "db:reset:force": "bun run scripts/reset-db.ts --force",
     "lint": "next lint",
     "env:validate": "bun -e \"import('./src/env').then(m => m.env)\"",
-    "env:generate": "bun scripts/generate-env-example.js"
+    "env:generate": "bun scripts/generate-env-example.js",
+    "stop": "pkill -f 'next dev' || true",
+    "restart": "bun run stop && bun run dev"
   },
   "dependencies": {
     "@radix-ui/react-slider": "^1.3.6",

@@ -184,7 +184,7 @@ export const invitation = createTable("invitations", {
         .notNull()
         .default('pending'),
     expiresAt: timestamp("expires_at").notNull(),
-    token: text("token").notNull().unique(),
+    token: text("token").unique(), // Let Better Auth manage this
     inviterId: text("inviter_id")
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),

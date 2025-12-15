@@ -3,13 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/server/auth";
-import { db } from "@/server/db";
-import { eq } from "drizzle-orm";
-import { workspaces } from "@/server/db/schema";
 import { requireAuth } from "@/server/auth-session";
 import type {
   CreateOrganizationBody
 } from "@/types/better-auth";
+import { randomBytes } from "crypto";
 
 export async function createWorkspace(data: {
   name: string;
@@ -122,7 +120,8 @@ export async function inviteUserToWorkspace(data: {
   email: string;
   role: "owner" | "admin" | "member";
 }) {
-  const session = await requireAuth();
+  // Auth is required to use better-auth client
+  await requireAuth();
 
   try {
     // Use better-auth's createInvitation method
@@ -140,6 +139,7 @@ export async function inviteUserToWorkspace(data: {
   } catch (error) {
     // Re-throw with more context
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Full invitation error:", error);
     throw new Error(`Failed to invite user to workspace: ${errorMessage}`);
   }
 }
@@ -148,12 +148,20 @@ export async function validateSlug(slug: string) {
   // Authentication is required to validate slugs
   await requireAuth();
 
-  // Check if slug is already taken
-  const existingWorkspace = await db.query.workspaces.findFirst({
-    where: eq(workspaces.slug, slug),
-  });
+  try {
+    // Use Better Auth's checkOrganizationSlug server method
+    const result = await auth.api.checkOrganizationSlug({
+      body: { slug },
+      headers: await headers(),
+    });
 
-  return !existingWorkspace;
+    // Better Auth returns { status: boolean }
+    return result.status;
+  } catch (error) {
+    // If checkSlug fails, assume slug is not available
+    console.error("Error checking slug availability:", error);
+    return false;
+  }
 }
 
 export async function acceptInvitation(token: string) {
