@@ -1,12 +1,15 @@
 #!/usr/bin/env bun
 
-import { db } from "../src/server/db";
-import { sql } from "drizzle-orm";
+import { exec } from "child_process";
+import { promisify } from "util";
+import fs from "fs/promises";
+import path from "path";
+
+const execAsync = promisify(exec);
 
 async function resetDatabase() {
-  // Check for --force and --restore flags
+  // Check for --force flag
   const forceFlag = process.argv.includes('--force');
-  const restoreFlag = process.argv.includes('--restore');
 
   if (!forceFlag) {
     console.log("⚠️  WARNING: This will drop all tables and reset the database!");
@@ -33,81 +36,63 @@ async function resetDatabase() {
   }
 
   try {
+    const DATABASE_URL = process.env.DATABASE_URL || "postgresql://postgres:1FwHvl2Y3wV5bopo@localhost:5432/ydtb";
+
+    // Step 1: Drop all tables
     console.log("\n🗑️  Dropping all tables...");
+    const dropTablesSQL = `
+      DO $$
+      DECLARE
+        r RECORD;
+      BEGIN
+        FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+          EXECUTE 'DROP TABLE IF EXISTS "' || r.tablename || '" CASCADE';
+        END LOOP;
+      END $$;
+    `;
 
-    // Get all table names from the database
-    const result = await db.execute(sql`
-      SELECT table_name
-      FROM information_schema.tables
-      WHERE table_schema = 'public'
-      AND table_type = 'BASE TABLE'
-    `);
+    // Write SQL to temp file
+    const tempFile = path.join(process.cwd(), "scripts", "backup", "temp-drop.sql");
+    await fs.writeFile(tempFile, dropTablesSQL, "utf-8");
 
-    const tables = result.map((row: any) => row.table_name as string);
+    // Execute the SQL
+    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${DATABASE_URL}" < "${tempFile}"`);
 
-    if (tables.length === 0) {
-      console.log("ℹ️  No tables found to drop.");
-    } else {
-      // Disable foreign key constraints temporarily
-      await db.execute(sql`SET session_replication_role = replica;`);
+    // Clean up temp file
+    await fs.unlink(tempFile);
 
-      // Drop each table
-      for (const table of tables) {
-        try {
-          await db.execute(sql.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`));
-          console.log(`✅ Dropped table: ${table}`);
-        } catch (error) {
-          console.log(`⚠️  Table ${table} may not exist or already dropped`);
-        }
+    console.log("✅ All tables dropped successfully!");
+
+    // Step 2: Check if reset.sql exists
+    const resetPath = path.join(process.cwd(), "scripts", "backup", "reset.sql");
+
+    try {
+      await fs.access(resetPath);
+    } catch (error) {
+      console.error("\n❌ Error: reset.sql file not found!");
+      console.error("Please copy one of the database-*.sql files to reset.sql first.");
+      console.log("\nAvailable backups:");
+
+      // List available backups
+      const backupDir = path.join(process.cwd(), "scripts", "backup");
+      const files = await fs.readdir(backupDir);
+      const backups = files.filter(f => f.startsWith('database-') && f.endsWith('.sql'));
+
+      if (backups.length === 0) {
+        console.log("   No backups found. Run 'bun run db:backup' first.");
+      } else {
+        backups.forEach(file => console.log(`   - ${file}`));
+        console.log("\nExample: cp database-2025-12-15T15-30-00.sql reset.sql");
       }
-
-      // Re-enable foreign key constraints
-      await db.execute(sql`SET session_replication_role = DEFAULT;`);
-
-      console.log("\n✨ All tables dropped successfully!");
+      process.exit(1);
     }
 
-    // Run drizzle-kit push
-    console.log("\n🔄 Running drizzle-kit push to recreate tables...");
-    const { spawn } = await import("child_process");
+    // Step 3: Restore from reset.sql
+    console.log("\n📂 Restoring database from reset.sql...");
+    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${DATABASE_URL}" < "${resetPath}"`);
+    console.log("✅ Database restored successfully!");
 
-    await new Promise((resolve, reject) => {
-      const pushProcess = spawn("bun", ["run", "drizzle-kit", "push"], {
-        stdio: "inherit",
-        cwd: process.cwd()
-      });
-
-      pushProcess.on("close", (code) => {
-        if (code === 0) {
-          console.log("✅ Database schema recreated successfully!");
-          resolve(null);
-        } else {
-          reject(new Error(`Drizzle push failed with code ${code}`));
-        }
-      });
-    });
-
-    // Check if we should restore from backup
-    if (restoreFlag) {
-      console.log("\n📂 Restoring database from backup...");
-      await restoreFromBackup();
-    } else {
-      console.log("\n🌱 Seeding database from reset.sql...");
-      await seedFromResetScript();
-    }
-
-    if (restoreFlag) {
-      console.log("\n🎉 Database restore complete!");
-      console.log("\n📝 Restored data includes:");
-      console.log("   - All users");
-      console.log("   - All accounts and passwords");
-      console.log("   - All workspaces");
-      console.log("   - All workspace memberships");
-      console.log("   - All active sessions");
-    } else {
-      console.log("\n🎉 Database reset and seeding complete!");
-      console.log("\n📝 Database seeded from scripts/backup/reset.sql");
-    }
+    console.log("\n🎉 Database reset and restore complete!");
 
   } catch (error) {
     console.error("\n❌ Error resetting database:", error);
@@ -115,159 +100,15 @@ async function resetDatabase() {
   }
 }
 
-async function seedDatabase() {
-  try {
-    console.log("📝 Seeding database with initial data...");
-
-    // Insert user
-    await db.execute(sql`
-      INSERT INTO ydtb_users (id, name, email, email_verified, two_factor_enabled, created_at, updated_at)
-      VALUES (
-        'Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n',
-        'John Kraczek',
-        'john@kraczek.com',
-        false,
-        false,
-        '2025-12-14T05:17:23.913Z',
-        '2025-12-14T05:17:23.913Z'
-      )
-    `);
-    console.log("   ✅ Inserted user");
-
-    // Insert account with password
-    await db.execute(sql`
-      INSERT INTO ydtb_accounts (id, user_id, provider_id, account_id, password, created_at, updated_at)
-      VALUES (
-        'EdftQ5DJ9IGsDvPs2bOqoCrth32ZIaIG',
-        'Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n',
-        'credential',
-        'Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n',
-        'c45e860a7f6fb2033b51794f8db50b39:dbae3752ef6ef995bbf752993df073c7e5f99a898823b32bfabd1fa79c7822c6874ae9358a5754edb540f92ee97790e05477b7e64ebd91f0f849faf29739ef1d',
-        '2025-12-14T05:17:23.927Z',
-        '2025-12-14T05:17:23.927Z'
-      )
-    `);
-    console.log("   ✅ Inserted account with password");
-
-    console.log("✅ Database seeded with initial data");
-  } catch (error) {
-    console.error("❌ Error seeding database:", error);
-    throw error;
-  }
-}
-
-async function seedFromResetScript() {
-  try {
-    const fs = await import("fs/promises");
-    const path = await import("path");
-
-    // Check if the reset script exists
-    const resetPath = path.join(process.cwd(), "scripts", "backup", "reset.sql");
-    console.log(resetPath);
-
-    try {
-      await fs.access(resetPath);
-    } catch (error) {
-      console.error("\n❌ Error: reset.sql file not found!");
-      console.error("Please run 'bun run scripts/simple-backup.ts' first to create the reset script.");
-      process.exit(1);
-    }
-
-    // Read and execute the reset script
-    const resetScript = await fs.readFile(resetPath, "utf-8");
-
-    // Split the script by semicolons and execute each statement
-    const statements = resetScript
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s && !s.startsWith('--') && !s.startsWith('/*'));
-
-    for (const statement of statements) {
-      if (statement) {
-        try {
-          await db.execute(sql.raw(statement + ';'));
-        } catch (error) {
-          // Ignore errors on empty statements and certain patterns
-          if (statement.trim()) {
-            // Only log errors for statements that look like actual SQL
-            if (statement.toUpperCase().includes('INSERT') ||
-                statement.toUpperCase().includes('UPDATE') ||
-                statement.toUpperCase().includes('DELETE')) {
-              console.error(`Error executing statement: ${statement.substring(0, 50)}...`);
-            }
-          }
-        }
-      }
-    }
-
-    console.log("   ✅ Database seeded from reset.sql");
-  } catch (error) {
-    console.error("❌ Error seeding from reset script:", error);
-    throw error;
-  }
-}
-
-async function restoreFromBackup() {
-  try {
-    const fs = await import("fs/promises");
-    const path = await import("path");
-
-    // Check if the restore file exists
-    const restorePath = path.join(process.cwd(), "scripts", "backup", "database-restore.sql");
-
-    try {
-      await fs.access(restorePath);
-    } catch (error) {
-      console.error("\n❌ Error: database-restore.sql file not found!");
-      console.error("Please run 'bun run scripts/simple-backup.ts' first to create the backup.");
-      process.exit(1);
-    }
-
-    // Read and execute the restore script
-    const restoreScript = await fs.readFile(restorePath, "utf-8");
-
-    // Split the script by semicolons and execute each statement
-    const statements = restoreScript
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s && !s.startsWith('--') && !s.startsWith('/*'));
-
-    for (const statement of statements) {
-      if (statement) {
-        try {
-          await db.execute(sql.raw(statement + ';'));
-        } catch (error) {
-          // Ignore errors on SET statements and empty statements
-          if (!statement.toUpperCase().includes('SET ') &&
-            !statement.toUpperCase().includes('BEGIN') &&
-            !statement.toUpperCase().includes('COMMIT')) {
-            throw error;
-          }
-        }
-      }
-    }
-
-    console.log("   ✅ Database restored from backup");
-  } catch (error) {
-    console.error("❌ Error restoring from backup:", error);
-    throw error;
-  }
-}
-
 // Export command for drizzle-kit studio
 console.log(`
-📤 To export data from drizzle-kit studio, run:
-   1. Open Drizzle Studio: bun run drizzle-kit studio
-   2. Go to your database
-   3. Select all tables you want to export
-   4. Click Export → SQL
-   5. Save the SQL file
+💾 To create a backup: bun run db:backup
+🔄 To reset database: bun run db:reset:force
 
-📋 After exporting, update the seedDatabase() function in this script with the INSERT statements.
-
-💾 To create a backup: bun run scripts/simple-backup.ts
-🔄 To reset database (using reset.sql): bun run scripts/reset-db.ts --force
-📂 To restore from full backup: bun run scripts/reset-db.ts --force --restore
+📝 Usage:
+  1. Create backup: bun run db:backup
+  2. Set restore point: cp database-<timestamp>.sql reset.sql
+  3. Reset database: bun run db:reset:force
 `);
 
 // Run the reset
