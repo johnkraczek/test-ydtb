@@ -220,7 +220,8 @@ function createRestoreScript(backup: any): string {
 
 function createResetScript(backup: any): string {
   let sql = "-- Database reset/seed script created at " + new Date().toISOString() + "\n";
-  sql += "-- This script contains the initial seed data for the database\n\n";
+  sql += "-- This script contains the initial seed data for the database\n";
+  sql += "-- Note: Sessions are excluded from reset as they are temporary\n\n";
 
   // Restore users
   if (backup.tables.users && backup.tables.users.length > 0) {
@@ -282,26 +283,8 @@ function createResetScript(backup: any): string {
     sql += "\n";
   }
 
-  // Restore sessions
-  if (backup.tables.sessions && backup.tables.sessions.length > 0) {
-    sql += "-- Seed sessions\n";
-    backup.tables.sessions.forEach((sess: any) => {
-      const values = [
-        `'${sess.id}'`,
-        `'${sess.userId}'`,
-        `'${sess.token || ''}'`,
-        `'${sess.expiresAt.toISOString()}'`,
-        sess.user ? `'${JSON.stringify(sess.user).replace(/'/g, "''")}'` : 'NULL',
-        sess.ipAddress ? `'${sess.ipAddress}'` : 'NULL',
-        sess.userAgent ? `'${sess.userAgent.replace(/'/g, "''")}'` : 'NULL',
-        sess.activeOrganizationId ? `'${sess.activeOrganizationId}'` : 'NULL',
-        `'${sess.createdAt.toISOString()}'`,
-        `'${sess.updatedAt.toISOString()}'`
-      ];
-      sql += `INSERT INTO ydtb_sessions (id, userId, token, expiresAt, user, ipAddress, userAgent, activeOrganizationId, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
-    });
-    sql += "\n";
-  }
+  // Note: Sessions are excluded from reset script as they are temporary
+  // Users will need to log in again after reset
 
   // Restore workspace members
   if (backup.tables.workspaceMembers && backup.tables.workspaceMembers.length > 0) {

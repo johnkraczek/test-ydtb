@@ -163,6 +163,7 @@ async function seedFromResetScript() {
 
     // Check if the reset script exists
     const resetPath = path.join(process.cwd(), "scripts", "backup", "reset.sql");
+    console.log(resetPath);
 
     try {
       await fs.access(resetPath);
@@ -186,9 +187,14 @@ async function seedFromResetScript() {
         try {
           await db.execute(sql.raw(statement + ';'));
         } catch (error) {
-          // Ignore errors on empty statements
+          // Ignore errors on empty statements and certain patterns
           if (statement.trim()) {
-            console.error(`Error executing statement: ${statement.substring(0, 50)}...`);
+            // Only log errors for statements that look like actual SQL
+            if (statement.toUpperCase().includes('INSERT') ||
+                statement.toUpperCase().includes('UPDATE') ||
+                statement.toUpperCase().includes('DELETE')) {
+              console.error(`Error executing statement: ${statement.substring(0, 50)}...`);
+            }
           }
         }
       }
@@ -233,8 +239,8 @@ async function restoreFromBackup() {
         } catch (error) {
           // Ignore errors on SET statements and empty statements
           if (!statement.toUpperCase().includes('SET ') &&
-              !statement.toUpperCase().includes('BEGIN') &&
-              !statement.toUpperCase().includes('COMMIT')) {
+            !statement.toUpperCase().includes('BEGIN') &&
+            !statement.toUpperCase().includes('COMMIT')) {
             throw error;
           }
         }
