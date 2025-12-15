@@ -6,7 +6,7 @@ import { organization } from "better-auth/plugins";
 import { emailOTP } from "better-auth/plugins";
 import { env } from "@/env";
 import { db } from "@/server/db";
-import { user, session, account, verification, passkey as passkeyTable, workspaces, workspaceMembers } from "@/server/db/schema";
+import { user, session, account, verification, passkey as passkeyTable, workspaces, workspaceMembers, invitation } from "@/server/db/schema";
 import { sendVerificationOTP } from "./auth/email-sender";
 import { eq } from "drizzle-orm";
 
@@ -23,6 +23,7 @@ export const auth = betterAuth({
       passkey: passkeyTable,
       organization: workspaces,
       member: workspaceMembers,
+      invitation,
     },
   }),
   emailAndPassword: {

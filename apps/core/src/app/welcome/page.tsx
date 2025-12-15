@@ -24,7 +24,6 @@ export default async function WelcomePage() {
       redirect('/');
     }
   } catch (error) {
-    console.error("Failed to check user organizations:", error);
     // Continue to onboarding if we can't check organizations
   }
 

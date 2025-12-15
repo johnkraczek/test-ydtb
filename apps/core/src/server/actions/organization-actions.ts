@@ -50,7 +50,6 @@ export async function getActiveOrganization(): Promise<Organization | null> {
       updatedAt: orgData.updatedAt || new Date(),
     } as Organization;
   } catch (error) {
-    console.error("Failed to fetch active organization:", error);
     return null;
   }
 }
@@ -62,7 +61,6 @@ export async function listOrganizations(): Promise<Organization[]> {
     });
     return data as Organization[] || [];
   } catch (error) {
-    console.error("Failed to fetch organizations:", error);
     return [];
   }
 }
@@ -76,7 +74,6 @@ export async function setActiveOrganization(organizationId: string) {
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    console.error("Failed to set active organization:", error);
     throw error;
   }
 }
@@ -99,7 +96,6 @@ export async function createOrganization(data: {
     revalidatePath("/");
     return result || null;
   } catch (error) {
-    console.error("Failed to create organization:", error);
     throw error;
   }
 }
@@ -112,7 +108,6 @@ export async function getOrganizationMembers(organizationId: string) {
     });
     return data?.members || [];
   } catch (error) {
-    console.error("Failed to fetch organization members:", error);
     return [];
   }
 }
@@ -130,7 +125,6 @@ export async function inviteUser(data: {
     revalidatePath(`/workspaces/${data.organizationId}/members`);
     return result;
   } catch (error) {
-    console.error("Failed to invite user:", error);
     throw error;
   }
 }

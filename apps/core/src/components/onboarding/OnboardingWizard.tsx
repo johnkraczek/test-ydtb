@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 // Import server actions
 import { createWorkspace, validateSlug } from "@/server/actions/workspace";
@@ -85,8 +86,9 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
 
           const workspace = await createWorkspace(workspaceData);
 
-          console.log(`Workspace "${workspace.name}" created successfully!`);
-          alert(`Workspace "${workspace.name}" created successfully!`);
+          toast.success(`Workspace "${workspace.name}" created successfully!`, {
+            description: "Your workspace is ready to use",
+          });
 
           // Switch to the new workspace
           await import("@/server/actions/workspace").then(({ switchWorkspace }) => {
@@ -99,8 +101,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             router.push("/");
           }
         } catch (error) {
-          console.error("Failed to create workspace:", error);
-          alert(error instanceof Error ? error.message : "Failed to create workspace. Please try again.");
+          toast.error(error instanceof Error ? error.message : "Failed to create workspace. Please try again.");
         }
       });
     }
@@ -128,7 +129,6 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
       const isValid = await validateSlug(slug);
       setSlugError(isValid ? "" : "URL slug is already taken");
     } catch (error) {
-      console.error("Failed to validate slug:", error);
       setSlugError("Failed to validate slug");
     } finally {
       setIsValidatingSlug(false);

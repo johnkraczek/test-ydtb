@@ -23,22 +23,7 @@ export async function createWorkspace(data: {
     message?: string;
   }>;
 }) {
-  console.log("[createWorkspace] Starting workspace creation with data:", {
-    name: data.name,
-    slug: data.slug,
-    hasDescription: !!data.description,
-    hasMetadata: !!data.metadata,
-    hasLogo: !!data.logo,
-    memberCount: data.members?.length || 0
-  });
-
-  const session = await requireAuth();
-
-  console.log("[createWorkspace] Authenticated session:", {
-    userId: session.user.id,
-    userEmail: session.user.email,
-    userName: session.user.name
-  });
+  await requireAuth();
 
   try {
     // Use better-auth's createOrganization method
@@ -52,43 +37,18 @@ export async function createWorkspace(data: {
       },
     };
 
-    console.log("[createWorkspace] Calling createOrganization with:", {
-      body: orgBody
-    });
-
     const workspace = await auth.api.createOrganization({
       body: orgBody,
       headers: await headers(),
     });
 
-    console.log("[createWorkspace] createOrganization response:", {
-      success: !!workspace,
-      hasId: !!workspace?.id,
-      workspaceId: workspace?.id,
-      workspace: workspace
-    });
-
     if (!workspace || !workspace.id) {
-      console.error("[createWorkspace] Invalid workspace response:", workspace);
       throw new Error("Failed to create workspace - invalid response from createOrganization");
     }
 
     revalidatePath("/");
     return workspace;
   } catch (error) {
-    console.error("[createWorkspace] Error details:", {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      // Access properties safely
-      status: (error as any)?.status,
-      statusCode: (error as any)?.statusCode,
-      body: (error as any)?.body,
-      headers: (error as any)?.headers,
-      name: (error as any)?.name,
-      constructor: error?.constructor?.name
-    });
-
     // Re-throw with more context
     const errorStatus = (error as any)?.status || (error as any)?.statusCode;
     if (errorStatus === 'UNAUTHORIZED' || errorStatus === 401) {
@@ -117,7 +77,6 @@ export async function getUserWorkspaces() {
 
     return organizations || [];
   } catch (error) {
-    console.error("Failed to fetch user workspaces:", error);
     return [];
   }
 }
@@ -132,8 +91,6 @@ export async function switchWorkspace(workspaceId: string) {
   }
 
   try {
-    console.log("[switchWorkspace] Attempting to switch to workspace:", workspaceId);
-
     // Use better-auth's setActiveOrganization method
     await auth.api.setActiveOrganization({
       body: {
@@ -142,15 +99,8 @@ export async function switchWorkspace(workspaceId: string) {
       headers: await headers(),
     });
 
-    console.log("[switchWorkspace] Successfully switched to workspace:", workspaceId);
     revalidatePath("/");
   } catch (error) {
-    console.error("[switchWorkspace] Failed to switch workspace:", {
-      error,
-      workspaceId,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    });
     throw new Error(`Failed to switch workspace: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -175,7 +125,6 @@ export async function getWorkspaceMembers(workspaceId: string) {
 
     return members?.members || [];
   } catch (error) {
-    console.error("Failed to fetch workspace members:", error);
     return [];
   }
 }
@@ -207,7 +156,6 @@ export async function inviteUserToWorkspace(data: {
     revalidatePath(`/workspaces/${data.workspaceId}/members`);
     return result;
   } catch (error) {
-    console.error("Failed to invite user:", error);
     throw new Error("Failed to invite user to workspace");
   }
 }
@@ -243,7 +191,6 @@ export async function acceptInvitation(token: string) {
     revalidatePath("/");
     return result;
   } catch (error) {
-    console.error("Failed to accept invitation:", error);
     throw new Error("Invalid or expired invitation");
   }
 }
@@ -265,7 +212,6 @@ export async function getPendingInvitations() {
 
     return invitations || [];
   } catch (error) {
-    console.error("Failed to fetch pending invitations:", error);
     return [];
   }
 }
