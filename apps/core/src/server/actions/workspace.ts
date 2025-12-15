@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/server/auth";
 import { requireAuth } from "@/server/auth-session";
+import { db } from "@/server/db";
+import { eq } from "drizzle-orm";
+import { user } from "@/server/db/schema";
 import type {
   CreateOrganizationBody
 } from "@/types/better-auth";
@@ -202,29 +205,54 @@ export async function getPendingInvitations() {
       invite.status === 'pending'
     ) || [];
 
-    // Map to our expected format
-    const formattedInvites = pendingInvites.map((invite: any) => ({
-      id: invite.id,
-      email: invite.email,
-      organizationId: invite.organizationId,
-      role: invite.role || 'member',
-      status: invite.status || 'pending',
-      expiresAt: invite.expiresAt || new Date(),
-      inviterId: invite.inviterId || '',
-      createdAt: invite.createdAt || new Date(),
-      organization: invite.organization ? {
-        id: invite.organization.id,
-        name: invite.organization.name || 'Unknown Workspace',
-        slug: invite.organization.slug || 'unknown',
-      } : undefined,
-      inviter: invite.inviter ? {
-        id: invite.inviter.id,
-        name: invite.inviter.name || 'Someone',
-        email: invite.inviter.email || '',
-      } : null,
-    }));
+    // Get user details for the inviter
+    const invitesWithInviter = await Promise.all(
+      pendingInvites.map(async (invite: any) => {
+        let inviter = null;
 
-    return formattedInvites;
+        // Fetch inviter details if we have an inviterId
+        if (invite.inviterId) {
+          try {
+            // Get inviter from database
+            const inviterRecord = await db
+              .select({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+              })
+              .from(user)
+              .where(eq(user.id, invite.inviterId))
+              .limit(1);
+
+            if (inviterRecord.length > 0) {
+              inviter = inviterRecord[0];
+            }
+          } catch (error) {
+            // If we can't fetch inviter details, leave as null
+            inviter = null;
+          }
+        }
+
+        return {
+          id: invite.id,
+          email: invite.email,
+          organizationId: invite.organizationId,
+          role: invite.role || 'member',
+          status: invite.status || 'pending',
+          expiresAt: invite.expiresAt || new Date(),
+          inviterId: invite.inviterId || '',
+          createdAt: invite.createdAt || new Date(),
+          organization: {
+            id: invite.organizationId,
+            name: invite.organizationName || 'Unknown Workspace',
+            slug: invite.organizationId, // Using organizationId as slug since it's not provided
+          },
+          inviter,
+        };
+      })
+    );
+
+    return invitesWithInviter;
   } catch (error) {
     return [];
   }
