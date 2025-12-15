@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { getUserWorkspaces } from "@/server/actions/workspace";

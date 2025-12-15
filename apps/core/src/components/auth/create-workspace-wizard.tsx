@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/auth-client";
 import { createWorkspace, validateSlug } from "@/server/actions/workspace";
 import Cropper from "react-easy-crop";
 import { Button } from "@/components/ui/button";
@@ -11,16 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
     Check,
-    X,
     ChevronRight,
     ChevronLeft,
     Upload,
@@ -28,9 +26,6 @@ import {
     Users,
     Briefcase,
     User,
-    MapPin,
-    MoreHorizontal,
-    Mail,
     Trash2,
     Plus,
     LayoutDashboard,
@@ -62,8 +57,6 @@ import {
     Truck,
     Wifi,
     Target,
-    Circle,
-    CircleDot,
     Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -71,7 +64,15 @@ import { WORKSPACE_WIZARD_ERRORS } from "@/lib/constants/workspace-wizard";
 
 // Types
 type WorkspaceType = "Company" | "Team" | "Project" | "Personal" | "Location" | "Other";
-type Role = "admin" | "member" | "guest";
+type Role = "admin" | "member" | "guest"; // UI role type
+
+type Tool = {
+    id: string;
+    name: string;
+    description: string;
+    icon: any;
+    disabled?: boolean;
+};
 
 interface TeamMember {
     id: string;
@@ -104,12 +105,6 @@ interface CropArea {
 }
 
 interface CreateWorkspaceWizardProps {
-    user?: {
-        id: string;
-        name?: string | null;
-        email: string;
-    };
-    invitations?: any[];
     onSuccess?: () => void;
 }
 
@@ -215,8 +210,7 @@ const colors = [
     { name: "gray", bg: "bg-gray-500", light: "bg-gray-100", text: "text-gray-600" },
 ];
 
-export default function CreateWorkspaceWizard({ user, invitations = [], onSuccess }: CreateWorkspaceWizardProps) {
-    const { data: session } = useSession();
+export default function CreateWorkspaceWizard({ onSuccess }: CreateWorkspaceWizardProps) {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -313,7 +307,7 @@ export default function CreateWorkspaceWizard({ user, invitations = [], onSucces
     };
 
     // Handle crop complete
-    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: CropArea) => {
+    const onCropComplete = useCallback((croppedAreaPixels: CropArea) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
@@ -473,7 +467,7 @@ export default function CreateWorkspaceWizard({ user, invitations = [], onSucces
                 .filter(member => member.email.trim())
                 .map(member => ({
                     email: member.email.trim(),
-                    role: member.role as "admin" | "member" | "guest",
+                    role: member.role === "guest" ? "member" : member.role as "admin" | "member",
                     message: member.message,
                 }));
 
@@ -1007,7 +1001,7 @@ function Step4Tools({
     onToggleTool,
 }: {
     selectedTools: string[];
-    availableTools: typeof availableTools;
+    availableTools: Tool[];
     onToggleTool: (toolId: string) => void;
 }) {
     const [searchTerm, setSearchTerm] = useState("");

@@ -53,11 +53,20 @@ A checklist of specific, measurable accomplishments:
 Step-by-step instructions for implementation:
 1. **Preparation steps** - setup, configuration, dependencies
 2. **Core implementation** - main work broken into logical steps
-3. **Integration work** - connecting with existing systems
-4. **Testing and validation** - how to test the implementation
-5. **Cleanup and documentation** - final touches
+3. **Build Verification** - After each major implementation step, run `bun run build` to catch errors early
+4. **Integration work** - connecting with existing systems
+5. **Testing and validation** - how to test the implementation
+6. **Final build and cleanup** - ensure everything builds successfully, documentation updates
 
 **Important**: Write instructions, not code. Use minimal code snippets only when they clearly communicate a pattern or implementation detail better than words can.
+
+**Build Requirements**:
+- Always run `bun run build` after completing each major task section
+- Fix any build errors before proceeding to the next section
+- This ensures early detection of issues and maintains code stability throughout development
+- **ALL errors must be resolved** each time we build the software - do not proceed with any errors
+- If the software built previously and then fails after a change, **FIRST look at what was just changed** - use git diff or review recent changes to identify the cause
+- Build errors are blocking issues that must be fixed immediately before continuing
 
 #### **Files to Create/Update**
 A specific list of files developers will work on:
@@ -121,6 +130,7 @@ Only for integration with external systems:
 
 #### **Validation Checklist**
 Specific steps to verify the implementation:
+- [ ] Build passes with `bun run build` after each major section
 - [ ] Manual testing checklist
 - [ ] Automated tests passing
 - [ ] No console errors
@@ -163,6 +173,22 @@ Related Work:
 - **Consider edge cases**: Note special conditions or error scenarios
 - **Plan for testing**: Include test scenarios and validation criteria
 - **Document decisions**: Explain why certain approaches are recommended
+
+### Error Resolution and Debugging Guidelines
+
+When creating plans, emphasize these error resolution practices:
+
+- **Zero Error Tolerance**: All build errors must be resolved before proceeding - never continue with errors
+- **Change-First Debugging**: When builds fail after making changes, immediately review what was just changed:
+  - Use `git diff` to see recent modifications
+  - Check files that were just created or modified
+  - Review recent additions to imports, exports, or function signatures
+- **Incremental Building**: Build after each logical unit of work to isolate issues quickly
+- **Systematic Approach**:
+  1. Build fails → Stop all other work
+  2. Review recent changes → Identify the likely cause
+  3. Fix the issue → Verify with another build
+  4. Only then proceed to the next task
 
 ### 5. Continuing Planning
 

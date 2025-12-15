@@ -15,7 +15,7 @@ export async function createWorkspace(data: {
   logo?: string;
   members?: Array<{
     email: string;
-    role: "admin" | "member" | "guest";
+    role: "owner" | "admin" | "member" | "guest";
     message?: string;
   }>;
 }) {
@@ -41,6 +41,10 @@ export async function createWorkspace(data: {
       } as any,
     });
 
+    if (!workspace) {
+      throw new Error("Failed to create workspace");
+    }
+
     // Send invitations to team members
     if (data.members && data.members.length > 0) {
       const { sendWorkspaceInvitation } = await import("@/server/auth/email-sender");
@@ -48,12 +52,15 @@ export async function createWorkspace(data: {
       for (const member of data.members) {
         if (member.email) {
           try {
+            // Convert guest role to member for Better Auth
+            const role: "owner" | "admin" | "member" = member.role === "guest" ? "member" : member.role as "owner" | "admin" | "member";
+
             // Create invitation through Better Auth
             const invitation = await auth.api.createInvitation({
               body: {
                 email: member.email,
-                role: member.role,
-                organizationId: workspace.data?.id || workspace.id,
+                role,
+                organizationId: workspace.id,
               },
               headers: await headers(),
             });
@@ -65,7 +72,7 @@ export async function createWorkspace(data: {
               invitedByEmail: session.user.email,
               workspaceName: data.name,
               workspaceSlug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
-              invitationToken: invitation.data?.id || invitation.id,
+              invitationToken: invitation.id,
               message: member.message,
             });
           } catch (inviteError) {
@@ -217,7 +224,7 @@ export async function acceptInvitation(token: string) {
   // Use Better Auth's acceptInvitation method
   try {
     const result = await auth.api.acceptInvitation({
-      body: { token },
+      body: { invitationId: token },
       headers: await headers(),
     });
 

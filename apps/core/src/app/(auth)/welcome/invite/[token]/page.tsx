@@ -5,7 +5,7 @@ import { getUserWorkspaces, acceptInvitation } from "@/server/actions/workspace"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Users, Check, AlertCircle, ArrowLeft } from "lucide-react";
+import { Check, AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -39,10 +39,11 @@ export default async function InvitationPage({ params }: Props) {
   let workspaceName = "";
 
   try {
-    const result = await acceptInvitation(params.token);
+    await acceptInvitation(params.token);
     success = true;
-    // The result should contain workspace information
-    workspaceName = result?.data?.organization?.name || result?.organization?.name || "the workspace";
+    // The result might contain workspace information, but we need to fetch it separately
+    // For now, just use a generic message
+    workspaceName = "the workspace";
   } catch (err) {
     console.error("Failed to accept invitation:", err);
     error = err instanceof Error ? err.message : "Invalid or expired invitation";

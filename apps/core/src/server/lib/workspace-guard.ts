@@ -67,5 +67,5 @@ export default async function ProtectedRoute({
     redirect(redirectTo);
   }
 
-  return <>{children}</>;
+  return children;
 }

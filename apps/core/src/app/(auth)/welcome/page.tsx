@@ -90,8 +90,6 @@ export default async function WelcomePage() {
 
         {/* Create Workspace Wizard */}
         <CreateWorkspaceWizard
-          user={session.user}
-          invitations={invitations}
           onSuccess={() => redirect("/")}
         />
       </div>
