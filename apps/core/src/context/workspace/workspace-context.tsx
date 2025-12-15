@@ -9,7 +9,12 @@ interface WorkspaceContextType {
   isLoading: boolean;
   switchWorkspace: (workspaceId: string) => Promise<void>;
   refreshWorkspaces: () => void;
-  createWorkspace: (data: { name: string; slug?: string; description?: string }) => Promise<void>;
+  createWorkspace: (data: {
+    name: string;
+    slug?: string;
+    description?: string;
+    metadata?: Record<string, any>;
+  }) => Promise<any>;
 }
 
 export const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);

@@ -43,7 +43,8 @@ export function WorkspaceProvider({ children }: Props) {
   const createWorkspace = useCallback(async (data: {
     name: string;
     slug?: string;
-    description?: string
+    description?: string;
+    metadata?: Record<string, any>;
   }) => {
     try {
       const result = await createOrgMutation.mutateAsync({
@@ -51,6 +52,7 @@ export function WorkspaceProvider({ children }: Props) {
         slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
         metadata: {
           description: data.description,
+          ...data.metadata,
         },
       });
 
@@ -61,7 +63,8 @@ export function WorkspaceProvider({ children }: Props) {
         await switchWorkspace(result.id);
       }
 
-      router.push("/");
+      // Return the created workspace
+      return result;
     } catch (error) {
       console.error("Failed to create workspace:", error);
       throw error;

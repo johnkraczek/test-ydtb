@@ -9,7 +9,10 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 // Import server actions
-import { createWorkspace, validateSlug } from "@/server/actions/workspace";
+import { validateSlug, inviteUserToWorkspace } from "@/server/actions/workspace";
+
+// Import client-side workspace context
+import { useWorkspace } from "@/context/workspace/workspace-context";
 
 // Import all onboarding components
 import {
@@ -29,6 +32,7 @@ interface OnboardingWizardProps {
 
 export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const router = useRouter();
+  const { createWorkspace: createWorkspaceInContext } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<WorkspaceData>({
@@ -62,12 +66,11 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
       // Create workspace
       startTransition(async () => {
         try {
-          // Prepare the data for the server action
-          const workspaceData = {
+          // Use the context's createWorkspace function which handles all the side effects
+          const workspace = await createWorkspaceInContext({
             name: formData.name,
             slug: formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
             description: formData.description,
-            logo: formData.iconType === "image" ? formData.icon : undefined,
             metadata: {
               type: formData.type,
               customType: formData.customType,
@@ -77,22 +80,28 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               iconColor: formData.iconColor,
               backgroundColor: formData.backgroundColor,
             },
-            members: formData.members.map(member => ({
-              email: member.email,
-              role: member.role as "owner" | "admin" | "member" | "guest",
-              message: member.message,
-            })),
-          };
-
-          const workspace = await createWorkspace(workspaceData);
-
-          toast.success(`Workspace "${workspace.name}" created successfully!`, {
-            description: "Your workspace is ready to use",
           });
 
-          // Switch to the new workspace
-          await import("@/server/actions/workspace").then(({ switchWorkspace }) => {
-            return switchWorkspace(workspace.id);
+          // Send invitations to team members
+          if (formData.members && formData.members.length > 0) {
+            for (const member of formData.members) {
+              try {
+                await inviteUserToWorkspace({
+                  workspaceId: workspace.id,
+                  email: member.email,
+                  role: member.role as "owner" | "admin" | "member",
+                });
+              } catch (inviteError) {
+                // Log error but continue with other invitations
+                toast.error(`Failed to invite ${member.email}: ${inviteError instanceof Error ? inviteError.message : 'Unknown error'}`);
+              }
+            }
+          }
+
+          toast.success(`Workspace "${formData.name}" created successfully!`, {
+            description: formData.members.length > 0
+              ? `Workspace ready. ${formData.members.length} invitation${formData.members.length > 1 ? 's' : ''} sent.`
+              : "Your workspace is ready to use",
           });
 
           if (onComplete) {
