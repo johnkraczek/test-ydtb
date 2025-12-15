@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { eq, and, gt } from "drizzle-orm";
-import { workspaces, workspaceInvitations } from "@/server/db/schema";
+import { workspaces, workspaceInvitations, workspaceMembers } from "@/server/db/schema";
 
 export async function createWorkspace(data: {
   name: string;
@@ -101,12 +101,22 @@ export async function getUserWorkspaces() {
   }
 
   try {
-    // Use better-auth's listOrganizations method
-    const workspaces = await auth.api.listOrganizations({
-      headers: await headers(),
+    // Query workspaces through workspaceMembers
+    const memberships = await db.query.workspaceMembers.findMany({
+      where: eq(workspaceMembers.userId, session.user.id),
+      with: {
+        workspace: {
+          columns: {
+            id: true,
+            name: true,
+            slug: true,
+            logo: true,
+          },
+        },
+      },
     });
 
-    return workspaces;
+    return memberships.map(m => m.workspace).filter(Boolean);
   } catch (error) {
     console.error("Failed to fetch workspaces:", error);
     return [];
