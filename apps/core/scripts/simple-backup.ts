@@ -46,7 +46,8 @@ async function createBackup() {
     console.log(`✓ Backed up ${invitations.length} invitations`);
 
     // Write backup to JSON file
-    const backupPath = path.join(process.cwd(), "database-backup.json");
+    const backupDir = path.join(process.cwd(), "scripts", "backup");
+    const backupPath = path.join(backupDir, "database-backup.json");
     await fs.writeFile(backupPath, JSON.stringify(backup, null, 2), "utf-8");
 
     console.log("\n✅ Database backup created successfully!");
@@ -58,10 +59,17 @@ async function createBackup() {
 
     // Also create an SQL restore script
     const sqlScript = createRestoreScript(backup);
-    const sqlPath = path.join(process.cwd(), "database-restore.sql");
+    const sqlPath = path.join(backupDir, "database-restore.sql");
     await fs.writeFile(sqlPath, sqlScript, "utf-8");
 
     console.log(`📍 SQL restore script: ${sqlPath}`);
+
+    // Create the reset.sql file for the reset script to use
+    const resetScript = createResetScript(backup);
+    const resetPath = path.join(backupDir, "reset.sql");
+    await fs.writeFile(resetPath, resetScript, "utf-8");
+
+    console.log(`📍 Reset SQL script: ${resetPath}`);
 
   } catch (error) {
     console.error("\n❌ Error creating backup:", error);
@@ -202,6 +210,130 @@ function createRestoreScript(backup: any): string {
   }
 
   sql += "\nCOMMIT;\n";
+
+  return sql;
+}
+
+function createResetScript(backup: any): string {
+  let sql = "-- Database reset/seed script created at " + new Date().toISOString() + "\n";
+  sql += "-- This script contains the initial seed data for the database\n\n";
+
+  // Restore users
+  if (backup.tables.users && backup.tables.users.length > 0) {
+    sql += "-- Seed users\n";
+    backup.tables.users.forEach((user: any) => {
+      const values = [
+        `'${user.id}'`,
+        `'${user.name?.replace(/'/g, "''") || ''}'`,
+        `'${user.email}'`,
+        user.emailVerified ? `'${new Date(user.emailVerified).toISOString()}'` : 'NULL',
+        `'${user.image || ''}'`,
+        `'${JSON.stringify(user).replace(/'/g, "''")}'`,
+        `'${user.createdAt.toISOString()}'`,
+        `'${user.updatedAt.toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_users (id, name, email, emailVerified, image, metadata, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
+    });
+    sql += "\n";
+  }
+
+  // Restore workspaces
+  if (backup.tables.workspaces && backup.tables.workspaces.length > 0) {
+    sql += "-- Seed workspaces\n";
+    backup.tables.workspaces.forEach((ws: any) => {
+      const values = [
+        `'${ws.id}'`,
+        `'${ws.name.replace(/'/g, "''")}'`,
+        `'${ws.slug || ''}'`,
+        `'${JSON.stringify(ws.metadata || {}).replace(/'/g, "''")}'`,
+        `'${ws.createdAt.toISOString()}'`,
+        `'${ws.updatedAt.toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_workspaces (id, name, slug, metadata, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
+    });
+    sql += "\n";
+  }
+
+  // Restore accounts
+  if (backup.tables.accounts && backup.tables.accounts.length > 0) {
+    sql += "-- Seed accounts\n";
+    backup.tables.accounts.forEach((acc: any) => {
+      const values = [
+        `'${acc.id}'`,
+        `'${acc.userId}'`,
+        `'${acc.providerId}'`,
+        `'${acc.accountId}'`,
+        acc.accessToken ? `'${acc.accessToken.replace(/'/g, "''")}'` : 'NULL',
+        acc.refreshToken ? `'${acc.refreshToken.replace(/'/g, "''")}'` : 'NULL',
+        acc.idToken ? `'${acc.idToken.replace(/'/g, "''")}'` : 'NULL',
+        acc.accessTokenExpiresAt ? `'${new Date(acc.accessTokenExpiresAt).toISOString()}'` : 'NULL',
+        acc.refreshTokenExpiresAt ? `'${new Date(acc.refreshTokenExpiresAt).toISOString()}'` : 'NULL',
+        acc.scope ? `'${acc.scope.replace(/'/g, "''")}'` : 'NULL',
+        acc.password ? `'${acc.password.replace(/'/g, "''")}'` : 'NULL',
+        `'${acc.createdAt.toISOString()}'`,
+        `'${acc.updatedAt.toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_accounts (id, userId, providerId, accountId, accessToken, refreshToken, idToken, accessTokenExpiresAt, refreshTokenExpiresAt, scope, password, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
+    });
+    sql += "\n";
+  }
+
+  // Restore sessions
+  if (backup.tables.sessions && backup.tables.sessions.length > 0) {
+    sql += "-- Seed sessions\n";
+    backup.tables.sessions.forEach((sess: any) => {
+      const values = [
+        `'${sess.id}'`,
+        `'${sess.userId}'`,
+        `'${sess.token || ''}'`,
+        `'${sess.expiresAt.toISOString()}'`,
+        sess.user ? `'${JSON.stringify(sess.user).replace(/'/g, "''")}'` : 'NULL',
+        sess.ipAddress ? `'${sess.ipAddress}'` : 'NULL',
+        sess.userAgent ? `'${sess.userAgent.replace(/'/g, "''")}'` : 'NULL',
+        sess.activeOrganizationId ? `'${sess.activeOrganizationId}'` : 'NULL',
+        `'${sess.createdAt.toISOString()}'`,
+        `'${sess.updatedAt.toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_sessions (id, userId, token, expiresAt, user, ipAddress, userAgent, activeOrganizationId, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
+    });
+    sql += "\n";
+  }
+
+  // Restore workspace members
+  if (backup.tables.workspaceMembers && backup.tables.workspaceMembers.length > 0) {
+    sql += "-- Seed workspace members\n";
+    backup.tables.workspaceMembers.forEach((member: any) => {
+      const values = [
+        `'${member.id}'`,
+        `'${member.organizationId}'`,
+        `'${member.userId}'`,
+        `'${member.role}'`,
+        `'${member.createdAt.toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_workspace_members (id, organizationId, userId, role, createdAt) VALUES (${values.join(", ")});\n`;
+    });
+    sql += "\n";
+  }
+
+  // Restore invitations
+  if (backup.tables.invitations && backup.tables.invitations.length > 0) {
+    sql += "-- Seed invitations\n";
+    backup.tables.invitations.forEach((inv: any) => {
+      const values = [
+        `'${inv.id}'`,
+        `'${inv.email}'`,
+        `'${inv.organizationId}'`,
+        `'${inv.role}'`,
+        `'${inv.status}'`,
+        `'${inv.expiresAt.toISOString()}'`,
+        inv.token ? `'${inv.token}'` : 'NULL',
+        `'${inv.inviterId}'`,
+        `'${inv.createdAt.toISOString()}'`,
+        `'${new Date().toISOString()}'`
+      ];
+      sql += `INSERT INTO ydtb_invitations (id, email, organizationId, role, status, expiresAt, token, inviterId, createdAt, updatedAt) VALUES (${values.join(", ")});\n`;
+    });
+  }
 
   return sql;
 }

@@ -4,8 +4,9 @@ import { db } from "../src/server/db";
 import { sql } from "drizzle-orm";
 
 async function resetDatabase() {
-  // Check for --force flag
+  // Check for --force and --restore flags
   const forceFlag = process.argv.includes('--force');
+  const restoreFlag = process.argv.includes('--restore');
 
   if (!forceFlag) {
     console.log("⚠️  WARNING: This will drop all tables and reset the database!");
@@ -91,8 +92,8 @@ async function resetDatabase() {
       console.log("\n📂 Restoring database from backup...");
       await restoreFromBackup();
     } else {
-      console.log("\n🌱 Seeding database with initial data...");
-      await seedDatabase();
+      console.log("\n🌱 Seeding database from reset.sql...");
+      await seedFromResetScript();
     }
 
     if (restoreFlag) {
@@ -105,10 +106,7 @@ async function resetDatabase() {
       console.log("   - All active sessions");
     } else {
       console.log("\n🎉 Database reset and seeding complete!");
-      console.log("\n📝 Seed data created:");
-      console.log("   - 1 user (John Kraczek - john@kraczek.com)");
-      console.log("   - Account with original password restored");
-      console.log("   - Ready for testing authentication");
+      console.log("\n📝 Database seeded from scripts/backup/reset.sql");
     }
 
   } catch (error) {
@@ -158,13 +156,58 @@ async function seedDatabase() {
   }
 }
 
+async function seedFromResetScript() {
+  try {
+    const fs = await import("fs/promises");
+    const path = await import("path");
+
+    // Check if the reset script exists
+    const resetPath = path.join(process.cwd(), "scripts", "backup", "reset.sql");
+
+    try {
+      await fs.access(resetPath);
+    } catch (error) {
+      console.error("\n❌ Error: reset.sql file not found!");
+      console.error("Please run 'bun run scripts/simple-backup.ts' first to create the reset script.");
+      process.exit(1);
+    }
+
+    // Read and execute the reset script
+    const resetScript = await fs.readFile(resetPath, "utf-8");
+
+    // Split the script by semicolons and execute each statement
+    const statements = resetScript
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s && !s.startsWith('--') && !s.startsWith('/*'));
+
+    for (const statement of statements) {
+      if (statement) {
+        try {
+          await db.execute(sql.raw(statement + ';'));
+        } catch (error) {
+          // Ignore errors on empty statements
+          if (statement.trim()) {
+            console.error(`Error executing statement: ${statement.substring(0, 50)}...`);
+          }
+        }
+      }
+    }
+
+    console.log("   ✅ Database seeded from reset.sql");
+  } catch (error) {
+    console.error("❌ Error seeding from reset script:", error);
+    throw error;
+  }
+}
+
 async function restoreFromBackup() {
   try {
     const fs = await import("fs/promises");
     const path = await import("path");
 
     // Check if the restore file exists
-    const restorePath = path.join(process.cwd(), "database-restore.sql");
+    const restorePath = path.join(process.cwd(), "scripts", "backup", "database-restore.sql");
 
     try {
       await fs.access(restorePath);
@@ -217,7 +260,8 @@ console.log(`
 📋 After exporting, update the seedDatabase() function in this script with the INSERT statements.
 
 💾 To create a backup: bun run scripts/simple-backup.ts
-🔄 To restore from backup: bun run scripts/reset-db.ts --force --restore
+🔄 To reset database (using reset.sql): bun run scripts/reset-db.ts --force
+📂 To restore from full backup: bun run scripts/reset-db.ts --force --restore
 `);
 
 // Run the reset
