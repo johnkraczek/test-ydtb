@@ -89,9 +89,7 @@ export default async function WelcomePage() {
         )}
 
         {/* Create Workspace Wizard */}
-        <CreateWorkspaceWizard
-          onSuccess={() => redirect("/")}
-        />
+        <CreateWorkspaceWizard />
       </div>
     </div>
   );

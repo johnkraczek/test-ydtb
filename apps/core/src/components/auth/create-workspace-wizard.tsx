@@ -104,9 +104,6 @@ interface CropArea {
     height: number;
 }
 
-interface CreateWorkspaceWizardProps {
-    onSuccess?: () => void;
-}
 
 const steps = [
     { id: 1, title: "Identity", icon: Building2 },
@@ -210,7 +207,7 @@ const colors = [
     { name: "gray", bg: "bg-gray-500", light: "bg-gray-100", text: "text-gray-600" },
 ];
 
-export default function CreateWorkspaceWizard({ onSuccess }: CreateWorkspaceWizardProps) {
+export default function CreateWorkspaceWizard() {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -481,7 +478,7 @@ export default function CreateWorkspaceWizard({ onSuccess }: CreateWorkspaceWiza
                 members: members.length > 0 ? members : undefined,
             });
 
-            onSuccess?.();
+            // Always redirect to dashboard after successful workspace creation
             router.push("/");
         } catch (err) {
             console.error("Failed to create workspace:", err);
