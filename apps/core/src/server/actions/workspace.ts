@@ -185,17 +185,46 @@ export async function getPendingInvitations() {
     headers: await headers(),
   });
 
-  if (!session?.user) {
+  if (!session?.user?.email) {
     return [];
   }
 
-  // Use Better Auth's listInvitations method
   try {
-    const invitations = await auth.api.listInvitations({
-      headers: await headers(),
+    // Use Better Auth's listUserInvitations API
+    const invitations = await auth.api.listUserInvitations({
+      query: {
+        email: session.user.email,
+      },
     });
 
-    return invitations || [];
+    // Filter for pending status if needed
+    const pendingInvites = invitations?.filter((invite: any) =>
+      invite.status === 'pending'
+    ) || [];
+
+    // Map to our expected format
+    const formattedInvites = pendingInvites.map((invite: any) => ({
+      id: invite.id,
+      email: invite.email,
+      organizationId: invite.organizationId,
+      role: invite.role || 'member',
+      status: invite.status || 'pending',
+      expiresAt: invite.expiresAt || new Date(),
+      inviterId: invite.inviterId || '',
+      createdAt: invite.createdAt || new Date(),
+      organization: invite.organization ? {
+        id: invite.organization.id,
+        name: invite.organization.name || 'Unknown Workspace',
+        slug: invite.organization.slug || 'unknown',
+      } : undefined,
+      inviter: invite.inviter ? {
+        id: invite.inviter.id,
+        name: invite.inviter.name || 'Someone',
+        email: invite.inviter.email || '',
+      } : null,
+    }));
+
+    return formattedInvites;
   } catch (error) {
     return [];
   }

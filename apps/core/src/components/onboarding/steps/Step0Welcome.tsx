@@ -1,32 +1,109 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Building2, Users, Check, X, Mail } from "lucide-react";
-import { MockInvite } from "../types";
-import { MOCK_INVITES } from "../constants";
+import { Building2, Users, Check, X, Mail, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { acceptInvitation, getPendingInvitations } from "@/server/actions/workspace";
 
 interface Step0WelcomeProps {
   onStartNew: () => void;
 }
 
-export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
-  const [invites, setInvites] = useState<MockInvite[]>(MOCK_INVITES);
+interface Invitation {
+  id: string;
+  email: string;
+  organizationId: string;
+  organization?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  role: "owner" | "admin" | "member" | "guest";
+  status: "pending" | "accepted" | "rejected" | "expired" | "canceled";
+  expiresAt: Date;
+  inviterId: string;
+  inviter?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  createdAt: Date;
+}
 
-  const handleAccept = (id: string) => {
-    // In a real app, this would make an API call
-    console.log("Accepted invite:", id);
-    setInvites(invites.filter(i => i.id !== id));
+export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
+  const router = useRouter();
+  const [invites, setInvites] = useState<Invitation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const pendingInvites = await getPendingInvitations();
+        setInvites(pendingInvites);
+      } catch (error) {
+        // Silently handle errors
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInvitations();
+  }, []);
+
+  const handleAccept = async (invitationId: string) => {
+    try {
+      await acceptInvitation(invitationId);
+
+      // Remove the invitation from the list
+      setInvites(invites.filter(i => i.id !== invitationId));
+
+      // Show success toast
+      toast.success("Successfully joined the workspace!", {
+        description: "You've been added to the team."
+      });
+
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        router.push('/');
+      }, 1000);
+
+    } catch (error) {
+      toast.error("Failed to join workspace", {
+        description: "Please try again or contact the workspace admin."
+      });
+    }
   };
 
-  const handleDecline = (id: string) => {
-    // In a real app, this would make an API call
-    console.log("Declined invite:", id);
-    setInvites(invites.filter(i => i.id !== id));
+  const handleDecline = async (invitationId: string) => {
+    // TODO: Implement decline/reject invitation API
+    // For now, just remove it from the UI
+    setInvites(invites.filter(i => i.id !== invitationId));
+    toast.info("Invitation declined");
+  };
+
+  const formatRole = (role: string) => {
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  };
+
+  const formatSentAt = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - new Date(date).getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffDays > 0) {
+      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    } else if (diffHours > 0) {
+      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    } else {
+      return "Just now";
+    }
   };
 
   return (
@@ -80,81 +157,93 @@ export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
             </CardHeader>
             <CardContent className="p-6">
               <ScrollArea className="h-auto max-h-[220px] pr-4">
-                <div className="space-y-3">
-                  {invites.length > 0 ? (
-                    invites.map((invite) => (
-                      <div key={invite.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-colors flex items-center justify-between group/invite">
-                        <div className="flex-1 min-w-0 mr-3">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-bold text-slate-900 truncate text-sm">{invite.workspaceName}</h4>
-                            <Badge variant="secondary" className="text-[10px] h-4 px-1 shrink-0 font-normal">{invite.role}</Badge>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[200px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {invites.length > 0 ? (
+                      invites.map((invite) => (
+                        <div key={invite.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-colors flex items-center justify-between group/invite">
+                          <div className="flex-1 min-w-0 mr-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-bold text-slate-900 truncate text-sm">
+                                {invite.organization?.name || 'Unknown Workspace'}
+                              </h4>
+                              <Badge variant="secondary" className="text-[10px] h-4 px-1 shrink-0 font-normal capitalize">
+                                {formatRole(invite.role)}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate">
+                              <span className="font-medium text-slate-600">
+                                {invite.inviter?.name || 'Someone'}
+                              </span>
+                              <span className="text-slate-300">•</span>
+                              <span>{formatSentAt(invite.createdAt)}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate">
-                            <span className="font-medium text-slate-600">{invite.inviterName}</span>
-                            <span className="text-slate-300">•</span>
-                            <span>{invite.sentAt}</span>
+
+                          <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-60 sm:group-hover/invite:opacity-100 transition-opacity">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAccept(invite.id);
+                                    }}
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Accept Invitation</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDecline(invite.id);
+                                    }}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Decline Invitation</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-60 sm:group-hover/invite:opacity-100 transition-opacity">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAccept(invite.id);
-                                  }}
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Accept Invitation</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDecline(invite.id);
-                                  }}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Decline Invitation</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 p-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+                        <div className="bg-slate-100 p-3 rounded-full">
+                          <Mail className="h-6 w-6 text-slate-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-medium text-slate-900">No pending invites</p>
+                          <p className="text-xs text-slate-500 max-w-[200px] mx-auto">
+                            Check with your workspace admin to ensure they've sent an invitation to your email.
+                          </p>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 p-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
-                      <div className="bg-slate-100 p-3 rounded-full">
-                        <Mail className="h-6 w-6 text-slate-400" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-medium text-slate-900">No pending invites</p>
-                        <p className="text-xs text-slate-500 max-w-[200px] mx-auto">
-                          Check with your workspace admin to ensure they've sent an invitation to your email.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </ScrollArea>
 
               <div className="mt-6 text-center">

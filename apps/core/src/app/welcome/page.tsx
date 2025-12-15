@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { auth } from '@/server/auth'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
+import { WelcomeWrapper } from './components/WelcomeWrapper'
 
 export default async function WelcomePage() {
   const session = await auth.api.getSession({
@@ -27,6 +28,10 @@ export default async function WelcomePage() {
     // Continue to onboarding if we can't check organizations
   }
 
-  // User is authenticated but has no workspaces, show onboarding
-  return <OnboardingWizard />;
+  // User is authenticated but has no workspaces, show onboarding with profile avatar
+  return (
+    <WelcomeWrapper>
+      <OnboardingWizard />
+    </WelcomeWrapper>
+  );
 }
