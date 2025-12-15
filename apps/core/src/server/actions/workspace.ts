@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/server/auth";
+import { db } from "@/server/db";
+import { eq, and, gt } from "drizzle-orm";
+import { workspaces, workspaceInvitations } from "@/server/db/schema";
 
 export async function createWorkspace(data: {
   name: string;
@@ -139,4 +142,75 @@ export async function inviteUserToWorkspace(data: {
     console.error("Failed to invite user:", error);
     throw new Error("Failed to invite user to workspace");
   }
+}
+
+export async function validateSlug(slug: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Authentication required");
+  }
+
+  // Check if slug is already taken
+  const existingWorkspace = await db.query.workspaces.findFirst({
+    where: eq(workspaces.slug, slug),
+  });
+
+  return !existingWorkspace;
+}
+
+export async function acceptInvitation(token: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Authentication required");
+  }
+
+  // Use Better Auth's acceptInvitation method
+  try {
+    const result = await auth.api.acceptInvitation({
+      body: { token },
+      headers: await headers(),
+    });
+
+    revalidatePath("/dashboard");
+    return result;
+  } catch (error) {
+    console.error("Failed to accept invitation:", error);
+    throw new Error("Invalid or expired invitation");
+  }
+}
+
+export async function getPendingInvitations(email: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return [];
+  }
+
+  // Query pending invitations for this email
+  const invitations = await db.query.workspaceInvitations.findMany({
+    where: and(
+      eq(workspaceInvitations.email, email),
+      eq(workspaceInvitations.status, "pending"),
+      gt(workspaceInvitations.expiresAt, new Date())
+    ),
+    with: {
+      workspace: {
+        columns: {
+          id: true,
+          name: true,
+          slug: true
+        }
+      }
+    }
+  });
+
+  return invitations;
 }

@@ -160,11 +160,6 @@ export const passkeyRelations = relations(passkey, ({ one }) => ({
     }),
 }));
 
-// Workspace relations
-export const workspacesRelations = relations(workspaces, ({ many }) => ({
-    members: many(workspaceMembers),
-}));
-
 export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
     workspace: one(workspaces, {
         fields: [workspaceMembers.workspaceId],
@@ -174,6 +169,50 @@ export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) =
         fields: [workspaceMembers.userId],
         references: [user.id],
     }),
+}));
+
+// Workspace invitations table
+export const workspaceInvitations = createTable("workspace_invitations", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: varchar("workspace_id", { length: 20 })
+        .notNull()
+        .references(() => workspaces.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
+        .notNull()
+        .default('member'),
+    message: text("message"),
+    token: varchar("token", { length: 255 }).notNull().unique(),
+    invitedBy: text("invited_by")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow(),
+    expiresAt: timestamp("expires_at").notNull(),
+    acceptedAt: timestamp("accepted_at"),
+    status: varchar("status", { length: 20, enum: ['pending', 'accepted', 'declined', 'expired'] })
+        .notNull()
+        .default('pending'),
+}, (table) => ({
+    tokenIdx: index("workspace_invitations_token_idx").on(table.token),
+    emailIdx: index("workspace_invitations_email_idx").on(table.email),
+}));
+
+export const workspaceInvitationsRelations = relations(workspaceInvitations, ({ one }) => ({
+    workspace: one(workspaces, {
+        fields: [workspaceInvitations.workspaceId],
+        references: [workspaces.id],
+    }),
+    inviter: one(user, {
+        fields: [workspaceInvitations.invitedBy],
+        references: [user.id],
+    }),
+}));
+
+// Add reverse relations for workspaces
+export const workspacesRelations = relations(workspaces, ({ many }) => ({
+    members: many(workspaceMembers),
+    invitations: many(workspaceInvitations),
+    sessions: many(session),
 }));
 
 // Type exports for convenience
@@ -189,3 +228,5 @@ export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;
 export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
 export type NewWorkspaceMember = typeof workspaceMembers.$inferInsert;
+export type WorkspaceInvitation = typeof workspaceInvitations.$inferSelect;
+export type NewWorkspaceInvitation = typeof workspaceInvitations.$inferInsert;

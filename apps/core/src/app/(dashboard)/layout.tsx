@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/server/auth";
+import { getUserWorkspaces } from "@/server/actions/workspace";
 import { SidebarProvider } from "~/context/sidebar/use-sidebar";
 import { MainHeader } from "~/components/dashboard/headers/MainHeader";
 import { IconRail } from "~/components/dashboard/sidebars/IconRail";
@@ -27,6 +28,12 @@ export default async function DashboardLayout({
   // Check if email is verified
   if (!session.user.emailVerified) {
     redirect(`/verify-otp?email=${encodeURIComponent(session.user.email)}&fromDashboard=true`);
+  }
+
+  // Check if user has workspaces
+  const workspaces = await getUserWorkspaces();
+  if (workspaces.length === 0) {
+    redirect("/welcome");
   }
 
   return (
