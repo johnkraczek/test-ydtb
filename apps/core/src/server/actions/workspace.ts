@@ -7,7 +7,6 @@ import { requireAuth } from "@/server/auth-session";
 import type {
   CreateOrganizationBody
 } from "@/types/better-auth";
-import { randomBytes } from "crypto";
 
 export async function createWorkspace(data: {
   name: string;

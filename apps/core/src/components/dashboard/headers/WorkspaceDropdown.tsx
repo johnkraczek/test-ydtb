@@ -69,8 +69,8 @@ export function WorkspaceDropdown() {
             </span>
             <div className="flex items-center gap-1 mt-0.5">
               <Zap className="h-3 w-3 text-amber-500 fill-amber-500" />
-              <span className="text-slate-500 text-[10px] leading-none">
-                {activeWorkspaceData?.role || 'Member'}
+              <span className="text-slate-500 text-[10px] leading-none capitalize">
+                {activeWorkspaceData?.role || 'member'}
               </span>
             </div>
           </div>
@@ -126,7 +126,7 @@ export function WorkspaceDropdown() {
                     <span className={`font-medium text-sm ${isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-600 dark:text-slate-400'}`}>
                       {ws.name}
                     </span>
-                    <span className="text-xs text-slate-400">{ws.role}</span>
+                    <span className="text-xs text-slate-400 capitalize">{ws.role}</span>
                   </div>
                   {isActive && <Check className="h-4 w-4 text-primary" />}
                 </DropdownMenuItem>

@@ -9,7 +9,6 @@ import { db } from "@/server/db";
 import { user, session, account, verification, passkey as passkeyTable, workspaces, workspaceMembers, invitation } from "@/server/db/schema";
 import { sendVerificationOTP } from "./auth/email-sender";
 import { eq } from "drizzle-orm";
-import { randomBytes } from "crypto";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,

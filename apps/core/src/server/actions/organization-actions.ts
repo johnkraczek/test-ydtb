@@ -59,7 +59,47 @@ export async function listOrganizations(): Promise<Organization[]> {
     const data = await auth.api.listOrganizations({
       headers: await headers(),
     });
-    return data as Organization[] || [];
+
+    // Get the user's session to identify the current user
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user?.id || !data) {
+      return data as Organization[] || [];
+    }
+
+    // For each organization, we need to determine the user's role
+    const organizations = data as Organization[];
+    const organizationsWithRole = await Promise.all(
+      organizations.map(async (org: any) => {
+        // Check if the user is the creator/owner
+        // The first member is typically the creator
+        try {
+          const members = await auth.api.listMembers({
+            headers: await headers(),
+            query: { organizationId: org.id },
+          });
+
+          const userMembership = members?.members?.find((member: any) =>
+            member.userId === session.user.id
+          );
+
+          return {
+            ...org,
+            role: userMembership?.role || 'member', // Default to member if not found
+          };
+        } catch (error) {
+          // If we can't get members, assume member
+          return {
+            ...org,
+            role: 'member',
+          };
+        }
+      })
+    );
+
+    return organizationsWithRole;
   } catch (error) {
     return [];
   }
