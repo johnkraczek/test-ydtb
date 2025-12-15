@@ -80,6 +80,45 @@ Files to Update:
   - Do NOT create a new component with similar styles from scratch
   - This ensures consistency and avoids re-implementation of existing patterns
 
+#### **Internal vs External Communication Patterns**
+
+**Important**: Internal communication within the application uses direct function calls (either across RSC boundary or server-side), NOT HTTP requests. HTTP APIs are ONLY for external system integration.
+
+##### Internal Package Communication
+
+**1. RSC Client-Server Boundary**
+- **Mechanism**: Direct function calls between client components and server functions
+- **Technology**: React Server Components boundary
+- **Performance**: No network overhead, maintains type safety
+- **Use Cases**:
+  - Client components fetching data from server
+  - Form submissions and mutations
+  - Server actions for client interactions
+
+**2. Server-Side Package-to-Package Communication**
+- **Mechanism**: Direct function calls between packages on the server
+- **Technology**: Internal function imports/calls
+- **Performance**: No network overhead, maintains type safety
+- **Use Cases**:
+  - Package A calling functions from Package B
+  - Shared services and utilities
+  - Database operations
+  - Internal business logic
+
+##### External API Registration (HTTP)
+Only for integration with external systems:
+- **Mechanism**: HTTP endpoints exposed to outside world
+- **Technology**: Next.js API routes
+- **Authentication**: Required for all external endpoints
+  - API keys for service-to-service communication
+  - OAuth/JWT for third-party integrations
+  - Signature verification for webhooks
+- **Use Cases**:
+  - Webhooks from external services (with signature verification)
+  - Public APIs for third-party integration (with API keys)
+  - Mobile app backends (with OAuth/JWT)
+  - Internal package webhooks (with authenticated calls)
+
 #### **Validation Checklist**
 Specific steps to verify the implementation:
 - [ ] Manual testing checklist
