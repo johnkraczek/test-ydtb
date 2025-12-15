@@ -61,7 +61,7 @@ export function WorkspaceProvider({ children }: Props) {
         await switchWorkspace(result.id);
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       console.error("Failed to create workspace:", error);
       throw error;

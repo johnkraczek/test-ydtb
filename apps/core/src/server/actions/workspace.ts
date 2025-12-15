@@ -45,6 +45,21 @@ export async function createWorkspace(data: {
       throw new Error("Failed to create workspace");
     }
 
+    // Manually create the owner membership record
+    try {
+      await db.insert(workspaceMembers).values({
+        workspaceId: workspace.id,
+        userId: session.user.id,
+        role: 'owner',
+        status: 'active',
+        joinedAt: new Date(),
+      });
+      console.log("[createWorkspace] Created owner membership for user:", session.user.id, "workspace:", workspace.id);
+    } catch (memberError) {
+      console.error("[createWorkspace] Failed to create owner membership:", memberError);
+      // Continue anyway since the workspace was created
+    }
+
     // Send invitations to team members
     if (data.members && data.members.length > 0) {
       const { sendWorkspaceInvitation } = await import("@/server/auth/email-sender");
@@ -83,7 +98,7 @@ export async function createWorkspace(data: {
       }
     }
 
-    revalidatePath("/dashboard");
+    revalidatePath("/");
     return workspace;
   } catch (error) {
     console.error("Failed to create workspace:", error);
@@ -97,11 +112,8 @@ export async function getUserWorkspaces() {
   });
 
   if (!session?.user) {
-    console.log("[getUserWorkspaces] No session found");
     return [];
   }
-
-  console.log("[getUserWorkspaces] Querying for user ID:", session.user.id);
 
   try {
     // Query workspaces through workspaceMembers
@@ -119,13 +131,11 @@ export async function getUserWorkspaces() {
       },
     });
 
-    console.log("[getUserWorkspaces] Found memberships:", memberships.length);
     const workspaces = memberships.map(m => m.workspace).filter(Boolean);
-    console.log("[getUserWorkspaces] Valid workspaces:", workspaces.length);
 
     return workspaces;
   } catch (error) {
-    console.error("[getUserWorkspaces] Failed to fetch workspaces:", error);
+    console.error("Failed to fetch workspaces:", error);
     return [];
   }
 }
@@ -148,7 +158,7 @@ export async function switchWorkspace(workspaceId: string) {
       headers: await headers(),
     });
 
-    revalidatePath("/dashboard");
+    revalidatePath("/");
   } catch (error) {
     console.error("Failed to switch workspace:", error);
     throw new Error("Failed to switch workspace");
@@ -245,7 +255,7 @@ export async function acceptInvitation(token: string) {
       headers: await headers(),
     });
 
-    revalidatePath("/dashboard");
+    revalidatePath("/");
     return result;
   } catch (error) {
     console.error("Failed to accept invitation:", error);

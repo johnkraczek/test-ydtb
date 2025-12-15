@@ -22,22 +22,17 @@ export default async function DashboardLayout({
 
   // If not authenticated, redirect to login
   if (!session) {
-    console.log("[Dashboard Layout] No session - redirecting to /login");
     redirect("/login");
   }
 
   // Check if email is verified
   if (!session.user.emailVerified) {
-    console.log("[Dashboard Layout] Email not verified - redirecting to /verify-otp");
     redirect(`/verify-otp?email=${encodeURIComponent(session.user.email)}&fromDashboard=true`);
   }
 
   // Check if user has workspaces
   const workspaces = await getUserWorkspaces();
-  console.log("[Dashboard Layout] User ID:", session.user.id);
-  console.log("[Dashboard Layout] Workspaces found:", workspaces.length);
   if (workspaces.length === 0) {
-    console.log("[Dashboard Layout] Redirecting to /welcome - no workspaces found");
     redirect("/welcome");
   }
 

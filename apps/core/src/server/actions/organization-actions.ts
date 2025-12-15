@@ -73,7 +73,7 @@ export async function setActiveOrganization(organizationId: string) {
       body: { organizationId },
       headers: await headers(),
     });
-    revalidatePath("/dashboard");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("Failed to set active organization:", error);
@@ -91,7 +91,7 @@ export async function createOrganization(data: {
       body: data as any,
       headers: await headers(),
     });
-    revalidatePath("/dashboard");
+    revalidatePath("/");
     return result || null;
   } catch (error) {
     console.error("Failed to create organization:", error);
