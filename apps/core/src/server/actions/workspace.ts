@@ -82,13 +82,7 @@ export async function getUserWorkspaces() {
 }
 
 export async function switchWorkspace(workspaceId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  await requireAuth();
 
   try {
     // Use better-auth's setActiveOrganization method
@@ -106,13 +100,7 @@ export async function switchWorkspace(workspaceId: string) {
 }
 
 export async function getWorkspaceMembers(workspaceId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  await requireAuth();
 
   try {
     // Use better-auth's listMembers method
@@ -134,13 +122,7 @@ export async function inviteUserToWorkspace(data: {
   email: string;
   role: "owner" | "admin" | "member";
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  const session = await requireAuth();
 
   try {
     // Use better-auth's createInvitation method
@@ -156,7 +138,9 @@ export async function inviteUserToWorkspace(data: {
     revalidatePath(`/workspaces/${data.workspaceId}/members`);
     return result;
   } catch (error) {
-    throw new Error("Failed to invite user to workspace");
+    // Re-throw with more context
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to invite user to workspace: ${errorMessage}`);
   }
 }
 
@@ -173,13 +157,7 @@ export async function validateSlug(slug: string) {
 }
 
 export async function acceptInvitation(token: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new Error("Authentication required");
-  }
+  await requireAuth();
 
   // Use Better Auth's acceptInvitation method
   try {

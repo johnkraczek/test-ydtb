@@ -58,9 +58,11 @@ export function WorkspaceProvider({ children }: Props) {
 
       // Refresh the workspaces list is handled automatically by the mutation
 
-      // The result should contain the created organization
+      // Switch to the new workspace and wait for it to complete
       if (result && result.id) {
-        await switchWorkspace(result.id);
+        await setActiveOrgMutation.mutateAsync({ organizationId: result.id });
+        // Refresh the router to ensure the workspace context is updated
+        router.refresh();
       }
 
       // Return the created workspace
@@ -69,7 +71,7 @@ export function WorkspaceProvider({ children }: Props) {
       console.error("Failed to create workspace:", error);
       throw error;
     }
-  }, [createOrgMutation, switchWorkspace, router]);
+  }, [createOrgMutation, setActiveOrgMutation, router]);
 
   return (
     <WorkspaceContext.Provider

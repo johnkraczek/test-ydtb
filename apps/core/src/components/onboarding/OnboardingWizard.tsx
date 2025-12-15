@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useSession } from "@/lib/auth-client";
 
 // Import server actions
 import { validateSlug, inviteUserToWorkspace } from "@/server/actions/workspace";
@@ -32,6 +33,7 @@ interface OnboardingWizardProps {
 
 export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const { createWorkspace: createWorkspaceInContext } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const [currentStep, setCurrentStep] = useState(0);
@@ -82,25 +84,53 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             },
           });
 
-          // Send invitations to team members
+          // Send invitations to team members after a short delay to ensure workspace is fully created
+          let invitedCount = 0;
+          let skippedCount = 0;
+
           if (formData.members && formData.members.length > 0) {
-            for (const member of formData.members) {
-              try {
-                await inviteUserToWorkspace({
-                  workspaceId: workspace.id,
-                  email: member.email,
-                  role: member.role as "owner" | "admin" | "member",
-                });
-              } catch (inviteError) {
-                // Log error but continue with other invitations
-                toast.error(`Failed to invite ${member.email}: ${inviteError instanceof Error ? inviteError.message : 'Unknown error'}`);
+            // Wait a moment for the workspace to be fully set up
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            if (!workspace || !workspace.id) {
+              toast.error("Workspace ID not available for invitations");
+            } else {
+              // Get current user's email to avoid self-invitation
+              const currentUserEmail = session?.user?.email;
+
+              for (const member of formData.members) {
+                // Skip if trying to invite the current user
+                if (member.email === currentUserEmail) {
+                  skippedCount++;
+                  continue;
+                }
+
+                try {
+                  await inviteUserToWorkspace({
+                    workspaceId: workspace.id,
+                    email: member.email,
+                    role: member.role as "owner" | "admin" | "member",
+                  });
+                  invitedCount++;
+                } catch (inviteError) {
+                  // Log error but continue with other invitations
+                  console.error(`Failed to invite ${member.email}:`, inviteError);
+                  const errorMsg = inviteError instanceof Error ? inviteError.message : 'Unknown error';
+
+                  // Don't show error for "already a member" messages
+                  if (!errorMsg.includes("already a member")) {
+                    toast.error(`Failed to invite ${member.email}: ${errorMsg}`, {
+                      description: `Workspace ID: ${workspace.id}`,
+                    });
+                  }
+                }
               }
             }
           }
 
           toast.success(`Workspace "${formData.name}" created successfully!`, {
             description: formData.members.length > 0
-              ? `Workspace ready. ${formData.members.length} invitation${formData.members.length > 1 ? 's' : ''} sent.`
+              ? `Workspace ready. ${invitedCount} invitation${invitedCount !== 1 ? 's' : ''} sent${skippedCount > 0 ? ` (${skippedCount} skipped)` : ''}.`
               : "Your workspace is ready to use",
           });
 
