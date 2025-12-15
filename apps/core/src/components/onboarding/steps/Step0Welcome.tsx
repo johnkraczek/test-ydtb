@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useWorkspace } from "@/context/workspace/workspace-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ interface Invitation {
 }
 
 export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
-  const router = useRouter();
+  const { refreshWorkspaces } = useWorkspace();
   const [invites, setInvites] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -68,9 +68,14 @@ export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
         description: "You've been added to the team."
       });
 
+      // Refresh the workspaces list to get the latest data
+      refreshWorkspaces();
+
       // Redirect to dashboard after a short delay
       setTimeout(() => {
-        router.push('/');
+        // Use window.location.href to force a full page refresh
+        // This ensures the workspace context is fully reloaded with the new workspace
+        window.location.href = '/';
       }, 1000);
 
     } catch (error) {
