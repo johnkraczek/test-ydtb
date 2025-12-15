@@ -35,7 +35,7 @@ export const session = createTable("sessions", {
     expiresAt: timestamp("expires_at").notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
-    activeOrganizationId: varchar("active_organization_id", { length: 20 })
+    activeOrganizationId: text("active_organization_id")
         .references(() => workspaces.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
@@ -92,7 +92,7 @@ export const passkey = createTable("passkeys", {
 
 // Workspaces table - core multi-tenancy
 export const workspaces = createTable("workspaces", {
-    id: varchar("id", { length: 20 }).primaryKey(), // 10-20 alphanumeric for URL-friendly IDs
+    id: text("id").primaryKey(), // Better Auth generates longer IDs
     name: varchar("name", { length: 255 }).notNull(),
     slug: varchar("slug", { length: 255 }).notNull().unique(),
     description: text("description"),
@@ -106,10 +106,10 @@ export const workspaces = createTable("workspaces", {
         .notNull(),
 });
 
-// Workspace members table - links users to workspaces
+// Workspace members table - links users to workspaces (matches Better Auth's expected schema)
 export const workspaceMembers = createTable("workspace_members", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    workspaceId: varchar("workspace_id", { length: 20 })
+    id: text("id").primaryKey(),  // Let Better Auth set the ID
+    organizationId: text("organization_id")  // Better Auth expects this field name
         .notNull()
         .references(() => workspaces.id, { onDelete: "cascade" }),
     userId: text("user_id")
@@ -118,12 +118,11 @@ export const workspaceMembers = createTable("workspace_members", {
     role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
         .notNull()
         .default('member'),
-    status: varchar("status", { length: 50 }).default('active'),
-    joinedAt: timestamp("joined_at")
+    createdAt: timestamp("created_at")
         .$defaultFn(() => new Date())
         .notNull(),
 }, (table) => ({
-    workspaceUserIdx: index("workspace_members_workspace_user_idx").on(table.workspaceId, table.userId),
+    workspaceUserIdx: index("workspace_members_organization_user_idx").on(table.organizationId, table.userId),
 }));
 
 // Auth relations
@@ -162,7 +161,7 @@ export const passkeyRelations = relations(passkey, ({ one }) => ({
 
 export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
     workspace: one(workspaces, {
-        fields: [workspaceMembers.workspaceId],
+        fields: [workspaceMembers.organizationId],
         references: [workspaces.id],
     }),
     user: one(user, {
@@ -174,7 +173,7 @@ export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) =
 // Workspace invitations table
 export const workspaceInvitations = createTable("workspace_invitations", {
     id: uuid("id").primaryKey().defaultRandom(),
-    workspaceId: varchar("workspace_id", { length: 20 })
+    workspaceId: text("workspace_id")
         .notNull()
         .references(() => workspaces.id, { onDelete: "cascade" }),
     email: text("email").notNull(),

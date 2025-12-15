@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
-import { eq, and, gt } from "drizzle-orm";
-import { workspaces, workspaceInvitations, workspaceMembers } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
+import { workspaces } from "@/server/db/schema";
 import { requireAuth } from "@/server/auth-session";
 import type {
   CreateOrganizationBody
@@ -23,7 +23,22 @@ export async function createWorkspace(data: {
     message?: string;
   }>;
 }) {
+  console.log("[createWorkspace] Starting workspace creation with data:", {
+    name: data.name,
+    slug: data.slug,
+    hasDescription: !!data.description,
+    hasMetadata: !!data.metadata,
+    hasLogo: !!data.logo,
+    memberCount: data.members?.length || 0
+  });
+
   const session = await requireAuth();
+
+  console.log("[createWorkspace] Authenticated session:", {
+    userId: session.user.id,
+    userEmail: session.user.email,
+    userName: session.user.name
+  });
 
   try {
     // Use better-auth's createOrganization method
@@ -37,72 +52,51 @@ export async function createWorkspace(data: {
       },
     };
 
+    console.log("[createWorkspace] Calling createOrganization with:", {
+      body: orgBody
+    });
+
     const workspace = await auth.api.createOrganization({
       body: orgBody,
+      headers: await headers(),
+    });
+
+    console.log("[createWorkspace] createOrganization response:", {
+      success: !!workspace,
+      hasId: !!workspace?.id,
+      workspaceId: workspace?.id,
+      workspace: workspace
     });
 
     if (!workspace || !workspace.id) {
-      throw new Error("Failed to create workspace");
-    }
-
-    // Manually create the owner membership record
-    try {
-      await db.insert(workspaceMembers).values({
-        workspaceId: workspace.id,
-        userId: session.user.id,
-        role: 'owner',
-        status: 'active',
-        joinedAt: new Date(),
-      });
-      console.log("[createWorkspace] Created owner membership for user:", session.user.id, "workspace:", workspace.id);
-    } catch (memberError) {
-      console.error("[createWorkspace] Failed to create owner membership:", memberError);
-      // Continue anyway since the workspace was created
-    }
-
-    // Send invitations to team members
-    if (data.members && data.members.length > 0) {
-      const { sendWorkspaceInvitation } = await import("@/server/auth/email-sender");
-
-      for (const member of data.members) {
-        if (member.email) {
-          try {
-            // Convert guest role to member for Better Auth
-            const role: "owner" | "admin" | "member" = member.role === "guest" ? "member" : member.role as "owner" | "admin" | "member";
-
-            // Create invitation through Better Auth
-            const invitation = await auth.api.createInvitation({
-              body: {
-                email: member.email,
-                role,
-                organizationId: workspace.id,
-              },
-              headers: await headers(),
-            });
-
-            // Send invitation email
-            await sendWorkspaceInvitation({
-              email: member.email,
-              invitedByName: session.user.name || session.user.email,
-              invitedByEmail: session.user.email,
-              workspaceName: data.name,
-              workspaceSlug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
-              invitationToken: invitation.id,
-              message: member.message,
-            });
-          } catch (inviteError) {
-            console.error(`Failed to invite ${member.email}:`, inviteError);
-            // Continue with other invitations even if one fails
-          }
-        }
-      }
+      console.error("[createWorkspace] Invalid workspace response:", workspace);
+      throw new Error("Failed to create workspace - invalid response from createOrganization");
     }
 
     revalidatePath("/");
     return workspace;
   } catch (error) {
-    console.error("Failed to create workspace:", error);
-    throw new Error("Failed to create workspace");
+    console.error("[createWorkspace] Error details:", {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      // Access properties safely
+      status: (error as any)?.status,
+      statusCode: (error as any)?.statusCode,
+      body: (error as any)?.body,
+      headers: (error as any)?.headers,
+      name: (error as any)?.name,
+      constructor: error?.constructor?.name
+    });
+
+    // Re-throw with more context
+    const errorStatus = (error as any)?.status || (error as any)?.statusCode;
+    if (errorStatus === 'UNAUTHORIZED' || errorStatus === 401) {
+      throw new Error(`Authentication failed while creating workspace. Please ensure you're properly logged in.`);
+    }
+
+    const errorMessage = (error as any)?.message || (error instanceof Error ? error.message : 'Unknown error');
+    throw new Error(`Failed to create workspace: ${errorMessage}`);
   }
 }
 
@@ -116,26 +110,14 @@ export async function getUserWorkspaces() {
   }
 
   try {
-    // Query workspaces through workspaceMembers
-    const memberships = await db.query.workspaceMembers.findMany({
-      where: eq(workspaceMembers.userId, session.user.id),
-      with: {
-        workspace: {
-          columns: {
-            id: true,
-            name: true,
-            slug: true,
-            logo: true,
-          },
-        },
-      },
+    // Use Better Auth's listOrganizations method
+    const organizations = await auth.api.listOrganizations({
+      headers: await headers(),
     });
 
-    const workspaces = memberships.map(m => m.workspace).filter(Boolean);
-
-    return workspaces;
+    return organizations || [];
   } catch (error) {
-    console.error("Failed to fetch workspaces:", error);
+    console.error("Failed to fetch user workspaces:", error);
     return [];
   }
 }
@@ -150,18 +132,26 @@ export async function switchWorkspace(workspaceId: string) {
   }
 
   try {
+    console.log("[switchWorkspace] Attempting to switch to workspace:", workspaceId);
+
     // Use better-auth's setActiveOrganization method
     await auth.api.setActiveOrganization({
       body: {
         organizationId: workspaceId,
-      } as any,
+      },
       headers: await headers(),
     });
 
+    console.log("[switchWorkspace] Successfully switched to workspace:", workspaceId);
     revalidatePath("/");
   } catch (error) {
-    console.error("Failed to switch workspace:", error);
-    throw new Error("Failed to switch workspace");
+    console.error("[switchWorkspace] Failed to switch workspace:", {
+      error,
+      workspaceId,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw new Error(`Failed to switch workspace: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -258,7 +248,7 @@ export async function acceptInvitation(token: string) {
   }
 }
 
-export async function getPendingInvitations(email: string) {
+export async function getPendingInvitations() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -267,23 +257,15 @@ export async function getPendingInvitations(email: string) {
     return [];
   }
 
-  // Query pending invitations for this email
-  const invitations = await db.query.workspaceInvitations.findMany({
-    where: and(
-      eq(workspaceInvitations.email, email),
-      eq(workspaceInvitations.status, "pending"),
-      gt(workspaceInvitations.expiresAt, new Date())
-    ),
-    with: {
-      workspace: {
-        columns: {
-          id: true,
-          name: true,
-          slug: true
-        }
-      }
-    }
-  });
+  // Use Better Auth's listInvitations method
+  try {
+    const invitations = await auth.api.listInvitations({
+      headers: await headers(),
+    });
 
-  return invitations;
+    return invitations || [];
+  } catch (error) {
+    console.error("Failed to fetch pending invitations:", error);
+    return [];
+  }
 }

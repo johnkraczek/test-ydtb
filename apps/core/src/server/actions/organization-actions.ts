@@ -94,6 +94,7 @@ export async function createOrganization(data: {
     };
     const result = await auth.api.createOrganization({
       body: orgBody,
+      headers: await headers(),
     });
     revalidatePath("/");
     return result || null;
