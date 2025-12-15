@@ -1,236 +1,38 @@
-import { relations } from "drizzle-orm";
-import {
-    boolean,
-    index,
-    integer,
-    jsonb,
-    pgTableCreator,
-    text,
-    timestamp,
-    varchar,
-} from "drizzle-orm/pg-core";
+// Re-export everything from the new modular structure for backwards compatibility
+// This ensures all existing imports continue to work
 
-// Use pgTableCreator for consistent ydtb_ prefix
-export const createTable = pgTableCreator((name) => `ydtb_${name}`);
+// Direct imports from individual files to avoid export resolution issues
+// Separate value and type exports for isolatedModules compatibility
 
-// Better-auth tables
-export const user = createTable("users", {
-    id: text("id").primaryKey(),
-    name: text("name"),
-    email: text("email").notNull().unique(),
-    emailVerified: boolean("email_verified").default(false),
-    image: text("image"),
-    twoFactorEnabled: boolean("two_factor_enabled").default(false),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-});
+// Auth exports
+export { user } from "./auth/users";
+export { session } from "./auth/sessions";
+export { account } from "./auth/accounts";
+export { verification } from "./auth/verifications";
+export { passkey } from "./auth/passkeys";
 
-export const session = createTable("sessions", {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    token: text("token").notNull().unique(),
-    expiresAt: timestamp("expires_at").notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    activeOrganizationId: text("active_organization_id")
-        .references(() => workspaces.id, { onDelete: "set null" }),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-    tokenIdx: index("sessions_token_idx").on(table.token),
-}));
+export type { User, NewUser } from "./auth/users";
+export type { Session, NewSession } from "./auth/sessions";
+export type { Account, NewAccount } from "./auth/accounts";
+export type { Passkey, NewPasskey } from "./auth/passkeys";
 
-export const account = createTable("accounts", {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    providerId: text("provider_id").notNull(),
-    accountId: text("account_id").notNull(),
-    accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
-    idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at"),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-    scope: text("scope"),
-    password: text("password"),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-    providerAccountIdx: index("accounts_provider_account_idx").on(table.providerId, table.accountId),
-}));
+// Workspace exports
+export { workspaces } from "./workspaces/workspaces";
+export { workspaceMembers } from "./workspaces/members";
+export { invitation } from "./workspaces/invitations";
 
-export const verification = createTable("verifications", {
-    id: text("id").primaryKey(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-});
+export type { Workspace, NewWorkspace } from "./workspaces/workspaces";
+export type { WorkspaceMember, NewWorkspaceMember } from "./workspaces/members";
+export type { Invitation, NewInvitation } from "./workspaces/invitations";
 
-export const passkey = createTable("passkeys", {
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    publicKey: text("public_key").notNull(),
-    userId: text("user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    credentialId: text("credential_id").notNull().unique(),
-    counter: integer("counter").notNull().default(0),
-    deviceType: text("device_type").notNull(),
-    backedUp: boolean("backed_up").notNull().default(false),
-    transports: text("transports"),
-    createdAt: timestamp("created_at").defaultNow(),
-    aaguid: text("aaguid"),
-}, (table) => ({
-    credentialIdIdx: index("passkeys_credential_id_idx").on(table.credentialId),
-}));
+// Export auth relations
+export { userRelations, sessionRelations, accountRelations, passkeyRelations } from "./auth/relations";
 
-// Workspaces table - core multi-tenancy
-export const workspaces = createTable("workspaces", {
-    id: text("id").primaryKey(), // Better Auth generates longer IDs
-    name: varchar("name", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }).notNull().unique(),
-    description: text("description"),
-    logo: text("logo"),
-    metadata: jsonb("metadata").$default(() => ({})),
-    createdAt: timestamp("created_at")
-        .$defaultFn(() => new Date())
-        .notNull(),
-    updatedAt: timestamp("updated_at")
-        .$defaultFn(() => new Date())
-        .notNull(),
-});
+// Export workspace relations
+export { workspaceMembersRelations, invitationRelations, workspacesRelations } from "./workspaces/relations";
 
-// Workspace members table - links users to workspaces (matches Better Auth's expected schema)
-export const workspaceMembers = createTable("workspace_members", {
-    id: text("id").primaryKey(),  // Let Better Auth set the ID
-    organizationId: text("organization_id")  // Better Auth expects this field name
-        .notNull()
-        .references(() => workspaces.id, { onDelete: "cascade" }),
-    userId: text("user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
-        .notNull()
-        .default('member'),
-    createdAt: timestamp("created_at")
-        .$defaultFn(() => new Date())
-        .notNull(),
-}, (table) => ({
-    workspaceUserIdx: index("workspace_members_organization_user_idx").on(table.organizationId, table.userId),
-}));
+// Note: Cross-domain relations are not exported to avoid circular dependency issues
+// Applications can import relations directly from their domain folders as needed
 
-// Auth relations
-export const userRelations = relations(user, ({ many }) => ({
-    sessions: many(session),
-    accounts: many(account),
-    passkeys: many(passkey),
-    workspaceMembers: many(workspaceMembers),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-    user: one(user, {
-        fields: [session.userId],
-        references: [user.id],
-    }),
-    activeOrganization: one(workspaces, {
-        fields: [session.activeOrganizationId],
-        references: [workspaces.id],
-        relationName: "activeOrganization",
-    }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-    user: one(user, {
-        fields: [account.userId],
-        references: [user.id],
-    }),
-}));
-
-export const passkeyRelations = relations(passkey, ({ one }) => ({
-    user: one(user, {
-        fields: [passkey.userId],
-        references: [user.id],
-    }),
-}));
-
-export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
-    workspace: one(workspaces, {
-        fields: [workspaceMembers.organizationId],
-        references: [workspaces.id],
-    }),
-    user: one(user, {
-        fields: [workspaceMembers.userId],
-        references: [user.id],
-    }),
-}));
-
-// Better Auth invitation table - required for organization invitations
-export const invitation = createTable("invitations", {
-    id: text("id").primaryKey(),
-    email: text("email").notNull(),
-    organizationId: text("organization_id")
-        .notNull()
-        .references(() => workspaces.id, { onDelete: "cascade" }),
-    role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
-        .notNull()
-        .default('member'),
-    status: varchar("status", { length: 20, enum: ['pending', 'accepted', 'rejected', 'expired'] })
-        .notNull()
-        .default('pending'),
-    expiresAt: timestamp("expires_at").notNull(),
-    token: text("token").unique(), // Let Better Auth manage this
-    inviterId: text("inviter_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at")
-        .$defaultFn(() => new Date())
-        .notNull(),
-    updatedAt: timestamp("updated_at")
-        .$defaultFn(() => new Date())
-        .notNull(),
-}, (table) => ({
-    tokenIdx: index("invitations_token_idx").on(table.token),
-    emailOrgIdx: index("invitations_email_organization_idx").on(table.email, table.organizationId),
-}));
-
-
-// Invitation relations
-export const invitationRelations = relations(invitation, ({ one }) => ({
-    organization: one(workspaces, {
-        fields: [invitation.organizationId],
-        references: [workspaces.id],
-    }),
-    inviter: one(user, {
-        fields: [invitation.inviterId],
-        references: [user.id],
-    }),
-}));
-
-
-// Add reverse relations for workspaces
-export const workspacesRelations = relations(workspaces, ({ many }) => ({
-    members: many(workspaceMembers),
-    invitations: many(invitation),
-    sessions: many(session),
-}));
-
-// Type exports for convenience
-export type User = typeof user.$inferSelect;
-export type NewUser = typeof user.$inferInsert;
-export type Session = typeof session.$inferSelect;
-export type NewSession = typeof session.$inferInsert;
-export type Account = typeof account.$inferSelect;
-export type NewAccount = typeof account.$inferInsert;
-export type Passkey = typeof passkey.$inferSelect;
-export type NewPasskey = typeof passkey.$inferInsert;
-export type Workspace = typeof workspaces.$inferSelect;
-export type NewWorkspace = typeof workspaces.$inferInsert;
-export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
-export type NewWorkspaceMember = typeof workspaceMembers.$inferInsert;
-export type Invitation = typeof invitation.$inferSelect;
-export type NewInvitation = typeof invitation.$inferInsert;
+// Export utilities
+export { createTable } from "./utils";

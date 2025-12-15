@@ -44,7 +44,10 @@
       "Bash(cd:*)",
       "Bash(npx shadcn-ui@latest add:*)",
       "Bash(npx shadcn@latest add:*)",
-      "WebFetch(domain:*)"
+      "WebFetch(domain:*)",
+      "WebFetch(domain:www.typescriptlang.org)",
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:www.better-auth.com)"
     ],
     "deny": [
       "Bash(npm:*)"
