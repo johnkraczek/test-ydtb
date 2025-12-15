@@ -4,6 +4,10 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
 import path from "path";
+import { config } from "dotenv";
+
+// Load environment variables
+config({ path: "../.env.local" });
 
 const execAsync = promisify(exec);
 
@@ -11,7 +15,11 @@ async function createBackup() {
   try {
     console.log("📋 Creating database backup...");
 
-    const DATABASE_URL = process.env.DATABASE_URL || "postgresql://postgres:1FwHvl2Y3wV5bopo@localhost:5432/ydtb";
+    if (!process.env.DATABASE_URL) {
+      console.error("\n❌ Error: DATABASE_URL environment variable is not set!");
+      console.error("Please ensure DATABASE_URL is set in your .env.local file.");
+      process.exit(1);
+    }
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const filename = `database-${timestamp}.sql`;
 
@@ -23,7 +31,7 @@ async function createBackup() {
 
     // Use pg_dump to create a complete backup
     console.log(`💾 Creating backup: ${filename}`);
-    const command = `/opt/homebrew/opt/postgresql@18/bin/pg_dump "${DATABASE_URL}" --no-owner --no-privileges > "${backupPath}"`;
+    const command = `/opt/homebrew/opt/postgresql@18/bin/pg_dump "${process.env.DATABASE_URL}" --no-owner --no-privileges > "${backupPath}"`;
 
     await execAsync(command);
 

@@ -4,6 +4,10 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
 import path from "path";
+import { config } from "dotenv";
+
+// Load environment variables
+config({ path: "../.env.local" });
 
 const execAsync = promisify(exec);
 
@@ -36,7 +40,11 @@ async function resetDatabase() {
   }
 
   try {
-    const DATABASE_URL = process.env.DATABASE_URL || "postgresql://postgres:1FwHvl2Y3wV5bopo@localhost:5432/ydtb";
+    if (!process.env.DATABASE_URL) {
+      console.error("\n❌ Error: DATABASE_URL environment variable is not set!");
+      console.error("Please ensure DATABASE_URL is set in your .env.local file.");
+      process.exit(1);
+    }
 
     // Step 1: Drop all tables
     console.log("\n🗑️  Dropping all tables...");
@@ -56,7 +64,7 @@ async function resetDatabase() {
     await fs.writeFile(tempFile, dropTablesSQL, "utf-8");
 
     // Execute the SQL
-    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${DATABASE_URL}" < "${tempFile}"`);
+    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${process.env.DATABASE_URL}" < "${tempFile}"`);
 
     // Clean up temp file
     await fs.unlink(tempFile);
@@ -89,7 +97,7 @@ async function resetDatabase() {
 
     // Step 3: Restore from reset.sql
     console.log("\n📂 Restoring database from reset.sql...");
-    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${DATABASE_URL}" < "${resetPath}"`);
+    await execAsync(`/opt/homebrew/opt/postgresql@18/bin/psql "${process.env.DATABASE_URL}" < "${resetPath}"`);
     console.log("✅ Database restored successfully!");
 
     console.log("\n🎉 Database reset and restore complete!");
