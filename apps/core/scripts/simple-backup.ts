@@ -47,6 +47,10 @@ async function createBackup() {
 
     // Write backup to JSON file
     const backupDir = path.join(process.cwd(), "scripts", "backup");
+
+    // Ensure the backup directory exists
+    await fs.mkdir(backupDir, { recursive: true });
+
     const backupPath = path.join(backupDir, "database-backup.json");
     await fs.writeFile(backupPath, JSON.stringify(backup, null, 2), "utf-8");
 
