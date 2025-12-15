@@ -10,26 +10,35 @@ import { Mail, Users, Check } from "lucide-react";
 import Link from "next/link";
 
 export default async function WelcomePage() {
+  console.log("[Welcome Page] Loading welcome page...");
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
+    console.log("[Welcome Page] No session - redirecting to /login");
     redirect("/login");
   }
 
   if (!session.user.emailVerified) {
+    console.log("[Welcome Page] Email not verified - redirecting to /verify-otp");
     redirect(`/verify-otp?email=${encodeURIComponent(session.user.email)}`);
   }
 
   // Check if user already has workspaces
   const workspaces = await getUserWorkspaces();
+  console.log("[Welcome Page] User ID:", session.user.id);
+  console.log("[Welcome Page] Workspaces found:", workspaces.length);
+
   if (workspaces.length > 0) {
+    console.log("[Welcome Page] User has workspaces - redirecting to /");
     redirect("/");
   }
 
   // Show pending invitations if any
   const invitations = await getPendingInvitations(session.user.email);
+  console.log("[Welcome Page] Pending invitations:", invitations.length);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

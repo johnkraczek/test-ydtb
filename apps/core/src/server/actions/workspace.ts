@@ -97,8 +97,11 @@ export async function getUserWorkspaces() {
   });
 
   if (!session?.user) {
+    console.log("[getUserWorkspaces] No session found");
     return [];
   }
+
+  console.log("[getUserWorkspaces] Querying for user ID:", session.user.id);
 
   try {
     // Query workspaces through workspaceMembers
@@ -116,9 +119,13 @@ export async function getUserWorkspaces() {
       },
     });
 
-    return memberships.map(m => m.workspace).filter(Boolean);
+    console.log("[getUserWorkspaces] Found memberships:", memberships.length);
+    const workspaces = memberships.map(m => m.workspace).filter(Boolean);
+    console.log("[getUserWorkspaces] Valid workspaces:", workspaces.length);
+
+    return workspaces;
   } catch (error) {
-    console.error("Failed to fetch workspaces:", error);
+    console.error("[getUserWorkspaces] Failed to fetch workspaces:", error);
     return [];
   }
 }
