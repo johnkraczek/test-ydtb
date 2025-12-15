@@ -86,15 +86,30 @@ async function resetDatabase() {
       });
     });
 
-    // Seed with initial data
-    console.log("\n🌱 Seeding database with initial data...");
-    await seedDatabase();
+    // Check if we should restore from backup
+    if (restoreFlag) {
+      console.log("\n📂 Restoring database from backup...");
+      await restoreFromBackup();
+    } else {
+      console.log("\n🌱 Seeding database with initial data...");
+      await seedDatabase();
+    }
 
-    console.log("\n🎉 Database reset and seeding complete!");
-    console.log("\n📝 Seed data created:");
-    console.log("   - 1 user (John Kraczek - john@kraczek.com)");
-    console.log("   - Account with original password restored");
-    console.log("   - Ready for testing authentication");
+    if (restoreFlag) {
+      console.log("\n🎉 Database restore complete!");
+      console.log("\n📝 Restored data includes:");
+      console.log("   - All users");
+      console.log("   - All accounts and passwords");
+      console.log("   - All workspaces");
+      console.log("   - All workspace memberships");
+      console.log("   - All active sessions");
+    } else {
+      console.log("\n🎉 Database reset and seeding complete!");
+      console.log("\n📝 Seed data created:");
+      console.log("   - 1 user (John Kraczek - john@kraczek.com)");
+      console.log("   - Account with original password restored");
+      console.log("   - Ready for testing authentication");
+    }
 
   } catch (error) {
     console.error("\n❌ Error resetting database:", error);
@@ -143,6 +158,53 @@ async function seedDatabase() {
   }
 }
 
+async function restoreFromBackup() {
+  try {
+    const fs = await import("fs/promises");
+    const path = await import("path");
+
+    // Check if the restore file exists
+    const restorePath = path.join(process.cwd(), "database-restore.sql");
+
+    try {
+      await fs.access(restorePath);
+    } catch (error) {
+      console.error("\n❌ Error: database-restore.sql file not found!");
+      console.error("Please run 'bun run scripts/simple-backup.ts' first to create the backup.");
+      process.exit(1);
+    }
+
+    // Read and execute the restore script
+    const restoreScript = await fs.readFile(restorePath, "utf-8");
+
+    // Split the script by semicolons and execute each statement
+    const statements = restoreScript
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s && !s.startsWith('--') && !s.startsWith('/*'));
+
+    for (const statement of statements) {
+      if (statement) {
+        try {
+          await db.execute(sql.raw(statement + ';'));
+        } catch (error) {
+          // Ignore errors on SET statements and empty statements
+          if (!statement.toUpperCase().includes('SET ') &&
+              !statement.toUpperCase().includes('BEGIN') &&
+              !statement.toUpperCase().includes('COMMIT')) {
+            throw error;
+          }
+        }
+      }
+    }
+
+    console.log("   ✅ Database restored from backup");
+  } catch (error) {
+    console.error("❌ Error restoring from backup:", error);
+    throw error;
+  }
+}
+
 // Export command for drizzle-kit studio
 console.log(`
 📤 To export data from drizzle-kit studio, run:
@@ -153,6 +215,9 @@ console.log(`
    5. Save the SQL file
 
 📋 After exporting, update the seedDatabase() function in this script with the INSERT statements.
+
+💾 To create a backup: bun run scripts/simple-backup.ts
+🔄 To restore from backup: bun run scripts/reset-db.ts --force --restore
 `);
 
 // Run the reset

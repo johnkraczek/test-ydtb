@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-12-15T21:55:11.563Z",
+  "tables": {
+    "users": [
+      {
+        "id": "Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n",
+        "name": "John Kraczek",
+        "email": "john@kraczek.com",
+        "emailVerified": true,
+        "image": null,
+        "twoFactorEnabled": false,
+        "createdAt": "2025-12-14T05:17:23.913Z",
+        "updatedAt": "2025-12-15T21:49:50.212Z"
+      }
+    ],
+    "accounts": [
+      {
+        "id": "EdftQ5DJ9IGsDvPs2bOqoCrth32ZIaIG",
+        "userId": "Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n",
+        "providerId": "credential",
+        "accountId": "Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n",
+        "accessToken": null,
+        "refreshToken": null,
+        "idToken": null,
+        "accessTokenExpiresAt": null,
+        "refreshTokenExpiresAt": null,
+        "scope": null,
+        "password": "c45e860a7f6fb2033b51794f8db50b39:dbae3752ef6ef995bbf752993df073c7e5f99a898823b32bfabd1fa79c7822c6874ae9358a5754edb540f92ee97790e05477b7e64ebd91f0f849faf29739ef1d",
+        "createdAt": "2025-12-14T05:17:23.927Z",
+        "updatedAt": "2025-12-14T05:17:23.927Z"
+      }
+    ],
+    "sessions": [
+      {
+        "id": "FzD3838MIlnyqzzkJ7drYIuzqyxdDkW8",
+        "userId": "Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n",
+        "token": "gqbcWqSSzU3fsrg3iJwrgIxYZSpjzHE4",
+        "expiresAt": "2025-12-22T21:49:58.789Z",
+        "ipAddress": "127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+        "activeOrganizationId": "seQlI6FCrlYpIhfhP0fPbbFyG3eTryox",
+        "createdAt": "2025-12-15T21:49:58.790Z",
+        "updatedAt": "2025-12-15T21:50:15.767Z"
+      }
+    ],
+    "workspaces": [
+      {
+        "id": "seQlI6FCrlYpIhfhP0fPbbFyG3eTryox",
+        "name": "abc",
+        "slug": "abc",
+        "description": null,
+        "logo": null,
+        "metadata": {
+          "description": "",
+          "type": "Company",
+          "tools": [],
+          "iconType": "lucide",
+          "icon": "Building2",
+          "iconColor": "indigo",
+          "backgroundColor": "indigo"
+        },
+        "createdAt": "2025-12-15T21:50:15.620Z",
+        "updatedAt": "2025-12-15T21:50:15.622Z"
+      }
+    ],
+    "workspaceMembers": [
+      {
+        "id": "TAhECfEJO8s2OpDUbxCXcEPaaXs874jK",
+        "organizationId": "seQlI6FCrlYpIhfhP0fPbbFyG3eTryox",
+        "userId": "Uh5h6tm4BRmXowwz6T30X3f0gjbeph0n",
+        "role": "owner",
+        "createdAt": "2025-12-15T21:50:15.627Z"
+      }
+    ],
+    "invitations": []
+  }
+}
