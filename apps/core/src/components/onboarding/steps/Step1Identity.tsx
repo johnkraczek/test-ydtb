@@ -19,6 +19,8 @@ interface Step1IdentityProps {
   slugError: string;
   nameError: string;
   setNameError: (error: string) => void;
+  onSlugChange?: (slug: string) => void;
+  isValidatingSlug?: boolean;
 }
 
 export function Step1Identity({
@@ -26,7 +28,9 @@ export function Step1Identity({
   updateData,
   slugError,
   nameError,
-  setNameError
+  setNameError,
+  onSlugChange,
+  isValidatingSlug
 }: Step1IdentityProps) {
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
 
@@ -35,17 +39,15 @@ export function Step1Identity({
     updateData({ name });
     setNameError("");
     if (!data.slug || data.slug === generateSlug(data.name)) {
-      updateData({ slug: generateSlug(name) });
+      const newSlug = generateSlug(name);
+      updateData({ slug: newSlug });
+      onSlugChange?.(newSlug);
     }
   };
 
   const handleSlugChange = (slug: string) => {
     updateData({ slug });
-    // Re-run validation logic if needed
-    if (slug === "test") {
-      // Mock validation again for manual input
-      // Ideally pass setError up
-    }
+    onSlugChange?.(slug);
   };
 
   return (
@@ -118,6 +120,7 @@ export function Step1Identity({
               value={data.slug}
               onChange={handleSlugChange}
               error={slugError}
+              isValidating={isValidatingSlug}
             />
           </div>
         </CardContent>

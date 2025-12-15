@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useTransition, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Import server actions
+import { createWorkspace, validateSlug } from "@/server/actions/workspace";
 
 // Import all onboarding components
 import {
@@ -25,6 +28,7 @@ interface OnboardingWizardProps {
 
 export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<WorkspaceData>({
     name: "",
@@ -38,10 +42,11 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
     iconColor: "indigo",
     backgroundColor: "indigo",
   });
-  const [slugError] = useState("");
+  const [slugError, setSlugError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [isValidatingSlug, setIsValidatingSlug] = useState(false);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       if (!formData.name) {
         setNameError("Please enter a workspace name");
@@ -54,12 +59,50 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
       setCurrentStep(currentStep + 1);
     } else {
       // Create workspace
-      console.log("Creating workspace:", formData);
-      if (onComplete) {
-        onComplete();
-      } else {
-        router.push("/");
-      }
+      startTransition(async () => {
+        try {
+          // Prepare the data for the server action
+          const workspaceData = {
+            name: formData.name,
+            slug: formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            description: formData.description,
+            logo: formData.iconType === "image" ? formData.icon : undefined,
+            metadata: {
+              type: formData.type,
+              customType: formData.customType,
+              tools: formData.tools,
+              iconType: formData.iconType,
+              icon: formData.iconType === "lucide" ? formData.icon : undefined,
+              iconColor: formData.iconColor,
+              backgroundColor: formData.backgroundColor,
+            },
+            members: formData.members.map(member => ({
+              email: member.email,
+              role: member.role as "owner" | "admin" | "member" | "guest",
+              message: member.message,
+            })),
+          };
+
+          const workspace = await createWorkspace(workspaceData);
+
+          console.log(`Workspace "${workspace.name}" created successfully!`);
+          alert(`Workspace "${workspace.name}" created successfully!`);
+
+          // Switch to the new workspace
+          await import("@/server/actions/workspace").then(({ switchWorkspace }) => {
+            return switchWorkspace(workspace.id);
+          });
+
+          if (onComplete) {
+            onComplete();
+          } else {
+            router.push("/");
+          }
+        } catch (error) {
+          console.error("Failed to create workspace:", error);
+          alert(error instanceof Error ? error.message : "Failed to create workspace. Please try again.");
+        }
+      });
     }
   };
 
@@ -73,6 +116,31 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  // Real-time slug validation
+  const validateSlugAsync = async (slug: string) => {
+    if (!slug || slug.length < 3) {
+      setSlugError("");
+      return;
+    }
+
+    setIsValidatingSlug(true);
+    try {
+      const isValid = await validateSlug(slug);
+      setSlugError(isValid ? "" : "URL slug is already taken");
+    } catch (error) {
+      console.error("Failed to validate slug:", error);
+      setSlugError("Failed to validate slug");
+    } finally {
+      setIsValidatingSlug(false);
+    }
+  };
+
+  // Debounced slug validation
+  const debouncedValidateSlug = React.useCallback(
+    debounce(validateSlugAsync, 500),
+    []
+  );
+
   // For Step3Team
   const handleMembersChange = (members: any[]) => {
     updateData({ members });
@@ -82,8 +150,6 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
   const handleToolsChange = (tools: string[]) => {
     updateData({ tools });
   };
-
-  // const CurrentStepComponent = STEPS[currentStep].component;
 
   if (currentStep === 0) {
     return (
@@ -117,6 +183,11 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                 slugError={slugError}
                 nameError={nameError}
                 setNameError={setNameError}
+                onSlugChange={(slug) => {
+                  updateData({ slug });
+                  debouncedValidateSlug(slug);
+                }}
+                isValidatingSlug={isValidatingSlug}
               />
             )}
             {currentStep === 2 && (
@@ -152,7 +223,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
           <Button
             variant="ghost"
             onClick={handleBack}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || isPending}
             className={cn(currentStep === 1 && "invisible")}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
@@ -162,13 +233,31 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
           <Button
             onClick={handleNext}
             className="bg-indigo-600 hover:bg-indigo-700 min-w-[120px]"
-            disabled={!!slugError || (currentStep === 1 && !formData.name)}
+            disabled={isPending || !!slugError || (currentStep === 1 && !formData.name)}
           >
-            {currentStep === 5 ? "Create Workspace" : "Continue"}
-            {currentStep !== 5 && <ChevronRight className="ml-2 h-4 w-4" />}
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                {currentStep === 5 ? "Create Workspace" : "Continue"}
+                {currentStep !== 5 && <ChevronRight className="ml-2 h-4 w-4" />}
+              </>
+            )}
           </Button>
         </div>
       </div>
     </div>
   );
+}
+
+// Simple debounce implementation
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): T {
+  let timeout: NodeJS.Timeout;
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  }) as T;
 }
