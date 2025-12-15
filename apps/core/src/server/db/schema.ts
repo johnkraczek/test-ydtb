@@ -7,7 +7,6 @@ import {
     pgTableCreator,
     text,
     timestamp,
-    uuid,
     varchar,
 } from "drizzle-orm/pg-core";
 
@@ -199,31 +198,6 @@ export const invitation = createTable("invitations", {
     emailOrgIdx: index("invitations_email_organization_idx").on(table.email, table.organizationId),
 }));
 
-// Workspace invitations table - legacy, keep for migrations
-export const workspaceInvitations = createTable("workspace_invitations", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    workspaceId: text("workspace_id")
-        .notNull()
-        .references(() => workspaces.id, { onDelete: "cascade" }),
-    email: text("email").notNull(),
-    role: varchar("role", { length: 50, enum: ['owner', 'admin', 'member', 'guest'] })
-        .notNull()
-        .default('member'),
-    message: text("message"),
-    token: varchar("token", { length: 255 }).notNull().unique(),
-    invitedBy: text("invited_by")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at").defaultNow(),
-    expiresAt: timestamp("expires_at").notNull(),
-    acceptedAt: timestamp("accepted_at"),
-    status: varchar("status", { length: 20, enum: ['pending', 'accepted', 'declined', 'expired'] })
-        .notNull()
-        .default('pending'),
-}, (table) => ({
-    tokenIdx: index("workspace_invitations_token_idx").on(table.token),
-    emailIdx: index("workspace_invitations_email_idx").on(table.email),
-}));
 
 // Invitation relations
 export const invitationRelations = relations(invitation, ({ one }) => ({
@@ -237,22 +211,11 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
     }),
 }));
 
-export const workspaceInvitationsRelations = relations(workspaceInvitations, ({ one }) => ({
-    workspace: one(workspaces, {
-        fields: [workspaceInvitations.workspaceId],
-        references: [workspaces.id],
-    }),
-    inviter: one(user, {
-        fields: [workspaceInvitations.invitedBy],
-        references: [user.id],
-    }),
-}));
 
 // Add reverse relations for workspaces
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
     members: many(workspaceMembers),
-    invitations: many(workspaceInvitations),
-    betterAuthInvitations: many(invitation),
+    invitations: many(invitation),
     sessions: many(session),
 }));
 
@@ -269,7 +232,5 @@ export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;
 export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
 export type NewWorkspaceMember = typeof workspaceMembers.$inferInsert;
-export type WorkspaceInvitation = typeof workspaceInvitations.$inferSelect;
-export type NewWorkspaceInvitation = typeof workspaceInvitations.$inferInsert;
 export type Invitation = typeof invitation.$inferSelect;
 export type NewInvitation = typeof invitation.$inferInsert;

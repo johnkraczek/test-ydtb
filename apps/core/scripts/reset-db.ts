@@ -34,34 +34,37 @@ async function resetDatabase() {
   try {
     console.log("\n🗑️  Dropping all tables...");
 
-    // Drop all tables in correct order (respecting foreign keys)
-    const tables = [
-      "ydtb_workspace_members",
-      "ydtb_workspaces",
-      "ydtb_sessions",
-      "ydtb_passkeys",
-      "ydtb_verifications",
-      "ydtb_accounts",
-      "ydtb_users"
-    ];
+    // Get all table names from the database
+    const result = await db.execute(sql`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+      AND table_type = 'BASE TABLE'
+    `);
 
-    // Disable foreign key constraints temporarily
-    await db.execute(sql`SET session_replication_role = replica;`);
+    const tables = result.map((row: any) => row.table_name as string);
 
-    // Drop each table
-    for (const table of tables) {
-      try {
-        await db.execute(sql.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`));
-        console.log(`✅ Dropped table: ${table}`);
-      } catch (error) {
-        console.log(`⚠️  Table ${table} may not exist or already dropped`);
+    if (tables.length === 0) {
+      console.log("ℹ️  No tables found to drop.");
+    } else {
+      // Disable foreign key constraints temporarily
+      await db.execute(sql`SET session_replication_role = replica;`);
+
+      // Drop each table
+      for (const table of tables) {
+        try {
+          await db.execute(sql.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`));
+          console.log(`✅ Dropped table: ${table}`);
+        } catch (error) {
+          console.log(`⚠️  Table ${table} may not exist or already dropped`);
+        }
       }
+
+      // Re-enable foreign key constraints
+      await db.execute(sql`SET session_replication_role = DEFAULT;`);
+
+      console.log("\n✨ All tables dropped successfully!");
     }
-
-    // Re-enable foreign key constraints
-    await db.execute(sql`SET session_replication_role = DEFAULT;`);
-
-    console.log("\n✨ All tables dropped successfully!");
 
     // Run drizzle-kit push
     console.log("\n🔄 Running drizzle-kit push to recreate tables...");
