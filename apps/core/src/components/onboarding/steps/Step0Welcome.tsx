@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Building2, Users, Check, X, Mail, Loader2 } from "lucide-react";
+import { Building2, Users, Check, Trash2, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { acceptInvitation, getPendingInvitations } from "@/server/actions/workspace";
+import { acceptInvitation, getPendingInvitations, rejectInvitation } from "@/server/actions/workspace";
 
 interface Step0WelcomeProps {
   onStartNew: () => void;
@@ -81,10 +81,22 @@ export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
   };
 
   const handleDecline = async (invitationId: string) => {
-    // TODO: Implement decline/reject invitation API
-    // For now, just remove it from the UI
-    setInvites(invites.filter(i => i.id !== invitationId));
-    toast.info("Invitation declined");
+    try {
+      await rejectInvitation(invitationId);
+
+      // Remove the invitation from the list
+      setInvites(invites.filter(i => i.id !== invitationId));
+
+      toast.info("Invitation declined", {
+        description: "The invitation has been removed."
+      });
+    } catch (error) {
+      toast.error("Failed to decline invitation", {
+        description: "Please try again or contact support."
+      });
+      // Still remove from UI as fallback
+      setInvites(invites.filter(i => i.id !== invitationId));
+    }
   };
 
   const formatRole = (role: string) => {
@@ -218,7 +230,7 @@ export function Step0Welcome({ onStartNew }: Step0WelcomeProps) {
                                       handleDecline(invite.id);
                                     }}
                                   >
-                                    <X className="h-4 w-4" />
+                                    <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>

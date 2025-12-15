@@ -225,7 +225,11 @@ export async function getPendingInvitations() {
               .limit(1);
 
             if (inviterRecord.length > 0) {
-              inviter = inviterRecord[0];
+              inviter = {
+                id: inviterRecord[0].id,
+                name: inviterRecord[0].name || 'Someone',
+                email: inviterRecord[0].email,
+              };
             }
           } catch (error) {
             // If we can't fetch inviter details, leave as null
@@ -255,5 +259,24 @@ export async function getPendingInvitations() {
     return invitesWithInviter;
   } catch (error) {
     return [];
+  }
+}
+
+export async function rejectInvitation(invitationId: string) {
+  await requireAuth();
+
+  try {
+    // Use Better Auth's rejectInvitation method
+    await auth.api.rejectInvitation({
+      body: {
+        invitationId,
+      },
+      headers: await headers(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to reject invitation: ${errorMessage}`);
   }
 }
