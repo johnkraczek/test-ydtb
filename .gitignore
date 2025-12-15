@@ -22,3 +22,9 @@ apps/*/.env
 apps/*/.env.local
 apps/*/.env.development
 apps/*/.env.production
+
+# Database backups
+**/database-backup.json
+**/database-restore.sql
+apps/core/scripts/backup/
+*.sql
