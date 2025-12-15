@@ -42,7 +42,7 @@ export default async function InvitationPage({ params }: Props) {
     const result = await acceptInvitation(params.token);
     success = true;
     // The result should contain workspace information
-    workspaceName = result?.organization?.name || "the workspace";
+    workspaceName = result?.data?.organization?.name || result?.organization?.name || "the workspace";
   } catch (err) {
     console.error("Failed to accept invitation:", err);
     error = err instanceof Error ? err.message : "Invalid or expired invitation";
@@ -71,14 +71,9 @@ export default async function InvitationPage({ params }: Props) {
             </CardContent>
           </Card>
 
-          {/* Auto redirect after 3 seconds */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `setTimeout(() => {
-                window.location.href = "/";
-              }, 3000);`,
-            }}
-          />
+          <p className="text-center text-sm text-gray-600 mt-4">
+            You will be redirected to your dashboard in a few seconds...
+          </p>
         </div>
       </div>
     );

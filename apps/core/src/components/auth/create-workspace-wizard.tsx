@@ -468,24 +468,39 @@ export default function CreateWorkspaceWizard({ user, invitations = [], onSucces
                 enabledTools: workspaceData.tools,
             };
 
-            // Create workspace
+            // Prepare members list (only include those with email)
+            const members = workspaceData.members
+                .filter(member => member.email.trim())
+                .map(member => ({
+                    email: member.email.trim(),
+                    role: member.role as "admin" | "member" | "guest",
+                    message: member.message,
+                }));
+
+            // Create workspace with all data
             await createWorkspace({
                 name: workspaceData.name,
                 slug: workspaceData.slug,
                 description: workspaceData.description,
-                // Note: You'll need to extend createWorkspace to accept metadata and logo
-                // metadata,
-                // logo: workspaceData.icon,
+                metadata,
+                logo: workspaceData.iconType === "image" ? workspaceData.icon : undefined,
+                members: members.length > 0 ? members : undefined,
             });
-
-            // TODO: Send invitations to team members
-            // TODO: Handle file upload if workspace icon is selected
 
             onSuccess?.();
             router.push("/");
         } catch (err) {
             console.error("Failed to create workspace:", err);
-            setError(WORKSPACE_WIZARD_ERRORS.CREATION_FAILED);
+            const errorMessage = err instanceof Error ? err.message : WORKSPACE_WIZARD_ERRORS.CREATION_FAILED;
+
+            // Handle specific error cases
+            if (errorMessage.includes("Too many invitation emails")) {
+                setError("Too many invitation emails sent. Please wait a moment and try again.");
+            } else if (errorMessage.includes("slug")) {
+                setError("This workspace subdomain is already taken. Please choose another.");
+            } else {
+                setError(errorMessage);
+            }
         } finally {
             setIsLoading(false);
         }

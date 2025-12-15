@@ -11,6 +11,13 @@ export async function createWorkspace(data: {
   name: string;
   slug?: string;
   description?: string;
+  metadata?: any;
+  logo?: string;
+  members?: Array<{
+    email: string;
+    role: "admin" | "member" | "guest";
+    message?: string;
+  }>;
 }) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -22,18 +29,55 @@ export async function createWorkspace(data: {
 
   try {
     // Use better-auth's createOrganization method
-    const result = await auth.api.createOrganization({
+    const workspace = await auth.api.createOrganization({
       body: {
         name: data.name,
         slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+        logo: data.logo,
         metadata: {
           description: data.description,
+          ...data.metadata,
         },
       } as any,
     });
 
+    // Send invitations to team members
+    if (data.members && data.members.length > 0) {
+      const { sendWorkspaceInvitation } = await import("@/server/auth/email-sender");
+
+      for (const member of data.members) {
+        if (member.email) {
+          try {
+            // Create invitation through Better Auth
+            const invitation = await auth.api.createInvitation({
+              body: {
+                email: member.email,
+                role: member.role,
+                organizationId: workspace.data?.id || workspace.id,
+              },
+              headers: await headers(),
+            });
+
+            // Send invitation email
+            await sendWorkspaceInvitation({
+              email: member.email,
+              invitedByName: session.user.name || session.user.email,
+              invitedByEmail: session.user.email,
+              workspaceName: data.name,
+              workspaceSlug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
+              invitationToken: invitation.data?.id || invitation.id,
+              message: member.message,
+            });
+          } catch (inviteError) {
+            console.error(`Failed to invite ${member.email}:`, inviteError);
+            // Continue with other invitations even if one fails
+          }
+        }
+      }
+    }
+
     revalidatePath("/dashboard");
-    return result;
+    return workspace;
   } catch (error) {
     console.error("Failed to create workspace:", error);
     throw new Error("Failed to create workspace");
