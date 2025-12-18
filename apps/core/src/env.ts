@@ -3,8 +3,8 @@ import { z } from "zod";
 import { envRegistry } from "./registry/env-registry";
 
 // Import and register all package environment schemas
-import { registerEnvironment as registerBasicEnv } from "@ydtb/basic";
-registerBasicEnv(envRegistry);
+// import { registerEnvironment as registerBasicEnv } from "@ydtb/basic";
+// registerBasicEnv(envRegistry);
 
 // Get merged schema from registry
 const { server: packageServer, client: packageClient } = envRegistry.getMergedSchema();
