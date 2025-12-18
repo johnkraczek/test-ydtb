@@ -53,7 +53,7 @@ export const generateSlug = (name: string): string => {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 };
 
-export const getColorClasses = (color: string) => {
+export const getColorClasses = (color: string): { bg: string, text: string, softBg: string } => {
   const map: Record<string, { bg: string, text: string, softBg: string }> = {
     slate: { bg: "bg-slate-600", text: "text-slate-600", softBg: "bg-slate-100" },
     red: { bg: "bg-red-600", text: "text-red-600", softBg: "bg-red-100" },
@@ -74,5 +74,10 @@ export const getColorClasses = (color: string) => {
     pink: { bg: "bg-pink-600", text: "text-pink-600", softBg: "bg-pink-100" },
     rose: { bg: "bg-rose-600", text: "text-rose-600", softBg: "bg-rose-100" },
   };
-  return map[color] || map.indigo;
+  const result = map[color] || map.indigo;
+  if (!result) {
+    // This should never happen since map.indigo is defined
+    return map.indigo!;
+  }
+  return result;
 };

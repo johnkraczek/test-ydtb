@@ -224,7 +224,7 @@ export async function getPendingInvitations() {
               .where(eq(user.id, invite.inviterId))
               .limit(1);
 
-            if (inviterRecord.length > 0) {
+            if (inviterRecord.length > 0 && inviterRecord[0]) {
               inviter = {
                 id: inviterRecord[0].id,
                 name: inviterRecord[0].name || 'Someone',

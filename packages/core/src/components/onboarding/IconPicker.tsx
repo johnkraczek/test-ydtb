@@ -255,7 +255,7 @@ export function IconPicker({ open, onOpenChange, data, updateData }: IconPickerP
                     min={1}
                     max={3}
                     step={0.1}
-                    onValueChange={(value) => setZoom(value[0])}
+                    onValueChange={(value) => setZoom(value[0] ?? 1)}
                     className="flex-1"
                   />
                 </div>

@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@ydtb/ui/*": ["../../packages/ui/src/*"]
+      "@ydtb/ui/*": ["../../packages/ui/src/*"],
+      "@ydtb/core/*": ["../../packages/core/src/*"]
     },
     "plugins": [
       {
