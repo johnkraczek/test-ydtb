@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { auth } from "@ydtb/core/server/auth";
 import { redirect } from "next/navigation";
 import { getUserWorkspaces } from "@ydtb/core/server/actions/workspace";
-import JoinWorkspaceForm from "@ydtb/core/components/auth/join-workspace-form";
+import JoinWorkspaceForm from "@ydtb/core/components/onboarding/join-workspace-form";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@ydtb/ui/base/button";

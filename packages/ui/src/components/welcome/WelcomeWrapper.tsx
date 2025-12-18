@@ -1,6 +1,6 @@
 "use client";
 
-import { SimpleProfileAvatar } from "./SimpleProfileAvatar";
+import { SimpleProfileAvatar } from "@ydtb/ui/base/SimpleProfileAvatar";
 
 interface WelcomeWrapperProps {
   children: React.ReactNode;

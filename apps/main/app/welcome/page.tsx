@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { auth } from '@ydtb/core/server/auth'
 import OnboardingWizard from '@ydtb/core/components/onboarding/OnboardingWizard'
-import { WelcomeWrapper } from './components/WelcomeWrapper'
+import { WelcomeWrapper } from '@ydtb/ui/welcome/WelcomeWrapper'
 
 export default async function WelcomePage() {
   const session = await auth.api.getSession({
