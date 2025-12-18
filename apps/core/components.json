@@ -5,20 +5,16 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/styles/globals.css",
+    "css": "@ydtb/ui/globals.css",
     "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
+    "cssVariables": true
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "~/components",
-    "utils": "~/lib/utils",
-    "ui": "~/components/ui",
-    "lib": "~/lib",
-    "hooks": "~/hooks"
-  },
-  "registries": {
-    "@uitripled": "https://ui.tripled.work/r/{name}.json"
+    "components": "@ydtb/ui/base",
+    "hooks": "@ydtb/ui/hooks",
+    "lib": "@ydtb/ui/lib",
+    "utils": "@ydtb/ui/lib/utils",
+    "ui": "@ydtb/ui/components"
   }
 }
