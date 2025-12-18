@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@ydtb/ui/*": [
+      "@ydtb/core/*": [
         "./src/*"
       ],
     }
