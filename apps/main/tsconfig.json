@@ -3,9 +3,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@ydtb/ui/*": ["../../packages/ui/src/*"],
-      "@ydtb/core/*": ["../../packages/core/src/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@ydtb/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@ydtb/core/*": [
+        "../../packages/core/src/*"
+      ]
     },
     "plugins": [
       {
@@ -20,5 +26,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

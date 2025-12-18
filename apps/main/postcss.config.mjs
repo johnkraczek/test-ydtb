@@ -1,1 +1,0 @@
-export { default } from "@ydtb/ui/postcss.config";
