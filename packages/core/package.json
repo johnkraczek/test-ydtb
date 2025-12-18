@@ -30,6 +30,7 @@
     "@ydtb/typescript-config": "workspace:*"
   },
   "exports": {
-    "./*": "./src/*"
+    "./*": "./src/*",
+    "./index.css": "./src/index.css"
   }
 }

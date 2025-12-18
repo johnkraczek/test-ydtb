@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Providers } from "@ydtb/core/context/providers";
 import { Toaster } from 'sonner'
 import '@ydtb/ui/globals.css'
+import '@ydtb/core/index.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
