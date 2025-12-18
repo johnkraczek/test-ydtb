@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { resetPassword } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ydtb/ui/base/button";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
+import { Card, CardContent, CardHeader } from "@ydtb/ui/base/card";
+import { Alert, AlertDescription } from "@ydtb/ui/base/alert";
 import { Loader2, Lock, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 

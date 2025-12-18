@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 // import { authClient } from "@/lib/auth-client"; // Not used directly
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ydtb/ui/base/button";
+import { Card, CardContent, CardHeader } from "@ydtb/ui/base/card";
+import { Alert, AlertDescription } from "@ydtb/ui/base/alert";
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "@ydtb/ui/base/input-otp";
 import { Hexagon, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -30,7 +30,7 @@ export default function VerifyOTPPage() {
         const emailParam = searchParams.get("email");
         const fromLoginParam = searchParams.get("fromLogin");
         const fromSignupParam = searchParams.get("fromSignup");
-        
+
         if (emailParam) {
             setEmail(emailParam);
         }
@@ -148,8 +148,8 @@ export default function VerifyOTPPage() {
                                 {fromLogin
                                     ? "Please verify your email to sign in"
                                     : fromSignup
-                                    ? "We sent a 6-digit code to your email to complete signup"
-                                    : "We sent a 6-digit code to your email"}
+                                        ? "We sent a 6-digit code to your email to complete signup"
+                                        : "We sent a 6-digit code to your email"}
                             </p>
                             {email && (
                                 <p className="text-xs text-slate-400 mt-2">

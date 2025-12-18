@@ -3,15 +3,15 @@ import {
   Dialog,
   DialogContent,
   DialogTitle
-} from "~/components/ui/dialog";
+} from "@ydtb/ui/base/dialog";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "~/components/ui/tabs";
-import { Checkbox } from "~/components/ui/checkbox";
-import { Label } from "~/components/ui/label";
+} from "@ydtb/ui/base/tabs";
+import { Checkbox } from "@ydtb/ui/base/checkbox";
+import { Label } from "@ydtb/ui/base/label";
 import { GripVertical } from "lucide-react";
 import {
   DndContext,

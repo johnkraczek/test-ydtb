@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Label } from "@ydtb/ui/base/label";
+import { Textarea } from "@ydtb/ui/base/textarea";
 import { WorkspaceData } from "../types";
 
 interface Step2DescriptionProps {

@@ -2,9 +2,9 @@ import { headers } from "next/headers";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { getUserWorkspaces, acceptInvitation } from "@/server/actions/workspace";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Button } from "@ydtb/ui/base/button";
+import { Alert, AlertDescription } from "@ydtb/ui/base/alert";
 import { Check, AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 

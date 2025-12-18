@@ -12,18 +12,18 @@ import {
   Users,
   BarChart3,
 } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Button } from "@ydtb/ui/base/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "~/components/ui/tooltip";
+} from "@ydtb/ui/base/tooltip";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/ui/popover";
+} from "@ydtb/ui/base/popover";
 import { CustomizeNavigationDialog, ToolItem } from "~/components/dashboard/customization/CustomizeNavigationDialog";
 import { useSidebar } from "~/context/sidebar/use-sidebar";
 

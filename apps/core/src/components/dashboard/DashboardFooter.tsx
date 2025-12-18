@@ -2,7 +2,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { ThemeSwitcher } from "~/components/ui/shadcn-io/theme-switcher";
+import { ThemeSwitcher } from "@ydtb/ui/base/theme-switcher";
 
 export function DashboardFooter() {
   const { theme, setTheme } = useTheme();

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useWorkspace } from "@/context/workspace/workspace-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Button } from "@ydtb/ui/base/button";
+import { Badge } from "@ydtb/ui/base/badge";
+import { ScrollArea } from "@ydtb/ui/base/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@ydtb/ui/base/tooltip";
 import { Building2, Users, Check, Trash2, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { acceptInvitation, getPendingInvitations, rejectInvitation } from "@/server/actions/workspace";

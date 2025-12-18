@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@ydtb/ui/base/avatar";
 import { Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WorkspaceData } from "./types";

@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 

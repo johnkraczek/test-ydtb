@@ -38,6 +38,8 @@
     "@types/nodemailer": "^7.0.4",
     "drizzle-kit": "^0.31.8",
     "next": "^16.0.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@ydtb/eslint-config": "workspace:^",
+    "@ydtb/typescript-config": "workspace:*"
   }
 }

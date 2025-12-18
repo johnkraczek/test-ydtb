@@ -1,13 +1,13 @@
 "use client";
 
 import { Bell, LayoutGrid, MessageSquare, CheckCircle2 } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Button } from "@ydtb/ui/base/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
+} from "@ydtb/ui/base/dropdown-menu";
 import { cn } from "~/lib/utils";
 
 const notifications = [

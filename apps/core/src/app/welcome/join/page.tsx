@@ -5,7 +5,7 @@ import { getUserWorkspaces } from "@/server/actions/workspace";
 import JoinWorkspaceForm from "@/components/auth/join-workspace-form";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ydtb/ui/base/button";
 
 export default async function JoinWorkspacePage() {
   const session = await auth.api.getSession({

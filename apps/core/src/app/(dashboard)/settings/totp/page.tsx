@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ydtb/ui/base/button";
+import { Card, CardContent, CardHeader } from "@ydtb/ui/base/card";
+import { Alert, AlertDescription } from "@ydtb/ui/base/alert";
 import { Shield, ShieldCheck, ShieldX, Loader2, QrCode } from "lucide-react";
 
 export default function TOTPSettingsPage() {
@@ -117,11 +117,10 @@ export default function TOTPSettingsPage() {
                     : "2FA is not enabled for your account"}
                 </p>
               </div>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                isTwoFactorEnabled
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${isTwoFactorEnabled
                   ? "bg-green-100 text-green-800"
                   : "bg-slate-100 text-slate-800"
-              }`}>
+                }`}>
                 {isTwoFactorEnabled ? (
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="h-4 w-4" />

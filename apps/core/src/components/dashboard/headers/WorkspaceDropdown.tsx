@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowLeft, Check, ChevronDown, Plus, Search, Zap, Loader2 } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Button } from "@ydtb/ui/base/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-} from "~/components/ui/dropdown-menu";
-import { Input } from "~/components/ui/input";
+} from "@ydtb/ui/base/dropdown-menu";
+import { Input } from "@ydtb/ui/base/input";
 import { useWorkspace } from "~/context/workspace/workspace-context";
 
 export function WorkspaceDropdown() {

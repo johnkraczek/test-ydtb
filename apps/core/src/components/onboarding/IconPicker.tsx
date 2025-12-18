@@ -2,14 +2,14 @@
 
 import { useState, useCallback, useRef } from "react";
 import Cropper from "react-easy-crop";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar } from "@/components/ui/avatar";
-import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@ydtb/ui/base/dialog";
+import { Button } from "@ydtb/ui/base/button";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ydtb/ui/base/select";
+import { ScrollArea } from "@ydtb/ui/base/scroll-area";
+import { Avatar } from "@ydtb/ui/base/avatar";
+import { Slider } from "@ydtb/ui/base/slider";
 import { Search, Upload, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WorkspaceData, CropArea } from "./types";

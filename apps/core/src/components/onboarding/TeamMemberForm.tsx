@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@ydtb/ui/base/button";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Avatar, AvatarFallback } from "@ydtb/ui/base/avatar";
+import { Badge } from "@ydtb/ui/base/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@ydtb/ui/base/dialog";
+import { Textarea } from "@ydtb/ui/base/textarea";
 import { MessageSquare, Trash2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TeamMember, Role } from "./types";

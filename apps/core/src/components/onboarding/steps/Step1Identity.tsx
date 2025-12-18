@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Pencil } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ydtb/ui/base/select";
 import { cn } from "@/lib/utils";
 import { WorkspaceData, WorkspaceType } from "../types";
 import { IconPicker } from "../IconPicker";

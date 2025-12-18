@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { signUp } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ydtb/ui/base/button";
+import { Input } from "@ydtb/ui/base/input";
+import { Label } from "@ydtb/ui/base/label";
+import { Card, CardContent, CardFooter, CardHeader } from "@ydtb/ui/base/card";
+import { Alert, AlertDescription } from "@ydtb/ui/base/alert";
 import { Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const validatePassword = (password: string) => {
     const minLength = password.length >= 8;
     const hasUpper = /[A-Z]/.test(password);

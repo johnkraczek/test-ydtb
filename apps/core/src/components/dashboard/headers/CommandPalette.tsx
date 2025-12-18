@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Search, Sparkles, Settings, ArrowLeft, Plus, CheckCircle2, Calendar, FileText, Hash, Mail, Box, Github, Slack, List, AppWindow, Command as CommandIcon, Image as ImageIcon, MessageSquare, LayoutGrid, User, Palette } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Switch } from "~/components/ui/switch";
+import { Button } from "@ydtb/ui/base/button";
+import { Switch } from "@ydtb/ui/base/switch";
 import { useThemeColor } from "~/context/theme/use-theme-color";
 import { useThemePattern } from "~/context/theme/use-theme-pattern";
 import { useTheme } from "next-themes";
@@ -15,7 +15,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "~/components/ui/command";
+} from "@ydtb/ui/base/command";
 import { Command as CommandPrimitive } from "cmdk";
 
 const availableThemeColors = [

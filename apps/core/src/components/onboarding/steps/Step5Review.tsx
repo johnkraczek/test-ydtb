@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@ydtb/ui/base/card";
+import { Badge } from "@ydtb/ui/base/badge";
 import { WorkspaceData } from "../types";
 import { AVAILABLE_TOOLS } from "../constants";
 import { WorkspaceIcon } from "../WorkspaceIcon";

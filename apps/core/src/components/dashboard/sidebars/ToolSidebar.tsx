@@ -4,8 +4,8 @@ import {
   ChevronsLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { ScrollArea } from "~/components/ui/scroll-area";
+import { Button } from "@ydtb/ui/base/button";
+import { ScrollArea } from "@ydtb/ui/base/scroll-area";
 import { useSidebar } from "~/context/sidebar/use-sidebar";
 
 export function ToolSidebar() {

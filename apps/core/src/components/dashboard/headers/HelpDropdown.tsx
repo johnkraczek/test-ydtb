@@ -1,14 +1,14 @@
 "use client";
 
 import { HelpCircle, FileText, MessageSquare, LayoutGrid, Mail } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Button } from "@ydtb/ui/base/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
+} from "@ydtb/ui/base/dropdown-menu";
 
 export function HelpDropdown() {
   return (
